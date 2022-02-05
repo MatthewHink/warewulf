@@ -218,6 +218,10 @@ dist: vendor config
 	cd .dist; tar -czf ../warewulf-$(VERSION).tar.gz warewulf-$(VERSION)
 	rm -rf .dist
 
+proto: ## wwapi generate code from protobuf
+	protoc -I=internal/app/api/routes --go_out=internal/app/api/routes/wwapi --go_opt=paths=source_relative \
+		--go-grpc_out=internal/app/api/routes/wwapi --go-grpc_opt=paths=source_relative routes.proto
+
 clean:
 	rm -f wwclient
 	rm -f wwctl

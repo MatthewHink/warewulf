@@ -17,5 +17,7 @@ require (
 	github.com/spf13/cobra v1.1.1
 	github.com/talos-systems/go-smbios v0.1.1
 	golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1
+	google.golang.org/grpc v1.33.2
+	google.golang.org/protobuf v1.25.0
 	gopkg.in/yaml.v2 v2.4.0
 )

@@ -4,7 +4,7 @@
 // - protoc             v3.19.4
 // source: routes.proto
 
-package routes
+package wwapi
 
 import (
 	context "context"
@@ -93,7 +93,7 @@ func NewWWApiClient(cc grpc.ClientConnInterface) WWApiClient {
 
 func (c *wWApiClient) Version(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*wrapperspb.StringValue, error) {
 	out := new(wrapperspb.StringValue)
-	err := c.cc.Invoke(ctx, "/wwapi.WWApi/Version", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/Version", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +102,7 @@ func (c *wWApiClient) Version(ctx context.Context, in *emptypb.Empty, opts ...gr
 
 func (c *wWApiClient) NodeAdd(ctx context.Context, in *NodeInfo, opts ...grpc.CallOption) (*NodeInfo, error) {
 	out := new(NodeInfo)
-	err := c.cc.Invoke(ctx, "/wwapi.WWApi/NodeAdd", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/NodeAdd", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +111,7 @@ func (c *wWApiClient) NodeAdd(ctx context.Context, in *NodeInfo, opts ...grpc.Ca
 
 func (c *wWApiClient) NodeDelete(ctx context.Context, in *NodeNames, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/wwapi.WWApi/NodeDelete", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/NodeDelete", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +120,7 @@ func (c *wWApiClient) NodeDelete(ctx context.Context, in *NodeNames, opts ...grp
 
 func (c *wWApiClient) NodeList(ctx context.Context, in *NodeNames, opts ...grpc.CallOption) (*NodeInfoResponse, error) {
 	out := new(NodeInfoResponse)
-	err := c.cc.Invoke(ctx, "/wwapi.WWApi/NodeList", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/NodeList", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +129,7 @@ func (c *wWApiClient) NodeList(ctx context.Context, in *NodeNames, opts ...grpc.
 
 func (c *wWApiClient) NodeStatus(ctx context.Context, in *NodeNames, opts ...grpc.CallOption) (*NodeStatusResponse, error) {
 	out := new(NodeStatusResponse)
-	err := c.cc.Invoke(ctx, "/wwapi.WWApi/NodeStatus", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/NodeStatus", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -138,7 +138,7 @@ func (c *wWApiClient) NodeStatus(ctx context.Context, in *NodeNames, opts ...grp
 
 func (c *wWApiClient) ProfileAdd(ctx context.Context, in *NodeInfo, opts ...grpc.CallOption) (*NodeInfo, error) {
 	out := new(NodeInfo)
-	err := c.cc.Invoke(ctx, "/wwapi.WWApi/ProfileAdd", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/ProfileAdd", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -147,7 +147,7 @@ func (c *wWApiClient) ProfileAdd(ctx context.Context, in *NodeInfo, opts ...grpc
 
 func (c *wWApiClient) ProfileDelete(ctx context.Context, in *NodeNames, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/wwapi.WWApi/ProfileDelete", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/ProfileDelete", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -156,7 +156,7 @@ func (c *wWApiClient) ProfileDelete(ctx context.Context, in *NodeNames, opts ...
 
 func (c *wWApiClient) ProfileList(ctx context.Context, in *NodeNames, opts ...grpc.CallOption) (*ProfileListResponse, error) {
 	out := new(ProfileListResponse)
-	err := c.cc.Invoke(ctx, "/wwapi.WWApi/ProfileList", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/ProfileList", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +165,7 @@ func (c *wWApiClient) ProfileList(ctx context.Context, in *NodeNames, opts ...gr
 
 func (c *wWApiClient) ContainerImport(ctx context.Context, in *ContainerImportInfo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/wwapi.WWApi/ContainerImport", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/ContainerImport", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -174,7 +174,7 @@ func (c *wWApiClient) ContainerImport(ctx context.Context, in *ContainerImportIn
 
 func (c *wWApiClient) ContainerBuild(ctx context.Context, in *ContainerBuildInfo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/wwapi.WWApi/ContainerBuild", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/ContainerBuild", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -183,7 +183,7 @@ func (c *wWApiClient) ContainerBuild(ctx context.Context, in *ContainerBuildInfo
 
 func (c *wWApiClient) ContainerDelete(ctx context.Context, in *wrapperspb.StringValue, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/wwapi.WWApi/ContainerDelete", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/ContainerDelete", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -192,7 +192,7 @@ func (c *wWApiClient) ContainerDelete(ctx context.Context, in *wrapperspb.String
 
 func (c *wWApiClient) ContainerList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ContainerListResponse, error) {
 	out := new(ContainerListResponse)
-	err := c.cc.Invoke(ctx, "/wwapi.WWApi/ContainerList", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/ContainerList", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -201,7 +201,7 @@ func (c *wWApiClient) ContainerList(ctx context.Context, in *emptypb.Empty, opts
 
 func (c *wWApiClient) KernelImport(ctx context.Context, in *KernelImportInfo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/wwapi.WWApi/KernelImport", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/KernelImport", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -210,7 +210,7 @@ func (c *wWApiClient) KernelImport(ctx context.Context, in *KernelImportInfo, op
 
 func (c *wWApiClient) KernelDelete(ctx context.Context, in *NodeNames, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/wwapi.WWApi/KernelDelete", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/KernelDelete", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -219,7 +219,7 @@ func (c *wWApiClient) KernelDelete(ctx context.Context, in *NodeNames, opts ...g
 
 func (c *wWApiClient) KernelList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*KernelListResponse, error) {
 	out := new(KernelListResponse)
-	err := c.cc.Invoke(ctx, "/wwapi.WWApi/KernelList", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/KernelList", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -228,7 +228,7 @@ func (c *wWApiClient) KernelList(ctx context.Context, in *emptypb.Empty, opts ..
 
 func (c *wWApiClient) IpmiPower(ctx context.Context, in *IpmiPowerRequest, opts ...grpc.CallOption) (*IpmiResponse, error) {
 	out := new(IpmiResponse)
-	err := c.cc.Invoke(ctx, "/wwapi.WWApi/IpmiPower", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/IpmiPower", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -237,7 +237,7 @@ func (c *wWApiClient) IpmiPower(ctx context.Context, in *IpmiPowerRequest, opts 
 
 func (c *wWApiClient) IpmiSdr(ctx context.Context, in *IpmiSdrRequest, opts ...grpc.CallOption) (*IpmiResponse, error) {
 	out := new(IpmiResponse)
-	err := c.cc.Invoke(ctx, "/wwapi.WWApi/IpmiSdr", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/IpmiSdr", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -246,7 +246,7 @@ func (c *wWApiClient) IpmiSdr(ctx context.Context, in *IpmiSdrRequest, opts ...g
 
 func (c *wWApiClient) IpmiSensor(ctx context.Context, in *IpmiSensorRequest, opts ...grpc.CallOption) (*IpmiResponse, error) {
 	out := new(IpmiResponse)
-	err := c.cc.Invoke(ctx, "/wwapi.WWApi/IpmiSensor", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/IpmiSensor", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -255,7 +255,7 @@ func (c *wWApiClient) IpmiSensor(ctx context.Context, in *IpmiSensorRequest, opt
 
 func (c *wWApiClient) OverlayBuild(ctx context.Context, in *NodeNames, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/wwapi.WWApi/OverlayBuild", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/OverlayBuild", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -264,7 +264,7 @@ func (c *wWApiClient) OverlayBuild(ctx context.Context, in *NodeNames, opts ...g
 
 func (c *wWApiClient) OverlayChmod(ctx context.Context, in *OverlayChmodRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/wwapi.WWApi/OverlayChmod", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/OverlayChmod", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -273,7 +273,7 @@ func (c *wWApiClient) OverlayChmod(ctx context.Context, in *OverlayChmodRequest,
 
 func (c *wWApiClient) OverlayChown(ctx context.Context, in *OverlayChownRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/wwapi.WWApi/OverlayChown", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/OverlayChown", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -282,7 +282,7 @@ func (c *wWApiClient) OverlayChown(ctx context.Context, in *OverlayChownRequest,
 
 func (c *wWApiClient) OverlayCreate(ctx context.Context, in *wrapperspb.StringValue, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/wwapi.WWApi/OverlayCreate", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/OverlayCreate", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -291,7 +291,7 @@ func (c *wWApiClient) OverlayCreate(ctx context.Context, in *wrapperspb.StringVa
 
 func (c *wWApiClient) OverlayDelete(ctx context.Context, in *OverlayDeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/wwapi.WWApi/OverlayDelete", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/OverlayDelete", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -300,7 +300,7 @@ func (c *wWApiClient) OverlayDelete(ctx context.Context, in *OverlayDeleteReques
 
 func (c *wWApiClient) OverlayImport(ctx context.Context, in *wrapperspb.StringValue, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/wwapi.WWApi/OverlayImport", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/OverlayImport", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -309,7 +309,7 @@ func (c *wWApiClient) OverlayImport(ctx context.Context, in *wrapperspb.StringVa
 
 func (c *wWApiClient) OverlayList(ctx context.Context, in *OverlayListRequest, opts ...grpc.CallOption) (*OverlayListResponse, error) {
 	out := new(OverlayListResponse)
-	err := c.cc.Invoke(ctx, "/wwapi.WWApi/OverlayList", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/OverlayList", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -318,7 +318,7 @@ func (c *wWApiClient) OverlayList(ctx context.Context, in *OverlayListRequest, o
 
 func (c *wWApiClient) OverlayMkdir(ctx context.Context, in *OverlayMkdirRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/wwapi.WWApi/OverlayMkdir", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/OverlayMkdir", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -494,7 +494,7 @@ func _WWApi_Version_Handler(srv interface{}, ctx context.Context, dec func(inter
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.WWApi/Version",
+		FullMethod: "/wwapi.v1.WWApi/Version",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).Version(ctx, req.(*emptypb.Empty))
@@ -512,7 +512,7 @@ func _WWApi_NodeAdd_Handler(srv interface{}, ctx context.Context, dec func(inter
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.WWApi/NodeAdd",
+		FullMethod: "/wwapi.v1.WWApi/NodeAdd",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).NodeAdd(ctx, req.(*NodeInfo))
@@ -530,7 +530,7 @@ func _WWApi_NodeDelete_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.WWApi/NodeDelete",
+		FullMethod: "/wwapi.v1.WWApi/NodeDelete",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).NodeDelete(ctx, req.(*NodeNames))
@@ -548,7 +548,7 @@ func _WWApi_NodeList_Handler(srv interface{}, ctx context.Context, dec func(inte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.WWApi/NodeList",
+		FullMethod: "/wwapi.v1.WWApi/NodeList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).NodeList(ctx, req.(*NodeNames))
@@ -566,7 +566,7 @@ func _WWApi_NodeStatus_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.WWApi/NodeStatus",
+		FullMethod: "/wwapi.v1.WWApi/NodeStatus",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).NodeStatus(ctx, req.(*NodeNames))
@@ -584,7 +584,7 @@ func _WWApi_ProfileAdd_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.WWApi/ProfileAdd",
+		FullMethod: "/wwapi.v1.WWApi/ProfileAdd",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).ProfileAdd(ctx, req.(*NodeInfo))
@@ -602,7 +602,7 @@ func _WWApi_ProfileDelete_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.WWApi/ProfileDelete",
+		FullMethod: "/wwapi.v1.WWApi/ProfileDelete",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).ProfileDelete(ctx, req.(*NodeNames))
@@ -620,7 +620,7 @@ func _WWApi_ProfileList_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.WWApi/ProfileList",
+		FullMethod: "/wwapi.v1.WWApi/ProfileList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).ProfileList(ctx, req.(*NodeNames))
@@ -638,7 +638,7 @@ func _WWApi_ContainerImport_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.WWApi/ContainerImport",
+		FullMethod: "/wwapi.v1.WWApi/ContainerImport",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).ContainerImport(ctx, req.(*ContainerImportInfo))
@@ -656,7 +656,7 @@ func _WWApi_ContainerBuild_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.WWApi/ContainerBuild",
+		FullMethod: "/wwapi.v1.WWApi/ContainerBuild",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).ContainerBuild(ctx, req.(*ContainerBuildInfo))
@@ -674,7 +674,7 @@ func _WWApi_ContainerDelete_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.WWApi/ContainerDelete",
+		FullMethod: "/wwapi.v1.WWApi/ContainerDelete",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).ContainerDelete(ctx, req.(*wrapperspb.StringValue))
@@ -692,7 +692,7 @@ func _WWApi_ContainerList_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.WWApi/ContainerList",
+		FullMethod: "/wwapi.v1.WWApi/ContainerList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).ContainerList(ctx, req.(*emptypb.Empty))
@@ -710,7 +710,7 @@ func _WWApi_KernelImport_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.WWApi/KernelImport",
+		FullMethod: "/wwapi.v1.WWApi/KernelImport",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).KernelImport(ctx, req.(*KernelImportInfo))
@@ -728,7 +728,7 @@ func _WWApi_KernelDelete_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.WWApi/KernelDelete",
+		FullMethod: "/wwapi.v1.WWApi/KernelDelete",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).KernelDelete(ctx, req.(*NodeNames))
@@ -746,7 +746,7 @@ func _WWApi_KernelList_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.WWApi/KernelList",
+		FullMethod: "/wwapi.v1.WWApi/KernelList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).KernelList(ctx, req.(*emptypb.Empty))
@@ -764,7 +764,7 @@ func _WWApi_IpmiPower_Handler(srv interface{}, ctx context.Context, dec func(int
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.WWApi/IpmiPower",
+		FullMethod: "/wwapi.v1.WWApi/IpmiPower",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).IpmiPower(ctx, req.(*IpmiPowerRequest))
@@ -782,7 +782,7 @@ func _WWApi_IpmiSdr_Handler(srv interface{}, ctx context.Context, dec func(inter
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.WWApi/IpmiSdr",
+		FullMethod: "/wwapi.v1.WWApi/IpmiSdr",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).IpmiSdr(ctx, req.(*IpmiSdrRequest))
@@ -800,7 +800,7 @@ func _WWApi_IpmiSensor_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.WWApi/IpmiSensor",
+		FullMethod: "/wwapi.v1.WWApi/IpmiSensor",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).IpmiSensor(ctx, req.(*IpmiSensorRequest))
@@ -818,7 +818,7 @@ func _WWApi_OverlayBuild_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.WWApi/OverlayBuild",
+		FullMethod: "/wwapi.v1.WWApi/OverlayBuild",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).OverlayBuild(ctx, req.(*NodeNames))
@@ -836,7 +836,7 @@ func _WWApi_OverlayChmod_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.WWApi/OverlayChmod",
+		FullMethod: "/wwapi.v1.WWApi/OverlayChmod",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).OverlayChmod(ctx, req.(*OverlayChmodRequest))
@@ -854,7 +854,7 @@ func _WWApi_OverlayChown_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.WWApi/OverlayChown",
+		FullMethod: "/wwapi.v1.WWApi/OverlayChown",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).OverlayChown(ctx, req.(*OverlayChownRequest))
@@ -872,7 +872,7 @@ func _WWApi_OverlayCreate_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.WWApi/OverlayCreate",
+		FullMethod: "/wwapi.v1.WWApi/OverlayCreate",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).OverlayCreate(ctx, req.(*wrapperspb.StringValue))
@@ -890,7 +890,7 @@ func _WWApi_OverlayDelete_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.WWApi/OverlayDelete",
+		FullMethod: "/wwapi.v1.WWApi/OverlayDelete",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).OverlayDelete(ctx, req.(*OverlayDeleteRequest))
@@ -908,7 +908,7 @@ func _WWApi_OverlayImport_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.WWApi/OverlayImport",
+		FullMethod: "/wwapi.v1.WWApi/OverlayImport",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).OverlayImport(ctx, req.(*wrapperspb.StringValue))
@@ -926,7 +926,7 @@ func _WWApi_OverlayList_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.WWApi/OverlayList",
+		FullMethod: "/wwapi.v1.WWApi/OverlayList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).OverlayList(ctx, req.(*OverlayListRequest))
@@ -944,7 +944,7 @@ func _WWApi_OverlayMkdir_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.WWApi/OverlayMkdir",
+		FullMethod: "/wwapi.v1.WWApi/OverlayMkdir",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).OverlayMkdir(ctx, req.(*OverlayMkdirRequest))
@@ -956,7 +956,7 @@ func _WWApi_OverlayMkdir_Handler(srv interface{}, ctx context.Context, dec func(
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var WWApi_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "wwapi.WWApi",
+	ServiceName: "wwapi.v1.WWApi",
 	HandlerType: (*WWApiServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

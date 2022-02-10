@@ -17,10 +17,8 @@ import "google/protobuf/wrappers.proto";
 message Entry {
     string value = 1;
     string altValue = 2;
-    bool bool = 3;
-    bool altBool = 4;
-    string from = 5;
-    string def = 6;
+    string from = 3;
+    string def = 4;
 }
 
 // NetDevEntry is a structure for a network device, a NIC.

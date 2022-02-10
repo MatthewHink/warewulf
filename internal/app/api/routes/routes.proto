@@ -3,7 +3,7 @@
 // Note: We may want rpcs for Entry accessors, but we may not need them. Unclear.
 syntax = "proto3";
 
-option go_package = "github.com/hpcng/warewulf/tree/main/internal/pkg/api/routes";
+option go_package = "internal/pkg/api/routes";
 
 package wwapi;
 

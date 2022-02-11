@@ -3,9 +3,10 @@
 // Note: We may want rpcs for Entry accessors, but we may not need them. Unclear.
 syntax = "proto3";
 
-option go_package = "pkg/api/v1;api";
+//option go_package = "pkg/api/v1;api";
+option go_package = "pkg/api/wwapiv1;wwapiv1";
 
-package warewulf.api.v1;
+package wwapi.v1;
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/wrappers.proto";

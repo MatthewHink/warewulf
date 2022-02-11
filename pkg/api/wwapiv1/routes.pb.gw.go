@@ -2,11 +2,11 @@
 // source: routes.proto
 
 /*
-Package api is a reverse proxy.
+Package wwapiv1 is a reverse proxy.
 
 It translates gRPC into RESTful JSON APIs.
 */
-package api
+package wwapiv1
 
 import (
 	"context"
@@ -939,7 +939,7 @@ func RegisterWWApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/warewulf.api.v1.WWApi/Version", runtime.WithHTTPPathPattern("/version"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/wwapi.v1.WWApi/Version", runtime.WithHTTPPathPattern("/version"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -962,7 +962,7 @@ func RegisterWWApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/warewulf.api.v1.WWApi/NodeAdd", runtime.WithHTTPPathPattern("/v1/node"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/wwapi.v1.WWApi/NodeAdd", runtime.WithHTTPPathPattern("/v1/node"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -985,7 +985,7 @@ func RegisterWWApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/warewulf.api.v1.WWApi/NodeDelete", runtime.WithHTTPPathPattern("/v1/node"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/wwapi.v1.WWApi/NodeDelete", runtime.WithHTTPPathPattern("/v1/node"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1008,7 +1008,7 @@ func RegisterWWApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/warewulf.api.v1.WWApi/NodeList", runtime.WithHTTPPathPattern("/v1/node"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/wwapi.v1.WWApi/NodeList", runtime.WithHTTPPathPattern("/v1/node"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1031,7 +1031,7 @@ func RegisterWWApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/warewulf.api.v1.WWApi/NodeStatus", runtime.WithHTTPPathPattern("/v1/nodestatus"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/wwapi.v1.WWApi/NodeStatus", runtime.WithHTTPPathPattern("/v1/nodestatus"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1054,7 +1054,7 @@ func RegisterWWApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/warewulf.api.v1.WWApi/ProfileAdd", runtime.WithHTTPPathPattern("/v1/profile"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/wwapi.v1.WWApi/ProfileAdd", runtime.WithHTTPPathPattern("/v1/profile"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1077,7 +1077,7 @@ func RegisterWWApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/warewulf.api.v1.WWApi/ProfileDelete", runtime.WithHTTPPathPattern("/v1/profile"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/wwapi.v1.WWApi/ProfileDelete", runtime.WithHTTPPathPattern("/v1/profile"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1100,7 +1100,7 @@ func RegisterWWApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/warewulf.api.v1.WWApi/ProfileList", runtime.WithHTTPPathPattern("/v1/profile"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/wwapi.v1.WWApi/ProfileList", runtime.WithHTTPPathPattern("/v1/profile"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1123,7 +1123,7 @@ func RegisterWWApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/warewulf.api.v1.WWApi/ContainerImport", runtime.WithHTTPPathPattern("/v1/container"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/wwapi.v1.WWApi/ContainerImport", runtime.WithHTTPPathPattern("/v1/container"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1146,7 +1146,7 @@ func RegisterWWApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/warewulf.api.v1.WWApi/ContainerBuild", runtime.WithHTTPPathPattern("/v1/container/build"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/wwapi.v1.WWApi/ContainerBuild", runtime.WithHTTPPathPattern("/v1/container/build"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1169,7 +1169,7 @@ func RegisterWWApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/warewulf.api.v1.WWApi/ContainerDelete", runtime.WithHTTPPathPattern("/v1/container"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/wwapi.v1.WWApi/ContainerDelete", runtime.WithHTTPPathPattern("/v1/container"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1192,7 +1192,7 @@ func RegisterWWApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/warewulf.api.v1.WWApi/ContainerList", runtime.WithHTTPPathPattern("/v1/container"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/wwapi.v1.WWApi/ContainerList", runtime.WithHTTPPathPattern("/v1/container"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1215,7 +1215,7 @@ func RegisterWWApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/warewulf.api.v1.WWApi/KernelImport", runtime.WithHTTPPathPattern("/v1/kernel"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/wwapi.v1.WWApi/KernelImport", runtime.WithHTTPPathPattern("/v1/kernel"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1238,7 +1238,7 @@ func RegisterWWApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/warewulf.api.v1.WWApi/KernelDelete", runtime.WithHTTPPathPattern("/v1/kernel"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/wwapi.v1.WWApi/KernelDelete", runtime.WithHTTPPathPattern("/v1/kernel"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1261,7 +1261,7 @@ func RegisterWWApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/warewulf.api.v1.WWApi/KernelList", runtime.WithHTTPPathPattern("/v1/kernel"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/wwapi.v1.WWApi/KernelList", runtime.WithHTTPPathPattern("/v1/kernel"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1284,7 +1284,7 @@ func RegisterWWApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/warewulf.api.v1.WWApi/IpmiPowerGet", runtime.WithHTTPPathPattern("/v1/ipmi/power"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/wwapi.v1.WWApi/IpmiPowerGet", runtime.WithHTTPPathPattern("/v1/ipmi/power"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1307,7 +1307,7 @@ func RegisterWWApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/warewulf.api.v1.WWApi/IpmiPowerSet", runtime.WithHTTPPathPattern("/v1/ipmi/power"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/wwapi.v1.WWApi/IpmiPowerSet", runtime.WithHTTPPathPattern("/v1/ipmi/power"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1330,7 +1330,7 @@ func RegisterWWApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/warewulf.api.v1.WWApi/IpmiSdr", runtime.WithHTTPPathPattern("/v1/ipmi/sdr"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/wwapi.v1.WWApi/IpmiSdr", runtime.WithHTTPPathPattern("/v1/ipmi/sdr"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1353,7 +1353,7 @@ func RegisterWWApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/warewulf.api.v1.WWApi/IpmiSensor", runtime.WithHTTPPathPattern("/v1/ipmi/sensor"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/wwapi.v1.WWApi/IpmiSensor", runtime.WithHTTPPathPattern("/v1/ipmi/sensor"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1376,7 +1376,7 @@ func RegisterWWApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/warewulf.api.v1.WWApi/OverlayBuild", runtime.WithHTTPPathPattern("/v1/overlay/build"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/wwapi.v1.WWApi/OverlayBuild", runtime.WithHTTPPathPattern("/v1/overlay/build"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1399,7 +1399,7 @@ func RegisterWWApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/warewulf.api.v1.WWApi/OverlayChmod", runtime.WithHTTPPathPattern("/v1/overlay/chmod"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/wwapi.v1.WWApi/OverlayChmod", runtime.WithHTTPPathPattern("/v1/overlay/chmod"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1422,7 +1422,7 @@ func RegisterWWApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/warewulf.api.v1.WWApi/OverlayChown", runtime.WithHTTPPathPattern("/v1/overlay/chown"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/wwapi.v1.WWApi/OverlayChown", runtime.WithHTTPPathPattern("/v1/overlay/chown"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1445,7 +1445,7 @@ func RegisterWWApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/warewulf.api.v1.WWApi/OverlayCreate", runtime.WithHTTPPathPattern("/v1/overlay"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/wwapi.v1.WWApi/OverlayCreate", runtime.WithHTTPPathPattern("/v1/overlay"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1468,7 +1468,7 @@ func RegisterWWApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/warewulf.api.v1.WWApi/OverlayDelete", runtime.WithHTTPPathPattern("/v1/overlay"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/wwapi.v1.WWApi/OverlayDelete", runtime.WithHTTPPathPattern("/v1/overlay"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1491,7 +1491,7 @@ func RegisterWWApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/warewulf.api.v1.WWApi/OverlayImport", runtime.WithHTTPPathPattern("/v1/overlay/import"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/wwapi.v1.WWApi/OverlayImport", runtime.WithHTTPPathPattern("/v1/overlay/import"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1514,7 +1514,7 @@ func RegisterWWApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/warewulf.api.v1.WWApi/OverlayList", runtime.WithHTTPPathPattern("/v1/overlay"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/wwapi.v1.WWApi/OverlayList", runtime.WithHTTPPathPattern("/v1/overlay"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1537,7 +1537,7 @@ func RegisterWWApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/warewulf.api.v1.WWApi/OverlayMkdir", runtime.WithHTTPPathPattern("/v1/overlay/mkdir"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/wwapi.v1.WWApi/OverlayMkdir", runtime.WithHTTPPathPattern("/v1/overlay/mkdir"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1599,7 +1599,7 @@ func RegisterWWApiHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/warewulf.api.v1.WWApi/Version", runtime.WithHTTPPathPattern("/version"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/wwapi.v1.WWApi/Version", runtime.WithHTTPPathPattern("/version"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1619,7 +1619,7 @@ func RegisterWWApiHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/warewulf.api.v1.WWApi/NodeAdd", runtime.WithHTTPPathPattern("/v1/node"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/wwapi.v1.WWApi/NodeAdd", runtime.WithHTTPPathPattern("/v1/node"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1639,7 +1639,7 @@ func RegisterWWApiHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/warewulf.api.v1.WWApi/NodeDelete", runtime.WithHTTPPathPattern("/v1/node"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/wwapi.v1.WWApi/NodeDelete", runtime.WithHTTPPathPattern("/v1/node"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1659,7 +1659,7 @@ func RegisterWWApiHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/warewulf.api.v1.WWApi/NodeList", runtime.WithHTTPPathPattern("/v1/node"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/wwapi.v1.WWApi/NodeList", runtime.WithHTTPPathPattern("/v1/node"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1679,7 +1679,7 @@ func RegisterWWApiHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/warewulf.api.v1.WWApi/NodeStatus", runtime.WithHTTPPathPattern("/v1/nodestatus"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/wwapi.v1.WWApi/NodeStatus", runtime.WithHTTPPathPattern("/v1/nodestatus"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1699,7 +1699,7 @@ func RegisterWWApiHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/warewulf.api.v1.WWApi/ProfileAdd", runtime.WithHTTPPathPattern("/v1/profile"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/wwapi.v1.WWApi/ProfileAdd", runtime.WithHTTPPathPattern("/v1/profile"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1719,7 +1719,7 @@ func RegisterWWApiHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/warewulf.api.v1.WWApi/ProfileDelete", runtime.WithHTTPPathPattern("/v1/profile"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/wwapi.v1.WWApi/ProfileDelete", runtime.WithHTTPPathPattern("/v1/profile"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1739,7 +1739,7 @@ func RegisterWWApiHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/warewulf.api.v1.WWApi/ProfileList", runtime.WithHTTPPathPattern("/v1/profile"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/wwapi.v1.WWApi/ProfileList", runtime.WithHTTPPathPattern("/v1/profile"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1759,7 +1759,7 @@ func RegisterWWApiHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/warewulf.api.v1.WWApi/ContainerImport", runtime.WithHTTPPathPattern("/v1/container"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/wwapi.v1.WWApi/ContainerImport", runtime.WithHTTPPathPattern("/v1/container"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1779,7 +1779,7 @@ func RegisterWWApiHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/warewulf.api.v1.WWApi/ContainerBuild", runtime.WithHTTPPathPattern("/v1/container/build"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/wwapi.v1.WWApi/ContainerBuild", runtime.WithHTTPPathPattern("/v1/container/build"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1799,7 +1799,7 @@ func RegisterWWApiHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/warewulf.api.v1.WWApi/ContainerDelete", runtime.WithHTTPPathPattern("/v1/container"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/wwapi.v1.WWApi/ContainerDelete", runtime.WithHTTPPathPattern("/v1/container"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1819,7 +1819,7 @@ func RegisterWWApiHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/warewulf.api.v1.WWApi/ContainerList", runtime.WithHTTPPathPattern("/v1/container"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/wwapi.v1.WWApi/ContainerList", runtime.WithHTTPPathPattern("/v1/container"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1839,7 +1839,7 @@ func RegisterWWApiHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/warewulf.api.v1.WWApi/KernelImport", runtime.WithHTTPPathPattern("/v1/kernel"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/wwapi.v1.WWApi/KernelImport", runtime.WithHTTPPathPattern("/v1/kernel"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1859,7 +1859,7 @@ func RegisterWWApiHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/warewulf.api.v1.WWApi/KernelDelete", runtime.WithHTTPPathPattern("/v1/kernel"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/wwapi.v1.WWApi/KernelDelete", runtime.WithHTTPPathPattern("/v1/kernel"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1879,7 +1879,7 @@ func RegisterWWApiHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/warewulf.api.v1.WWApi/KernelList", runtime.WithHTTPPathPattern("/v1/kernel"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/wwapi.v1.WWApi/KernelList", runtime.WithHTTPPathPattern("/v1/kernel"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1899,7 +1899,7 @@ func RegisterWWApiHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/warewulf.api.v1.WWApi/IpmiPowerGet", runtime.WithHTTPPathPattern("/v1/ipmi/power"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/wwapi.v1.WWApi/IpmiPowerGet", runtime.WithHTTPPathPattern("/v1/ipmi/power"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1919,7 +1919,7 @@ func RegisterWWApiHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/warewulf.api.v1.WWApi/IpmiPowerSet", runtime.WithHTTPPathPattern("/v1/ipmi/power"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/wwapi.v1.WWApi/IpmiPowerSet", runtime.WithHTTPPathPattern("/v1/ipmi/power"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1939,7 +1939,7 @@ func RegisterWWApiHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/warewulf.api.v1.WWApi/IpmiSdr", runtime.WithHTTPPathPattern("/v1/ipmi/sdr"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/wwapi.v1.WWApi/IpmiSdr", runtime.WithHTTPPathPattern("/v1/ipmi/sdr"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1959,7 +1959,7 @@ func RegisterWWApiHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/warewulf.api.v1.WWApi/IpmiSensor", runtime.WithHTTPPathPattern("/v1/ipmi/sensor"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/wwapi.v1.WWApi/IpmiSensor", runtime.WithHTTPPathPattern("/v1/ipmi/sensor"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1979,7 +1979,7 @@ func RegisterWWApiHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/warewulf.api.v1.WWApi/OverlayBuild", runtime.WithHTTPPathPattern("/v1/overlay/build"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/wwapi.v1.WWApi/OverlayBuild", runtime.WithHTTPPathPattern("/v1/overlay/build"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1999,7 +1999,7 @@ func RegisterWWApiHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/warewulf.api.v1.WWApi/OverlayChmod", runtime.WithHTTPPathPattern("/v1/overlay/chmod"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/wwapi.v1.WWApi/OverlayChmod", runtime.WithHTTPPathPattern("/v1/overlay/chmod"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2019,7 +2019,7 @@ func RegisterWWApiHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/warewulf.api.v1.WWApi/OverlayChown", runtime.WithHTTPPathPattern("/v1/overlay/chown"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/wwapi.v1.WWApi/OverlayChown", runtime.WithHTTPPathPattern("/v1/overlay/chown"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2039,7 +2039,7 @@ func RegisterWWApiHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/warewulf.api.v1.WWApi/OverlayCreate", runtime.WithHTTPPathPattern("/v1/overlay"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/wwapi.v1.WWApi/OverlayCreate", runtime.WithHTTPPathPattern("/v1/overlay"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2059,7 +2059,7 @@ func RegisterWWApiHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/warewulf.api.v1.WWApi/OverlayDelete", runtime.WithHTTPPathPattern("/v1/overlay"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/wwapi.v1.WWApi/OverlayDelete", runtime.WithHTTPPathPattern("/v1/overlay"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2079,7 +2079,7 @@ func RegisterWWApiHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/warewulf.api.v1.WWApi/OverlayImport", runtime.WithHTTPPathPattern("/v1/overlay/import"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/wwapi.v1.WWApi/OverlayImport", runtime.WithHTTPPathPattern("/v1/overlay/import"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2099,7 +2099,7 @@ func RegisterWWApiHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/warewulf.api.v1.WWApi/OverlayList", runtime.WithHTTPPathPattern("/v1/overlay"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/wwapi.v1.WWApi/OverlayList", runtime.WithHTTPPathPattern("/v1/overlay"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2119,7 +2119,7 @@ func RegisterWWApiHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/warewulf.api.v1.WWApi/OverlayMkdir", runtime.WithHTTPPathPattern("/v1/overlay/mkdir"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/wwapi.v1.WWApi/OverlayMkdir", runtime.WithHTTPPathPattern("/v1/overlay/mkdir"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return

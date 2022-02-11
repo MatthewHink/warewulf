@@ -231,9 +231,19 @@ proto: ## wwapi generate code from protobuf
 #		pkg/api/v1/routes.pb.gw.go \
 #		internal/app/api/server/wwapi.go
 
+#wwapiserver: # build the api server
+#	go build -race -ldflags "-s -w" \
+#		-o ./wwapid \
+#		internal/app/api/server/wwapi.go
+
 wwapiserver: # build the api server
-	go build -race -ldflags "-s -w" \
-		internal/app/api/server/wwapi.go
+	go build -race -ldflags "-s -w" -o ./wwapid internal/app/api/server/wwapi.go
+
+wwapiclient: # build api client
+	go build -race -ldflags "-s -w" -o ./wwapic internal/app/api/client/wwapiclient.go
+
+#wwapiserver: # build the api server
+#	go build -race -o ./wwapid internal/app/api/server/wwapi.go
 
 clean:
 	rm -f wwclient

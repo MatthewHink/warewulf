@@ -224,6 +224,17 @@ proto: ## wwapi generate code from protobuf
 		--go_out=. \
 		--go-grpc_out=. routes.proto
 
+#wwapiserver: # build the api server
+#	go build -race -ldflags "-s -w" \
+#		pkg/api/v1/routes_grpc.pb.go \
+#		pkg/api/v1/routes.pb.go \
+#		pkg/api/v1/routes.pb.gw.go \
+#		internal/app/api/server/wwapi.go
+
+wwapiserver: # build the api server
+	go build -race -ldflags "-s -w" \
+		internal/app/api/server/wwapi.go
+
 clean:
 	rm -f wwclient
 	rm -f wwctl

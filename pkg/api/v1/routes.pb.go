@@ -8,8 +8,6 @@
 // 	protoc        v3.19.4
 // source: routes.proto
 
-//package wwapi.v1;
-
 package api
 
 import (

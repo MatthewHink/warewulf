@@ -219,8 +219,10 @@ dist: vendor config
 	rm -rf .dist
 
 proto: ## wwapi generate code from protobuf
-	protoc -I=internal/app/api/routes/v1 --go_out=internal/app/api/routes/v1/wwapi --go_opt=paths=source_relative \
-		--go-grpc_out=internal/app/api/routes/v1/wwapi --go-grpc_opt=paths=source_relative routes.proto
+	protoc -I=internal/app/api/routes/v1 -I=. \
+		--grpc-gateway_out=. \
+		--go_out=. \
+		--go-grpc_out=. routes.proto
 
 clean:
 	rm -f wwclient

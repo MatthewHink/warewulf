@@ -4,7 +4,7 @@
 // - protoc             v3.19.4
 // source: routes.proto
 
-package wwapi
+package api
 
 import (
 	context "context"
@@ -31,8 +31,12 @@ type WWApiClient interface {
 	// Returns the added node since we may be shimming in defaults.
 	NodeAdd(ctx context.Context, in *NodeInfo, opts ...grpc.CallOption) (*NodeInfo, error)
 	// NodeDelete deletes one or mode nodes from warewulf. Returns an error on failure.
+	// See this for how the query parameters work:
+	// https://github.com/googleapis/googleapis/blob/7cde5d0df08801e00fc45df1546942aa2692d5c3/google/api/http.proto#L89-L122
 	NodeDelete(ctx context.Context, in *NodeNames, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// NodeList returns all nodes, or the NodeInfo for each node name in NodeNames.
+	// See this for how the query parameters work:
+	// https://github.com/googleapis/googleapis/blob/7cde5d0df08801e00fc45df1546942aa2692d5c3/google/api/http.proto#L89-L122
 	NodeList(ctx context.Context, in *NodeNames, opts ...grpc.CallOption) (*NodeInfoResponse, error)
 	// NodeStatus returns the status for all nodes or the given set of nodes
 	// in the request. If NodeNames is empty, return all.
@@ -55,10 +59,13 @@ type WWApiClient interface {
 	// KernelImport imports a kernel.
 	KernelImport(ctx context.Context, in *KernelImportInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// KernelDelete deletes a kernel.
+	// TODO: Do not overload NodeNames here. Could make for confusing query parameters.
 	KernelDelete(ctx context.Context, in *NodeNames, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	KernelList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*KernelListResponse, error)
-	// IpmiPower gets or sets the power state for a set of nodes.
-	IpmiPower(ctx context.Context, in *IpmiPowerRequest, opts ...grpc.CallOption) (*IpmiResponse, error)
+	// IpmiPower gets the power state for a set of nodes.
+	IpmiPowerGet(ctx context.Context, in *IpmiPowerRequest, opts ...grpc.CallOption) (*IpmiResponse, error)
+	// IpmiPower sets the power state for a set of nodes.
+	IpmiPowerSet(ctx context.Context, in *IpmiPowerRequest, opts ...grpc.CallOption) (*IpmiResponse, error)
 	// IpmiSdr gets the SDR for a set of nodes.
 	IpmiSdr(ctx context.Context, in *IpmiSdrRequest, opts ...grpc.CallOption) (*IpmiResponse, error)
 	// IpmiSensor gets the sensor readings for a set of nodes.
@@ -93,7 +100,7 @@ func NewWWApiClient(cc grpc.ClientConnInterface) WWApiClient {
 
 func (c *wWApiClient) Version(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*wrapperspb.StringValue, error) {
 	out := new(wrapperspb.StringValue)
-	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/Version", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/warewulf.api.v1.WWApi/Version", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +109,7 @@ func (c *wWApiClient) Version(ctx context.Context, in *emptypb.Empty, opts ...gr
 
 func (c *wWApiClient) NodeAdd(ctx context.Context, in *NodeInfo, opts ...grpc.CallOption) (*NodeInfo, error) {
 	out := new(NodeInfo)
-	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/NodeAdd", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/warewulf.api.v1.WWApi/NodeAdd", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +118,7 @@ func (c *wWApiClient) NodeAdd(ctx context.Context, in *NodeInfo, opts ...grpc.Ca
 
 func (c *wWApiClient) NodeDelete(ctx context.Context, in *NodeNames, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/NodeDelete", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/warewulf.api.v1.WWApi/NodeDelete", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +127,7 @@ func (c *wWApiClient) NodeDelete(ctx context.Context, in *NodeNames, opts ...grp
 
 func (c *wWApiClient) NodeList(ctx context.Context, in *NodeNames, opts ...grpc.CallOption) (*NodeInfoResponse, error) {
 	out := new(NodeInfoResponse)
-	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/NodeList", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/warewulf.api.v1.WWApi/NodeList", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +136,7 @@ func (c *wWApiClient) NodeList(ctx context.Context, in *NodeNames, opts ...grpc.
 
 func (c *wWApiClient) NodeStatus(ctx context.Context, in *NodeNames, opts ...grpc.CallOption) (*NodeStatusResponse, error) {
 	out := new(NodeStatusResponse)
-	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/NodeStatus", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/warewulf.api.v1.WWApi/NodeStatus", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -138,7 +145,7 @@ func (c *wWApiClient) NodeStatus(ctx context.Context, in *NodeNames, opts ...grp
 
 func (c *wWApiClient) ProfileAdd(ctx context.Context, in *NodeInfo, opts ...grpc.CallOption) (*NodeInfo, error) {
 	out := new(NodeInfo)
-	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/ProfileAdd", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/warewulf.api.v1.WWApi/ProfileAdd", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -147,7 +154,7 @@ func (c *wWApiClient) ProfileAdd(ctx context.Context, in *NodeInfo, opts ...grpc
 
 func (c *wWApiClient) ProfileDelete(ctx context.Context, in *NodeNames, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/ProfileDelete", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/warewulf.api.v1.WWApi/ProfileDelete", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -156,7 +163,7 @@ func (c *wWApiClient) ProfileDelete(ctx context.Context, in *NodeNames, opts ...
 
 func (c *wWApiClient) ProfileList(ctx context.Context, in *NodeNames, opts ...grpc.CallOption) (*ProfileListResponse, error) {
 	out := new(ProfileListResponse)
-	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/ProfileList", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/warewulf.api.v1.WWApi/ProfileList", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +172,7 @@ func (c *wWApiClient) ProfileList(ctx context.Context, in *NodeNames, opts ...gr
 
 func (c *wWApiClient) ContainerImport(ctx context.Context, in *ContainerImportInfo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/ContainerImport", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/warewulf.api.v1.WWApi/ContainerImport", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -174,7 +181,7 @@ func (c *wWApiClient) ContainerImport(ctx context.Context, in *ContainerImportIn
 
 func (c *wWApiClient) ContainerBuild(ctx context.Context, in *ContainerBuildInfo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/ContainerBuild", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/warewulf.api.v1.WWApi/ContainerBuild", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -183,7 +190,7 @@ func (c *wWApiClient) ContainerBuild(ctx context.Context, in *ContainerBuildInfo
 
 func (c *wWApiClient) ContainerDelete(ctx context.Context, in *wrapperspb.StringValue, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/ContainerDelete", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/warewulf.api.v1.WWApi/ContainerDelete", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -192,7 +199,7 @@ func (c *wWApiClient) ContainerDelete(ctx context.Context, in *wrapperspb.String
 
 func (c *wWApiClient) ContainerList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ContainerListResponse, error) {
 	out := new(ContainerListResponse)
-	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/ContainerList", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/warewulf.api.v1.WWApi/ContainerList", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -201,7 +208,7 @@ func (c *wWApiClient) ContainerList(ctx context.Context, in *emptypb.Empty, opts
 
 func (c *wWApiClient) KernelImport(ctx context.Context, in *KernelImportInfo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/KernelImport", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/warewulf.api.v1.WWApi/KernelImport", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -210,7 +217,7 @@ func (c *wWApiClient) KernelImport(ctx context.Context, in *KernelImportInfo, op
 
 func (c *wWApiClient) KernelDelete(ctx context.Context, in *NodeNames, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/KernelDelete", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/warewulf.api.v1.WWApi/KernelDelete", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -219,16 +226,25 @@ func (c *wWApiClient) KernelDelete(ctx context.Context, in *NodeNames, opts ...g
 
 func (c *wWApiClient) KernelList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*KernelListResponse, error) {
 	out := new(KernelListResponse)
-	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/KernelList", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/warewulf.api.v1.WWApi/KernelList", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *wWApiClient) IpmiPower(ctx context.Context, in *IpmiPowerRequest, opts ...grpc.CallOption) (*IpmiResponse, error) {
+func (c *wWApiClient) IpmiPowerGet(ctx context.Context, in *IpmiPowerRequest, opts ...grpc.CallOption) (*IpmiResponse, error) {
 	out := new(IpmiResponse)
-	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/IpmiPower", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/warewulf.api.v1.WWApi/IpmiPowerGet", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *wWApiClient) IpmiPowerSet(ctx context.Context, in *IpmiPowerRequest, opts ...grpc.CallOption) (*IpmiResponse, error) {
+	out := new(IpmiResponse)
+	err := c.cc.Invoke(ctx, "/warewulf.api.v1.WWApi/IpmiPowerSet", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -237,7 +253,7 @@ func (c *wWApiClient) IpmiPower(ctx context.Context, in *IpmiPowerRequest, opts 
 
 func (c *wWApiClient) IpmiSdr(ctx context.Context, in *IpmiSdrRequest, opts ...grpc.CallOption) (*IpmiResponse, error) {
 	out := new(IpmiResponse)
-	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/IpmiSdr", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/warewulf.api.v1.WWApi/IpmiSdr", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -246,7 +262,7 @@ func (c *wWApiClient) IpmiSdr(ctx context.Context, in *IpmiSdrRequest, opts ...g
 
 func (c *wWApiClient) IpmiSensor(ctx context.Context, in *IpmiSensorRequest, opts ...grpc.CallOption) (*IpmiResponse, error) {
 	out := new(IpmiResponse)
-	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/IpmiSensor", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/warewulf.api.v1.WWApi/IpmiSensor", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -255,7 +271,7 @@ func (c *wWApiClient) IpmiSensor(ctx context.Context, in *IpmiSensorRequest, opt
 
 func (c *wWApiClient) OverlayBuild(ctx context.Context, in *NodeNames, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/OverlayBuild", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/warewulf.api.v1.WWApi/OverlayBuild", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -264,7 +280,7 @@ func (c *wWApiClient) OverlayBuild(ctx context.Context, in *NodeNames, opts ...g
 
 func (c *wWApiClient) OverlayChmod(ctx context.Context, in *OverlayChmodRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/OverlayChmod", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/warewulf.api.v1.WWApi/OverlayChmod", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -273,7 +289,7 @@ func (c *wWApiClient) OverlayChmod(ctx context.Context, in *OverlayChmodRequest,
 
 func (c *wWApiClient) OverlayChown(ctx context.Context, in *OverlayChownRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/OverlayChown", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/warewulf.api.v1.WWApi/OverlayChown", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -282,7 +298,7 @@ func (c *wWApiClient) OverlayChown(ctx context.Context, in *OverlayChownRequest,
 
 func (c *wWApiClient) OverlayCreate(ctx context.Context, in *wrapperspb.StringValue, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/OverlayCreate", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/warewulf.api.v1.WWApi/OverlayCreate", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -291,7 +307,7 @@ func (c *wWApiClient) OverlayCreate(ctx context.Context, in *wrapperspb.StringVa
 
 func (c *wWApiClient) OverlayDelete(ctx context.Context, in *OverlayDeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/OverlayDelete", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/warewulf.api.v1.WWApi/OverlayDelete", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -300,7 +316,7 @@ func (c *wWApiClient) OverlayDelete(ctx context.Context, in *OverlayDeleteReques
 
 func (c *wWApiClient) OverlayImport(ctx context.Context, in *wrapperspb.StringValue, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/OverlayImport", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/warewulf.api.v1.WWApi/OverlayImport", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -309,7 +325,7 @@ func (c *wWApiClient) OverlayImport(ctx context.Context, in *wrapperspb.StringVa
 
 func (c *wWApiClient) OverlayList(ctx context.Context, in *OverlayListRequest, opts ...grpc.CallOption) (*OverlayListResponse, error) {
 	out := new(OverlayListResponse)
-	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/OverlayList", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/warewulf.api.v1.WWApi/OverlayList", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -318,7 +334,7 @@ func (c *wWApiClient) OverlayList(ctx context.Context, in *OverlayListRequest, o
 
 func (c *wWApiClient) OverlayMkdir(ctx context.Context, in *OverlayMkdirRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/OverlayMkdir", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/warewulf.api.v1.WWApi/OverlayMkdir", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -336,8 +352,12 @@ type WWApiServer interface {
 	// Returns the added node since we may be shimming in defaults.
 	NodeAdd(context.Context, *NodeInfo) (*NodeInfo, error)
 	// NodeDelete deletes one or mode nodes from warewulf. Returns an error on failure.
+	// See this for how the query parameters work:
+	// https://github.com/googleapis/googleapis/blob/7cde5d0df08801e00fc45df1546942aa2692d5c3/google/api/http.proto#L89-L122
 	NodeDelete(context.Context, *NodeNames) (*emptypb.Empty, error)
 	// NodeList returns all nodes, or the NodeInfo for each node name in NodeNames.
+	// See this for how the query parameters work:
+	// https://github.com/googleapis/googleapis/blob/7cde5d0df08801e00fc45df1546942aa2692d5c3/google/api/http.proto#L89-L122
 	NodeList(context.Context, *NodeNames) (*NodeInfoResponse, error)
 	// NodeStatus returns the status for all nodes or the given set of nodes
 	// in the request. If NodeNames is empty, return all.
@@ -360,10 +380,13 @@ type WWApiServer interface {
 	// KernelImport imports a kernel.
 	KernelImport(context.Context, *KernelImportInfo) (*emptypb.Empty, error)
 	// KernelDelete deletes a kernel.
+	// TODO: Do not overload NodeNames here. Could make for confusing query parameters.
 	KernelDelete(context.Context, *NodeNames) (*emptypb.Empty, error)
 	KernelList(context.Context, *emptypb.Empty) (*KernelListResponse, error)
-	// IpmiPower gets or sets the power state for a set of nodes.
-	IpmiPower(context.Context, *IpmiPowerRequest) (*IpmiResponse, error)
+	// IpmiPower gets the power state for a set of nodes.
+	IpmiPowerGet(context.Context, *IpmiPowerRequest) (*IpmiResponse, error)
+	// IpmiPower sets the power state for a set of nodes.
+	IpmiPowerSet(context.Context, *IpmiPowerRequest) (*IpmiResponse, error)
 	// IpmiSdr gets the SDR for a set of nodes.
 	IpmiSdr(context.Context, *IpmiSdrRequest) (*IpmiResponse, error)
 	// IpmiSensor gets the sensor readings for a set of nodes.
@@ -438,8 +461,11 @@ func (UnimplementedWWApiServer) KernelDelete(context.Context, *NodeNames) (*empt
 func (UnimplementedWWApiServer) KernelList(context.Context, *emptypb.Empty) (*KernelListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method KernelList not implemented")
 }
-func (UnimplementedWWApiServer) IpmiPower(context.Context, *IpmiPowerRequest) (*IpmiResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method IpmiPower not implemented")
+func (UnimplementedWWApiServer) IpmiPowerGet(context.Context, *IpmiPowerRequest) (*IpmiResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IpmiPowerGet not implemented")
+}
+func (UnimplementedWWApiServer) IpmiPowerSet(context.Context, *IpmiPowerRequest) (*IpmiResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IpmiPowerSet not implemented")
 }
 func (UnimplementedWWApiServer) IpmiSdr(context.Context, *IpmiSdrRequest) (*IpmiResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method IpmiSdr not implemented")
@@ -494,7 +520,7 @@ func _WWApi_Version_Handler(srv interface{}, ctx context.Context, dec func(inter
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.v1.WWApi/Version",
+		FullMethod: "/warewulf.api.v1.WWApi/Version",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).Version(ctx, req.(*emptypb.Empty))
@@ -512,7 +538,7 @@ func _WWApi_NodeAdd_Handler(srv interface{}, ctx context.Context, dec func(inter
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.v1.WWApi/NodeAdd",
+		FullMethod: "/warewulf.api.v1.WWApi/NodeAdd",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).NodeAdd(ctx, req.(*NodeInfo))
@@ -530,7 +556,7 @@ func _WWApi_NodeDelete_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.v1.WWApi/NodeDelete",
+		FullMethod: "/warewulf.api.v1.WWApi/NodeDelete",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).NodeDelete(ctx, req.(*NodeNames))
@@ -548,7 +574,7 @@ func _WWApi_NodeList_Handler(srv interface{}, ctx context.Context, dec func(inte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.v1.WWApi/NodeList",
+		FullMethod: "/warewulf.api.v1.WWApi/NodeList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).NodeList(ctx, req.(*NodeNames))
@@ -566,7 +592,7 @@ func _WWApi_NodeStatus_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.v1.WWApi/NodeStatus",
+		FullMethod: "/warewulf.api.v1.WWApi/NodeStatus",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).NodeStatus(ctx, req.(*NodeNames))
@@ -584,7 +610,7 @@ func _WWApi_ProfileAdd_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.v1.WWApi/ProfileAdd",
+		FullMethod: "/warewulf.api.v1.WWApi/ProfileAdd",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).ProfileAdd(ctx, req.(*NodeInfo))
@@ -602,7 +628,7 @@ func _WWApi_ProfileDelete_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.v1.WWApi/ProfileDelete",
+		FullMethod: "/warewulf.api.v1.WWApi/ProfileDelete",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).ProfileDelete(ctx, req.(*NodeNames))
@@ -620,7 +646,7 @@ func _WWApi_ProfileList_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.v1.WWApi/ProfileList",
+		FullMethod: "/warewulf.api.v1.WWApi/ProfileList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).ProfileList(ctx, req.(*NodeNames))
@@ -638,7 +664,7 @@ func _WWApi_ContainerImport_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.v1.WWApi/ContainerImport",
+		FullMethod: "/warewulf.api.v1.WWApi/ContainerImport",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).ContainerImport(ctx, req.(*ContainerImportInfo))
@@ -656,7 +682,7 @@ func _WWApi_ContainerBuild_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.v1.WWApi/ContainerBuild",
+		FullMethod: "/warewulf.api.v1.WWApi/ContainerBuild",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).ContainerBuild(ctx, req.(*ContainerBuildInfo))
@@ -674,7 +700,7 @@ func _WWApi_ContainerDelete_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.v1.WWApi/ContainerDelete",
+		FullMethod: "/warewulf.api.v1.WWApi/ContainerDelete",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).ContainerDelete(ctx, req.(*wrapperspb.StringValue))
@@ -692,7 +718,7 @@ func _WWApi_ContainerList_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.v1.WWApi/ContainerList",
+		FullMethod: "/warewulf.api.v1.WWApi/ContainerList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).ContainerList(ctx, req.(*emptypb.Empty))
@@ -710,7 +736,7 @@ func _WWApi_KernelImport_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.v1.WWApi/KernelImport",
+		FullMethod: "/warewulf.api.v1.WWApi/KernelImport",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).KernelImport(ctx, req.(*KernelImportInfo))
@@ -728,7 +754,7 @@ func _WWApi_KernelDelete_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.v1.WWApi/KernelDelete",
+		FullMethod: "/warewulf.api.v1.WWApi/KernelDelete",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).KernelDelete(ctx, req.(*NodeNames))
@@ -746,7 +772,7 @@ func _WWApi_KernelList_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.v1.WWApi/KernelList",
+		FullMethod: "/warewulf.api.v1.WWApi/KernelList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).KernelList(ctx, req.(*emptypb.Empty))
@@ -754,20 +780,38 @@ func _WWApi_KernelList_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
-func _WWApi_IpmiPower_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _WWApi_IpmiPowerGet_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(IpmiPowerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(WWApiServer).IpmiPower(ctx, in)
+		return srv.(WWApiServer).IpmiPowerGet(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.v1.WWApi/IpmiPower",
+		FullMethod: "/warewulf.api.v1.WWApi/IpmiPowerGet",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(WWApiServer).IpmiPower(ctx, req.(*IpmiPowerRequest))
+		return srv.(WWApiServer).IpmiPowerGet(ctx, req.(*IpmiPowerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WWApi_IpmiPowerSet_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IpmiPowerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WWApiServer).IpmiPowerSet(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/warewulf.api.v1.WWApi/IpmiPowerSet",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WWApiServer).IpmiPowerSet(ctx, req.(*IpmiPowerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -782,7 +826,7 @@ func _WWApi_IpmiSdr_Handler(srv interface{}, ctx context.Context, dec func(inter
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.v1.WWApi/IpmiSdr",
+		FullMethod: "/warewulf.api.v1.WWApi/IpmiSdr",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).IpmiSdr(ctx, req.(*IpmiSdrRequest))
@@ -800,7 +844,7 @@ func _WWApi_IpmiSensor_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.v1.WWApi/IpmiSensor",
+		FullMethod: "/warewulf.api.v1.WWApi/IpmiSensor",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).IpmiSensor(ctx, req.(*IpmiSensorRequest))
@@ -818,7 +862,7 @@ func _WWApi_OverlayBuild_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.v1.WWApi/OverlayBuild",
+		FullMethod: "/warewulf.api.v1.WWApi/OverlayBuild",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).OverlayBuild(ctx, req.(*NodeNames))
@@ -836,7 +880,7 @@ func _WWApi_OverlayChmod_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.v1.WWApi/OverlayChmod",
+		FullMethod: "/warewulf.api.v1.WWApi/OverlayChmod",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).OverlayChmod(ctx, req.(*OverlayChmodRequest))
@@ -854,7 +898,7 @@ func _WWApi_OverlayChown_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.v1.WWApi/OverlayChown",
+		FullMethod: "/warewulf.api.v1.WWApi/OverlayChown",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).OverlayChown(ctx, req.(*OverlayChownRequest))
@@ -872,7 +916,7 @@ func _WWApi_OverlayCreate_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.v1.WWApi/OverlayCreate",
+		FullMethod: "/warewulf.api.v1.WWApi/OverlayCreate",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).OverlayCreate(ctx, req.(*wrapperspb.StringValue))
@@ -890,7 +934,7 @@ func _WWApi_OverlayDelete_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.v1.WWApi/OverlayDelete",
+		FullMethod: "/warewulf.api.v1.WWApi/OverlayDelete",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).OverlayDelete(ctx, req.(*OverlayDeleteRequest))
@@ -908,7 +952,7 @@ func _WWApi_OverlayImport_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.v1.WWApi/OverlayImport",
+		FullMethod: "/warewulf.api.v1.WWApi/OverlayImport",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).OverlayImport(ctx, req.(*wrapperspb.StringValue))
@@ -926,7 +970,7 @@ func _WWApi_OverlayList_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.v1.WWApi/OverlayList",
+		FullMethod: "/warewulf.api.v1.WWApi/OverlayList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).OverlayList(ctx, req.(*OverlayListRequest))
@@ -944,7 +988,7 @@ func _WWApi_OverlayMkdir_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/wwapi.v1.WWApi/OverlayMkdir",
+		FullMethod: "/warewulf.api.v1.WWApi/OverlayMkdir",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).OverlayMkdir(ctx, req.(*OverlayMkdirRequest))
@@ -956,7 +1000,7 @@ func _WWApi_OverlayMkdir_Handler(srv interface{}, ctx context.Context, dec func(
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var WWApi_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "wwapi.v1.WWApi",
+	ServiceName: "warewulf.api.v1.WWApi",
 	HandlerType: (*WWApiServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -1020,8 +1064,12 @@ var WWApi_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _WWApi_KernelList_Handler,
 		},
 		{
-			MethodName: "IpmiPower",
-			Handler:    _WWApi_IpmiPower_Handler,
+			MethodName: "IpmiPowerGet",
+			Handler:    _WWApi_IpmiPowerGet_Handler,
+		},
+		{
+			MethodName: "IpmiPowerSet",
+			Handler:    _WWApi_IpmiPowerSet_Handler,
 		},
 		{
 			MethodName: "IpmiSdr",

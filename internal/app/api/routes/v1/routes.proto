@@ -3,13 +3,13 @@
 // Note: We may want rpcs for Entry accessors, but we may not need them. Unclear.
 syntax = "proto3";
 
-option go_package = "internal/pkg/api/v1/routes;wwapi";
+option go_package = "pkg/api/v1;api";
 
-package wwapi.v1;
+package warewulf.api.v1;
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/wrappers.proto";
-
+import "google/api/annotations.proto";
 
 // Nodes
 
@@ -313,97 +313,224 @@ service WWApi {
 
     // Version returns the wwapi version. This is also useful for testing if 
     // the service is up.
-    rpc Version(google.protobuf.Empty) returns (google.protobuf.StringValue) {}
+    rpc Version(google.protobuf.Empty) returns (google.protobuf.StringValue) {
+        option (google.api.http) = {
+            get: "/version"
+        };
+    }
 
     // Nodes
 
     // NodeAdd adds a node to warewulf.
     // Returns the added node since we may be shimming in defaults.
-    rpc NodeAdd(NodeInfo) returns (NodeInfo) {}
+    rpc NodeAdd(NodeInfo) returns (NodeInfo) {
+        option (google.api.http) = {
+            post: "/v1/node"
+            body: "*"
+        };
+    }
 
     // NodeDelete deletes one or mode nodes from warewulf. Returns an error on failure.
-    rpc NodeDelete(NodeNames) returns (google.protobuf.Empty) {}
+    // See this for how the query parameters work:
+    // https://github.com/googleapis/googleapis/blob/7cde5d0df08801e00fc45df1546942aa2692d5c3/google/api/http.proto#L89-L122
+    rpc NodeDelete(NodeNames) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/node"
+        };
+    }
 
     // NodeList returns all nodes, or the NodeInfo for each node name in NodeNames.
-    rpc NodeList(NodeNames) returns (NodeInfoResponse) {}
+    // See this for how the query parameters work:
+    // https://github.com/googleapis/googleapis/blob/7cde5d0df08801e00fc45df1546942aa2692d5c3/google/api/http.proto#L89-L122
+    rpc NodeList(NodeNames) returns (NodeInfoResponse) {
+        option (google.api.http) = {
+            get: "/v1/node"
+        };
+    }
 
     // NodeStatus returns the status for all nodes or the given set of nodes
     // in the request. If NodeNames is empty, return all.
-    rpc NodeStatus(NodeNames) returns (NodeStatusResponse) {}
+    rpc NodeStatus(NodeNames) returns (NodeStatusResponse) {
+        option (google.api.http) = {
+            get: "/v1/nodestatus"
+        };
+    }
 
     // Profiles
 
     // ProfileAdd adds a profile to warewulf.
     // This NodeInfo argument may seem odd, but it looks like that is what it is.
-    rpc ProfileAdd(NodeInfo) returns (NodeInfo) {}
+    rpc ProfileAdd(NodeInfo) returns (NodeInfo) {
+        option (google.api.http) = {
+            post: "/v1/profile"
+            body: "*"
+        };
+    }
 
     // ProfileDelete deletes one or more profils from warewulf given the id / name.
-    rpc ProfileDelete(NodeNames) returns (google.protobuf.Empty) {}
+    rpc ProfileDelete(NodeNames) returns (google.protobuf.Empty) {
+         option (google.api.http) = {
+            delete: "/v1/profile"
+        };
+    }
 
     // ProfileList returns all profiles.
-    rpc ProfileList(NodeNames) returns (ProfileListResponse) {}
+    rpc ProfileList(NodeNames) returns (ProfileListResponse) {
+        option (google.api.http) = {
+            get: "/v1/profile"
+        };
+    }
 
     // Containers
 
     // ContainerImport imports a container from a URL.
-    rpc ContainerImport(ContainerImportInfo) returns (google.protobuf.Empty) {}
+    rpc ContainerImport(ContainerImportInfo) returns (google.protobuf.Empty) {
+        option(google.api.http) = {
+            post: "/v1/container"
+            body: "*"
+        };
+    }
 
     // Container Build builds one or all containers
-    rpc ContainerBuild(ContainerBuildInfo) returns (google.protobuf.Empty){}
+    rpc ContainerBuild(ContainerBuildInfo) returns (google.protobuf.Empty){
+        option(google.api.http) = {
+            post: "/v1/container/build"
+            body: "*"
+        };
+    }
 
     // ContainerDelete deletes a container by name.
-    rpc ContainerDelete(google.protobuf.StringValue) returns (google.protobuf.Empty) {}
+    rpc ContainerDelete(google.protobuf.StringValue) returns (google.protobuf.Empty) {
+        option(google.api.http) = {
+            delete: "/v1/container"
+        };
+    }
 
     // ContainerList returns all containers.
-    rpc ContainerList(google.protobuf.Empty) returns (ContainerListResponse) {}
+    rpc ContainerList(google.protobuf.Empty) returns (ContainerListResponse) {
+        option(google.api.http) = {
+            get: "/v1/container"
+        };
+    }
 
     // Kernels
 
     // KernelImport imports a kernel.
-    rpc KernelImport(KernelImportInfo) returns (google.protobuf.Empty) {}
+    rpc KernelImport(KernelImportInfo) returns (google.protobuf.Empty) {
+        option(google.api.http) = {
+            post: "/v1/kernel"
+            body: "*"
+        };
+    }
 
     // KernelDelete deletes a kernel.
-    rpc KernelDelete(NodeNames) returns (google.protobuf.Empty) {}
+    // TODO: Do not overload NodeNames here. Could make for confusing query parameters.
+    rpc KernelDelete(NodeNames) returns (google.protobuf.Empty) {
+        option(google.api.http) = {
+            delete: "/v1/kernel"
+        };
+    }
 
-    rpc KernelList(google.protobuf.Empty) returns (KernelListResponse) {}
+    rpc KernelList(google.protobuf.Empty) returns (KernelListResponse) {
+        option(google.api.http) = {
+            get: "/v1/kernel"
+        };
+    }
 
     // IPMI
 
-    // IpmiPower gets or sets the power state for a set of nodes.
-    rpc IpmiPower(IpmiPowerRequest) returns (IpmiResponse) {}
+    // IpmiPower gets the power state for a set of nodes.
+    rpc IpmiPowerGet(IpmiPowerRequest) returns (IpmiResponse) {
+        option(google.api.http) = {
+            get: "/v1/ipmi/power"
+        };
+    }
+
+    // IpmiPower sets the power state for a set of nodes.
+    rpc IpmiPowerSet(IpmiPowerRequest) returns (IpmiResponse) {
+        option(google.api.http) = {
+            post: "/v1/ipmi/power"
+            body: "*"
+        };
+    }
 
     // IpmiSdr gets the SDR for a set of nodes.
-    rpc IpmiSdr(IpmiSdrRequest) returns (IpmiResponse) {}
+    rpc IpmiSdr(IpmiSdrRequest) returns (IpmiResponse) {
+        option(google.api.http) = {
+            get: "/v1/ipmi/sdr"
+        };
+    }
 
     // IpmiSensor gets the sensor readings for a set of nodes.
-    rpc IpmiSensor(IpmiSensorRequest) returns (IpmiResponse) {}
+    rpc IpmiSensor(IpmiSensorRequest) returns (IpmiResponse) {
+        option(google.api.http) = {
+            get: "/v1/ipmi/sensor"
+        };
+    }
 
     // Overlay
 
     // OverlayBuild builds overlays for all nodes or the given set of nodes
     // in the request. Return err from warewulf, if any.
-    rpc OverlayBuild(NodeNames) returns (google.protobuf.Empty) {}
+    rpc OverlayBuild(NodeNames) returns (google.protobuf.Empty) {
+        option(google.api.http) = {
+            post: "/v1/overlay/build"
+            body: "*"
+        };
+    }
 
     // OverlayChmod sets the file mode for a file in an overlay.
-    rpc OverlayChmod(OverlayChmodRequest) returns (google.protobuf.Empty) {}
+    rpc OverlayChmod(OverlayChmodRequest) returns (google.protobuf.Empty) {
+        option(google.api.http) = {
+            patch: "/v1/overlay/chmod"
+            body: "*"
+        };
+    }
 
     // OverlayChown sets the owner and, if desired, the group for a file in an overlay.
-    rpc OverlayChown(OverlayChownRequest) returns (google.protobuf.Empty) {}
+    rpc OverlayChown(OverlayChownRequest) returns (google.protobuf.Empty) {
+        option(google.api.http) = {
+            patch: "/v1/overlay/chown"
+            body: "*"
+        };
+    }
 
     // OverlayCreate creates a new overlay with the given name.
-    rpc OverlayCreate(google.protobuf.StringValue) returns (google.protobuf.Empty) {}
+    rpc OverlayCreate(google.protobuf.StringValue) returns (google.protobuf.Empty) {
+        option(google.api.http) = {
+            post: "/v1/overlay"
+            body: "*"
+        };
+    }
 
     // OverlayDelete deletes the overlay with the given name, and optionally 
     // deletes overlay files and empty directories.
-    rpc OverlayDelete(OverlayDeleteRequest) returns (google.protobuf.Empty) {}
+    rpc OverlayDelete(OverlayDeleteRequest) returns (google.protobuf.Empty) {
+        option(google.api.http) = {
+            delete: "/v1/overlay"
+        };
+    }
     
     // OverlayImport imports a file into an overlay.
-    rpc OverlayImport(google.protobuf.StringValue) returns (google.protobuf.Empty) {}
+    rpc OverlayImport(google.protobuf.StringValue) returns (google.protobuf.Empty) {
+        option(google.api.http) = {
+            patch: "/v1/overlay/import"
+            body: "*"
+        };
+    }
 
     // OverlayList lists all or the given overlays. Output contains OverlayListResponse.
-    rpc OverlayList(OverlayListRequest) returns (OverlayListResponse) {}
+    rpc OverlayList(OverlayListRequest) returns (OverlayListResponse) {
+        option(google.api.http) = {
+            get: "/v1/overlay"
+        };
+    }
 
     // OverlayMkdir creates a directory in an overlay.
-    rpc OverlayMkdir(OverlayMkdirRequest) returns (google.protobuf.Empty) {}
+    rpc OverlayMkdir(OverlayMkdirRequest) returns (google.protobuf.Empty) {
+        option(google.api.http) = {
+            patch: "/v1/overlay/mkdir"
+            body: "*"
+        };
+    }
 }
-

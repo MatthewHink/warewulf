@@ -534,4 +534,6 @@ service WWApi {
             body: "*"
         };
     }
+
+    // TODO: Configure is comppletely missing here. We need it.
 }

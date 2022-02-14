@@ -1,0 +1,539 @@
+// Routes for wwapi.
+// TODO: Try protoc-gen-doc for generating documentation.
+// Note: We may want rpcs for Entry accessors, but we may not need them. Unclear.
+syntax = "proto3";
+
+//option go_package = "pkg/api/v1;api";
+option go_package = "pkg/api/wwapiv1;wwapiv1";
+
+package wwapi.v1;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+import "google/api/annotations.proto";
+
+// Nodes
+
+// Entry is a low level structure for node fields and network device fields.
+message Entry {
+    string value = 1;
+    string altValue = 2;
+    string from = 3;
+    string def = 4;
+}
+
+// NetDevEntry is a structure for a network device, a NIC.
+message NetDevEntry {
+    Entry Type = 1;
+    Entry OnBoot = 2;
+    Entry Device = 3;
+    Entry HwAddr = 4;
+    Entry IpAddr = 5;
+    Entry IpCIDR = 6;
+    Entry Prefix = 7;
+    Entry Netmask = 8;
+    Entry Gateway = 9;
+    Entry Default = 10;
+}
+
+// NodeInfo contains everything we know about a node. A node is a machine imaged by Warewulf.
+message NodeInfo {
+    Entry Id = 1;
+    Entry Cid = 2;
+    Entry Comment = 3;
+    Entry ClusterName = 4;
+    Entry ContainerName = 5;
+    Entry Ipxe = 6;
+    Entry KernelVersion = 7;
+    Entry KernelArgs = 8;
+    Entry IpmiIpAddr = 9;
+    Entry IpmiNetmask = 10;
+    Entry IpmiPort = 11;
+    Entry IpmiGateway = 12;
+    Entry IpmiUserName = 13;
+    Entry IpmiPassword = 14;
+    Entry IpmiInterface = 15;
+    Entry RuntimeOverlay = 16;
+    Entry SystemOverlay = 17;
+    Entry Root = 18; // TODO: Doc what this is.
+    Entry Discoverable = 19;
+    Entry Init = 20;
+    Entry AssetKey = 21;
+    repeated string Profiles = 22;
+    repeated string GroupProfiles = 23;
+    map<string, NetDevEntry> NetDevs = 24;
+    map<string, Entry> Keys = 25;
+}
+
+// NodeInfos is a set of NodeInfo.
+message NodeInfos {
+    repeated NodeInfo NodeInfos = 1;
+}
+
+// NodeInfoResponse is the result of a call to NodeList.
+message NodeInfoResponse {
+    NodeInfos Nodes = 1;
+}
+
+// NodeName is the same as id.
+message NodeName {
+    string NodeName = 1;
+}
+
+// NodeNames is a set of NodeName.
+message NodeNames {
+    repeated NodeName NodeNames = 1;
+}
+
+// NodeStatus contains information about the imaging status.
+message NodeStatus {
+    string Node = 1;
+    string Stage = 2;       // FUTURE: This should be an enum, but none is currently defined in warewulf.
+    string Sent = 3;        // Name of the last file sent to the node.
+    string IpAddress = 4;
+    uint32 LastSeen = 5;    // Number of seconds since the node was last seen. 
+}
+
+// NodeStatusResponse contains the NodeStatus for a set of nodes and an error.
+message NodeStatusResponse {
+    repeated NodeStatus NodeStatuses = 1;  // Apparently statuses is a valid plural.
+}
+
+// Profiles
+
+// ProfileListResponse is a set of NodeInfo. These are essentially defaults for
+// the nodes in each profile.
+message ProfileListResponse {
+    repeated NodeInfo Profiles = 1;
+}
+
+// IPMI
+
+// IpmiPowerRequest contains a list of node names and the power command to run on the nodes.
+message IpmiPowerRequest {
+    NodeNames Nodes = 1;
+    string PowerCommand = 2; // ipmitool takes at least: on, off, reset, soft, status.
+}
+
+// IpmiSensorRequest contains a list of node names to get the sensor data from.
+message IpmiSensorRequest {
+    NodeNames Nodes = 1;
+}
+
+// IpmiSdrRequest contains a list of node names for which to get the SDR (Sensor Data Repository).
+message IpmiSdrRequest {
+    NodeNames Nodes = 1;
+}
+
+// IpmiNodeResponse is the node name, ipmitool output, and error if any per node.
+message IpmiNodeResponse {
+    string Node = 1;    // Name of the node.
+    string Out = 2;     // ipmitool output.
+}
+
+// IpmiResponse is a list of IpmiNodeResponse.
+message IpmiResponse {
+    repeated IpmiNodeResponse NodeResponses = 1;
+}
+
+// Configuration
+
+message WarewulfConf {
+    int32 Port = 1;
+    bool Secure = 2;
+    int32 UpdateInterval = 3;
+    bool AutobuildOverlays = 4;
+    bool Syslog = 5;
+    string DataStore = 6;
+}
+
+message DhcpConf {
+    bool Enabled = 1;
+    string Templage = 2;
+    string RangeStart = 3;
+    string RangeEnd = 4;
+    string SystemdName = 5;
+    string ConfigFile = 6;
+}
+
+message TftpConf {
+    bool Enabled = 1;
+    string TftpRoot = 2;
+    string SystemdName = 3;
+}
+
+message NfsExportConf {
+    string Path = 1;
+    string ExportOptions = 2;
+    string MountOptions = 3;
+    bool Mount = 4;
+}
+
+message NfsConf {
+    bool Enabled = 1;
+    repeated string Exports = 2;
+    repeated NfsExportConf ExportsExtended = 3; // TODO: Was a slice of pointer.
+    string SystemdName = 4;
+}
+
+message ControllerConf {
+    string Comment = 1;
+    string IpAddr = 2;
+    string Netmask = 3;
+    string Network = 4;
+    string Fqdn = 5;
+    WarewulfConf Warewulf = 6; // TODO: Here and below were pointers.
+    DhcpConf Dhcp = 7;
+    TftpConf Tftp = 8;
+    NfsConf Nfs = 9;
+    bool Current = 10;
+}
+
+// Container
+
+message RegistryCredentials {
+    string UserName = 1;
+    string Password = 2;
+}
+
+message ContainerImportInfo {
+    string Name = 1;
+    string Url = 2;
+    bool Build = 3;
+    bool Force = 4;
+    bool Update = 5;
+    RegistryCredentials Credentials = 6;
+}
+
+message ContainerBuildInfo {
+    string Name = 1;
+    bool Force = 2;
+    bool All = 3;
+}
+
+message ContainerListEntry {
+    string Name = 1;
+    bool Built = 2;
+    int32 NodeCount = 3;
+}
+
+message ContainerListResponse {
+    repeated ContainerListEntry Containers = 1;
+}
+
+// Kernel
+
+message KernelImportInfo {
+    string Name = 1;
+    string Version = 2;
+    string Container = 3;   // Import kernel from container.
+    NodeNames Nodes = 4;    // Build overlay for particular nodes.
+    string Root = 5;        // Import kernel from root (chroot) directory (default "/")
+    bool Default = 6;       // Set this kernel for the default profile.
+}
+
+message KernelListEntry {
+    string Name = 1;
+    string Version = 2;
+    int32 NodeCount = 3;
+}
+
+message KernelListResponse {
+    repeated KernelListEntry Kernels = 1;
+}
+
+// Overlay
+
+// OverlayChmodRequest contains the parameters to chmod a file in an overlay.
+message OverlayChmodRequest {
+    string Name = 1;        // The name of the overlay.
+    string FileName = 2;    // The file to chmod.
+    uint32 Mode = 3;        // The file mode. Default 0755.
+}
+
+// OverlayChownRequest contains the parameters to chmod a file in an overlay.
+message OverlayChownRequest {
+    string Name = 1;        // The name of the overlay.
+    string FileName = 2;    // The file to chmod.
+    uint32 Uid = 3;         // The user id.
+    uint32 Gid = 4;         // Optional group id.
+}
+
+// FileList is a set of file names.
+message FileList {
+    repeated string Filenames = 1;
+}
+
+// OverlayDeleteRequest contains the parameters to delete an overlay.
+message OverlayDeleteRequest {
+    string Name = 1;        // The name of the overlay.
+    FileList Filenames = 2; // Overlay files to delete. Delete the overlay if no files are given.
+    bool Force = 3;         // Force deletion of non-empty overlay.
+    bool Parents = 4;       // Remove empty parent directories.
+}
+
+// OverlayImportRequest contains the parameters to import (add) an overlay.
+message OverlayImportRequest {
+    string Name = 1;        // The name of the overlay.
+    string FileName = 2;    // The name of the file to import.
+    string NewFileName = 3; // Optional new name for the file.
+    uint32 Mode = 4;        // The file mode. Default 0755.
+    bool NoUpdate = 5;      // Do not update the overlay.
+}
+
+// OverlayListRequest contains the parameters for the overlays to list. If empty, list all.
+message OverlayListRequest {
+    FileList Names = 1;    //  Optional overlay names.
+}
+
+// OverlayInfo contains data about each file in an overlay.
+message OverlayInfo {
+    uint32 Mode = 1;    // File mode.
+    uint32 Uid = 2;     // User id.
+    uint32 Gid = 3;     // Group id.
+    string Name = 4;    // Overlay name.
+    string Path = 5;    // File path.
+}
+
+// OverlayListResponse contains a list of overlays and files in each overlay as well as an error.
+message OverlayListResponse {
+    repeated OverlayInfo Overlays = 1;
+}
+
+// OverlayMkdirRequest contains the parameters to make a directory in an overlay.
+message OverlayMkdirRequest {
+    string Name = 1;        // OverlayName
+    string Directory = 2;   // Directory to create.
+    uint32 Mode = 3;        // File mode of the directory. Default 0755.
+}
+
+// WWApi is the service definition for the warewulf api (wwapi).
+service WWApi {
+
+    // Main public interface.
+
+    // Version returns the wwapi version. This is also useful for testing if 
+    // the service is up.
+    rpc Version(google.protobuf.Empty) returns (google.protobuf.StringValue) {
+        option (google.api.http) = {
+            get: "/version"
+        };
+    }
+
+    // Nodes
+
+    // NodeAdd adds a node to warewulf.
+    // Returns the added node since we may be shimming in defaults.
+    rpc NodeAdd(NodeInfo) returns (NodeInfo) {
+        option (google.api.http) = {
+            post: "/v1/node"
+            body: "*"
+        };
+    }
+
+    // NodeDelete deletes one or mode nodes from warewulf. Returns an error on failure.
+    // See this for how the query parameters work:
+    // https://github.com/googleapis/googleapis/blob/7cde5d0df08801e00fc45df1546942aa2692d5c3/google/api/http.proto#L89-L122
+    rpc NodeDelete(NodeNames) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/node"
+        };
+    }
+
+    // NodeList returns all nodes, or the NodeInfo for each node name in NodeNames.
+    // See this for how the query parameters work:
+    // https://github.com/googleapis/googleapis/blob/7cde5d0df08801e00fc45df1546942aa2692d5c3/google/api/http.proto#L89-L122
+    rpc NodeList(NodeNames) returns (NodeInfoResponse) {
+        option (google.api.http) = {
+            get: "/v1/node"
+        };
+    }
+
+    // NodeStatus returns the status for all nodes or the given set of nodes
+    // in the request. If NodeNames is empty, return all.
+    rpc NodeStatus(NodeNames) returns (NodeStatusResponse) {
+        option (google.api.http) = {
+            get: "/v1/nodestatus"
+        };
+    }
+
+    // Profiles
+
+    // ProfileAdd adds a profile to warewulf.
+    // This NodeInfo argument may seem odd, but it looks like that is what it is.
+    rpc ProfileAdd(NodeInfo) returns (NodeInfo) {
+        option (google.api.http) = {
+            post: "/v1/profile"
+            body: "*"
+        };
+    }
+
+    // ProfileDelete deletes one or more profils from warewulf given the id / name.
+    rpc ProfileDelete(NodeNames) returns (google.protobuf.Empty) {
+         option (google.api.http) = {
+            delete: "/v1/profile"
+        };
+    }
+
+    // ProfileList returns all profiles.
+    rpc ProfileList(NodeNames) returns (ProfileListResponse) {
+        option (google.api.http) = {
+            get: "/v1/profile"
+        };
+    }
+
+    // Containers
+
+    // ContainerImport imports a container from a URL.
+    rpc ContainerImport(ContainerImportInfo) returns (google.protobuf.Empty) {
+        option(google.api.http) = {
+            post: "/v1/container"
+            body: "*"
+        };
+    }
+
+    // Container Build builds one or all containers
+    rpc ContainerBuild(ContainerBuildInfo) returns (google.protobuf.Empty){
+        option(google.api.http) = {
+            post: "/v1/container/build"
+            body: "*"
+        };
+    }
+
+    // ContainerDelete deletes a container by name.
+    rpc ContainerDelete(google.protobuf.StringValue) returns (google.protobuf.Empty) {
+        option(google.api.http) = {
+            delete: "/v1/container"
+        };
+    }
+
+    // ContainerList returns all containers.
+    rpc ContainerList(google.protobuf.Empty) returns (ContainerListResponse) {
+        option(google.api.http) = {
+            get: "/v1/container"
+        };
+    }
+
+    // Kernels
+
+    // KernelImport imports a kernel.
+    rpc KernelImport(KernelImportInfo) returns (google.protobuf.Empty) {
+        option(google.api.http) = {
+            post: "/v1/kernel"
+            body: "*"
+        };
+    }
+
+    // KernelDelete deletes a kernel.
+    // TODO: Do not overload NodeNames here. Could make for confusing query parameters.
+    rpc KernelDelete(NodeNames) returns (google.protobuf.Empty) {
+        option(google.api.http) = {
+            delete: "/v1/kernel"
+        };
+    }
+
+    rpc KernelList(google.protobuf.Empty) returns (KernelListResponse) {
+        option(google.api.http) = {
+            get: "/v1/kernel"
+        };
+    }
+
+    // IPMI
+
+    // IpmiPower gets the power state for a set of nodes.
+    rpc IpmiPowerGet(IpmiPowerRequest) returns (IpmiResponse) {
+        option(google.api.http) = {
+            get: "/v1/ipmi/power"
+        };
+    }
+
+    // IpmiPower sets the power state for a set of nodes.
+    rpc IpmiPowerSet(IpmiPowerRequest) returns (IpmiResponse) {
+        option(google.api.http) = {
+            post: "/v1/ipmi/power"
+            body: "*"
+        };
+    }
+
+    // IpmiSdr gets the SDR for a set of nodes.
+    rpc IpmiSdr(IpmiSdrRequest) returns (IpmiResponse) {
+        option(google.api.http) = {
+            get: "/v1/ipmi/sdr"
+        };
+    }
+
+    // IpmiSensor gets the sensor readings for a set of nodes.
+    rpc IpmiSensor(IpmiSensorRequest) returns (IpmiResponse) {
+        option(google.api.http) = {
+            get: "/v1/ipmi/sensor"
+        };
+    }
+
+    // Overlay
+
+    // OverlayBuild builds overlays for all nodes or the given set of nodes
+    // in the request. Return err from warewulf, if any.
+    rpc OverlayBuild(NodeNames) returns (google.protobuf.Empty) {
+        option(google.api.http) = {
+            post: "/v1/overlay/build"
+            body: "*"
+        };
+    }
+
+    // OverlayChmod sets the file mode for a file in an overlay.
+    rpc OverlayChmod(OverlayChmodRequest) returns (google.protobuf.Empty) {
+        option(google.api.http) = {
+            patch: "/v1/overlay/chmod"
+            body: "*"
+        };
+    }
+
+    // OverlayChown sets the owner and, if desired, the group for a file in an overlay.
+    rpc OverlayChown(OverlayChownRequest) returns (google.protobuf.Empty) {
+        option(google.api.http) = {
+            patch: "/v1/overlay/chown"
+            body: "*"
+        };
+    }
+
+    // OverlayCreate creates a new overlay with the given name.
+    rpc OverlayCreate(google.protobuf.StringValue) returns (google.protobuf.Empty) {
+        option(google.api.http) = {
+            post: "/v1/overlay"
+            body: "*"
+        };
+    }
+
+    // OverlayDelete deletes the overlay with the given name, and optionally 
+    // deletes overlay files and empty directories.
+    rpc OverlayDelete(OverlayDeleteRequest) returns (google.protobuf.Empty) {
+        option(google.api.http) = {
+            delete: "/v1/overlay"
+        };
+    }
+    
+    // OverlayImport imports a file into an overlay.
+    rpc OverlayImport(google.protobuf.StringValue) returns (google.protobuf.Empty) {
+        option(google.api.http) = {
+            patch: "/v1/overlay/import"
+            body: "*"
+        };
+    }
+
+    // OverlayList lists all or the given overlays. Output contains OverlayListResponse.
+    rpc OverlayList(OverlayListRequest) returns (OverlayListResponse) {
+        option(google.api.http) = {
+            get: "/v1/overlay"
+        };
+    }
+
+    // OverlayMkdir creates a directory in an overlay.
+    rpc OverlayMkdir(OverlayMkdirRequest) returns (google.protobuf.Empty) {
+        option(google.api.http) = {
+            patch: "/v1/overlay/mkdir"
+            body: "*"
+        };
+    }
+
+    // TODO: Configure is comppletely missing here. We need it.
+}

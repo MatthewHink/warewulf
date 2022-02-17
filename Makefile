@@ -224,8 +224,20 @@ dist: vendor config
 	cd .dist; tar -czf ../warewulf-$(VERSION).tar.gz warewulf-$(VERSION)
 	rm -rf .dist
 
+proto: ## wwapi generate code from protobuf
+	protoc -I internal/pkg/api/routes/v1 -I=. \
+		--grpc-gateway_out=. \
+		--go_out=. \
+		--go-grpc_out=. routes.proto
+
+wwapid: ## build the api server
+	go build -race -ldflags "-s -w" -o ./wwapid internal/app/api/wwapid/wwapid.go
+
+wwapic: ## buid the sample wwapi client.
+	go build -race -ldflags "-s -w" -o ./wwapic  internal/app/api/wwapic/wwapic.go
+
 clean:
-	rm -f wwclient
+	rm -f wwclient00111
 	rm -f wwctl
 	rm -rf .dist
 	rm -f warewulf-$(VERSION).tar.gz

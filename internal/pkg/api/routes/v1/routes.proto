@@ -1,0 +1,31 @@
+// Routes for wwapi.
+// TODO: Try protoc-gen-doc for generating documentation.
+
+syntax = "proto3";
+
+//option go_package = "pkg/api/v1;api";
+//option go_package = "pkg/api/wwapiv1;wwapiv1";
+option go_package = "internal/pkg/api/routes/wwapiv1;wwapiv1";
+
+package wwapi.v1;
+
+import "google/protobuf/empty.proto";
+//import "google/protobuf/wrappers.proto";
+import "google/api/annotations.proto";
+
+
+message VersionResponse {
+	string apiPrefix = 1;
+	string apiVersion = 2;
+	string warewulfVersion = 3;
+}
+
+service WWApi {
+	// Version returns the wwapi version. This is also useful for testing if 
+	// the service is up.
+	rpc Version(google.protobuf.Empty) returns (VersionResponse) {
+        option (google.api.http) = {
+            get: "/version"
+        };
+    }
+}

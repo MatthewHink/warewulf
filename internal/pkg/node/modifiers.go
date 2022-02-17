@@ -15,7 +15,7 @@ import (
  *
 ****/
 
-func (config *nodeYaml) AddNode(nodeID string) (NodeInfo, error) {
+func (config *NodeYaml) AddNode(nodeID string) (NodeInfo, error) {
 	var node NodeConf
 	var n NodeInfo
 
@@ -36,7 +36,7 @@ func (config *nodeYaml) AddNode(nodeID string) (NodeInfo, error) {
 	return n, nil
 }
 
-func (config *nodeYaml) DelNode(nodeID string) error {
+func (config *NodeYaml) DelNode(nodeID string) error {
 
 	if _, ok := config.Nodes[nodeID]; !ok {
 		return errors.New("Nodename does not exist: " + nodeID)
@@ -48,7 +48,7 @@ func (config *nodeYaml) DelNode(nodeID string) error {
 	return nil
 }
 
-func (config *nodeYaml) NodeUpdate(node NodeInfo) error {
+func (config *NodeYaml) NodeUpdate(node NodeInfo) error {
 	nodeID := node.Id.Get()
 
 	if _, ok := config.Nodes[nodeID]; !ok {
@@ -60,7 +60,7 @@ func (config *nodeYaml) NodeUpdate(node NodeInfo) error {
 	config.Nodes[nodeID].ClusterName = node.ClusterName.GetReal()
 	config.Nodes[nodeID].Ipxe = node.Ipxe.GetReal()
 	config.Nodes[nodeID].Init = node.Init.GetReal()
-	config.Nodes[nodeID].KernelVersion = node.KernelVersion.GetReal()
+	config.Nodes[nodeID].KernelOverride = node.KernelOverride.GetReal()
 	config.Nodes[nodeID].KernelArgs = node.KernelArgs.GetReal()
 	config.Nodes[nodeID].IpmiIpaddr = node.IpmiIpaddr.GetReal()
 	config.Nodes[nodeID].IpmiNetmask = node.IpmiNetmask.GetReal()
@@ -69,6 +69,7 @@ func (config *nodeYaml) NodeUpdate(node NodeInfo) error {
 	config.Nodes[nodeID].IpmiUserName = node.IpmiUserName.GetReal()
 	config.Nodes[nodeID].IpmiPassword = node.IpmiPassword.GetReal()
 	config.Nodes[nodeID].IpmiInterface = node.IpmiInterface.GetReal()
+	config.Nodes[nodeID].IpmiWrite = node.IpmiWrite.GetB()
 	config.Nodes[nodeID].RuntimeOverlay = node.RuntimeOverlay.GetReal()
 	config.Nodes[nodeID].SystemOverlay = node.SystemOverlay.GetReal()
 	config.Nodes[nodeID].Root = node.Root.GetReal()
@@ -108,7 +109,7 @@ func (config *nodeYaml) NodeUpdate(node NodeInfo) error {
  *
 ****/
 
-func (config *nodeYaml) AddProfile(profileID string) (NodeInfo, error) {
+func (config *NodeYaml) AddProfile(profileID string) (NodeInfo, error) {
 	var node NodeConf
 	var n NodeInfo
 
@@ -125,7 +126,7 @@ func (config *nodeYaml) AddProfile(profileID string) (NodeInfo, error) {
 	return n, nil
 }
 
-func (config *nodeYaml) DelProfile(profileID string) error {
+func (config *NodeYaml) DelProfile(profileID string) error {
 
 	if _, ok := config.NodeProfiles[profileID]; !ok {
 		return errors.New("Profile does not exist: " + profileID)
@@ -137,7 +138,7 @@ func (config *nodeYaml) DelProfile(profileID string) error {
 	return nil
 }
 
-func (config *nodeYaml) ProfileUpdate(profile NodeInfo) error {
+func (config *NodeYaml) ProfileUpdate(profile NodeInfo) error {
 	profileID := profile.Id.Get()
 
 	if _, ok := config.NodeProfiles[profileID]; !ok {
@@ -148,7 +149,7 @@ func (config *nodeYaml) ProfileUpdate(profile NodeInfo) error {
 	config.NodeProfiles[profileID].Ipxe = profile.Ipxe.GetReal()
 	config.NodeProfiles[profileID].Init = profile.Init.GetReal()
 	config.NodeProfiles[profileID].ClusterName = profile.ClusterName.GetReal()
-	config.NodeProfiles[profileID].KernelVersion = profile.KernelVersion.GetReal()
+	config.NodeProfiles[profileID].KernelOverride = profile.KernelOverride.GetReal()
 	config.NodeProfiles[profileID].KernelArgs = profile.KernelArgs.GetReal()
 	config.NodeProfiles[profileID].IpmiIpaddr = profile.IpmiIpaddr.GetReal()
 	config.NodeProfiles[profileID].IpmiNetmask = profile.IpmiNetmask.GetReal()
@@ -157,6 +158,7 @@ func (config *nodeYaml) ProfileUpdate(profile NodeInfo) error {
 	config.NodeProfiles[profileID].IpmiUserName = profile.IpmiUserName.GetReal()
 	config.NodeProfiles[profileID].IpmiPassword = profile.IpmiPassword.GetReal()
 	config.NodeProfiles[profileID].IpmiInterface = profile.IpmiInterface.GetReal()
+	config.NodeProfiles[profileID].IpmiWrite = profile.IpmiInterface.GetB()
 	config.NodeProfiles[profileID].RuntimeOverlay = profile.RuntimeOverlay.GetReal()
 	config.NodeProfiles[profileID].SystemOverlay = profile.SystemOverlay.GetReal()
 	config.NodeProfiles[profileID].Root = profile.Root.GetReal()
@@ -194,7 +196,7 @@ func (config *nodeYaml) ProfileUpdate(profile NodeInfo) error {
  *
 ****/
 
-func (config *nodeYaml) Persist() error {
+func (config *NodeYaml) Persist() error {
 
 	out, err := yaml.Marshal(config)
 	if err != nil {

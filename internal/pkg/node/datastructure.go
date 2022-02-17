@@ -9,7 +9,7 @@ import (
  * YAML data representations
  ******/
 
-type nodeYaml struct {
+type NodeYaml struct {
 	NodeProfiles map[string]*NodeConf
 	Nodes        map[string]*NodeConf
 }
@@ -20,6 +20,7 @@ type NodeConf struct {
 	ContainerName  string              `yaml:"container name,omitempty"`
 	Ipxe           string              `yaml:"ipxe template,omitempty"`
 	KernelVersion  string              `yaml:"kernel version,omitempty"`
+	KernelOverride string              `yaml:"kernel override,omitempty"`
 	KernelArgs     string              `yaml:"kernel args,omitempty"`
 	IpmiUserName   string              `yaml:"ipmi username,omitempty"`
 	IpmiPassword   string              `yaml:"ipmi password,omitempty"`
@@ -28,6 +29,7 @@ type NodeConf struct {
 	IpmiPort       string              `yaml:"ipmi port,omitempty"`
 	IpmiGateway    string              `yaml:"ipmi gateway,omitempty"`
 	IpmiInterface  string              `yaml:"ipmi interface,omitempty"`
+	IpmiWrite      bool                `yaml:"ipmi write,omitempty"`
 	RuntimeOverlay string              `yaml:"runtime overlay,omitempty"`
 	SystemOverlay  string              `yaml:"system overlay,omitempty"`
 	Init           string              `yaml:"init,omitempty"`
@@ -71,7 +73,7 @@ type NodeInfo struct {
 	ClusterName    Entry
 	ContainerName  Entry
 	Ipxe           Entry
-	KernelVersion  Entry
+	KernelOverride Entry
 	KernelArgs     Entry
 	IpmiIpaddr     Entry
 	IpmiNetmask    Entry
@@ -80,6 +82,7 @@ type NodeInfo struct {
 	IpmiUserName   Entry
 	IpmiPassword   Entry
 	IpmiInterface  Entry
+	IpmiWrite      Entry
 	RuntimeOverlay Entry
 	SystemOverlay  Entry
 	Root           Entry

@@ -21,8 +21,8 @@ func init() {
 	}
 }
 
-func New() (nodeYaml, error) {
-	var ret nodeYaml
+func New() (NodeYaml, error) {
+	var ret NodeYaml
 
 	wwlog.Printf(wwlog.VERBOSE, "Opening node configuration file: %s\n", ConfigFile)
 	data, err := ioutil.ReadFile(ConfigFile)
@@ -41,7 +41,7 @@ func New() (nodeYaml, error) {
 	return ret, nil
 }
 
-func (config *nodeYaml) FindAllNodes() ([]NodeInfo, error) {
+func (config *NodeYaml) FindAllNodes() ([]NodeInfo, error) {
 	var ret []NodeInfo
 
 	wwlog.Printf(wwlog.DEBUG, "Finding all nodes...\n")
@@ -72,7 +72,6 @@ func (config *nodeYaml) FindAllNodes() ([]NodeInfo, error) {
 		n.Id.Set(nodename)
 		n.Comment.Set(node.Comment)
 		n.ContainerName.Set(node.ContainerName)
-		n.KernelVersion.Set(node.KernelVersion)
 		n.KernelArgs.Set(node.KernelArgs)
 		n.ClusterName.Set(node.ClusterName)
 		n.Ipxe.Set(node.Ipxe)
@@ -84,11 +83,18 @@ func (config *nodeYaml) FindAllNodes() ([]NodeInfo, error) {
 		n.IpmiUserName.Set(node.IpmiUserName)
 		n.IpmiPassword.Set(node.IpmiPassword)
 		n.IpmiInterface.Set(node.IpmiInterface)
+		n.IpmiWrite.SetB(node.IpmiWrite)
 		n.SystemOverlay.Set(node.SystemOverlay)
 		n.RuntimeOverlay.Set(node.RuntimeOverlay)
 		n.Root.Set(node.Root)
 		n.AssetKey.Set(node.AssetKey)
 		n.Discoverable.Set(node.Discoverable)
+
+		if node.KernelOverride != "" {
+			n.KernelOverride.Set(node.KernelOverride)
+		} else if node.KernelVersion != "" {
+			n.KernelOverride.Set(node.KernelVersion)
+		}
 
 		for devname, netdev := range node.NetDevs {
 			if _, ok := n.NetDevs[devname]; !ok {
@@ -104,6 +110,10 @@ func (config *nodeYaml) FindAllNodes() ([]NodeInfo, error) {
 			n.NetDevs[devname].Type.Set(netdev.Type)
 			n.NetDevs[devname].OnBoot.Set(netdev.OnBoot)
 			n.NetDevs[devname].Default.Set(netdev.Default)
+			// for just one netdeve, it is always the default
+			if len(node.NetDevs) == 1 {
+				n.NetDevs[devname].Default.Set("true")
+			}
 		}
 
 		// Merge Keys into Tags for backwards compatibility
@@ -134,7 +144,6 @@ func (config *nodeYaml) FindAllNodes() ([]NodeInfo, error) {
 			n.Comment.SetAlt(config.NodeProfiles[p].Comment, p)
 			n.ClusterName.SetAlt(config.NodeProfiles[p].ClusterName, p)
 			n.ContainerName.SetAlt(config.NodeProfiles[p].ContainerName, p)
-			n.KernelVersion.SetAlt(config.NodeProfiles[p].KernelVersion, p)
 			n.KernelArgs.SetAlt(config.NodeProfiles[p].KernelArgs, p)
 			n.Ipxe.SetAlt(config.NodeProfiles[p].Ipxe, p)
 			n.Init.SetAlt(config.NodeProfiles[p].Init, p)
@@ -145,11 +154,18 @@ func (config *nodeYaml) FindAllNodes() ([]NodeInfo, error) {
 			n.IpmiUserName.SetAlt(config.NodeProfiles[p].IpmiUserName, p)
 			n.IpmiPassword.SetAlt(config.NodeProfiles[p].IpmiPassword, p)
 			n.IpmiInterface.SetAlt(config.NodeProfiles[p].IpmiInterface, p)
+			n.IpmiWrite.SetB(config.NodeProfiles[p].IpmiWrite)
 			n.SystemOverlay.SetAlt(config.NodeProfiles[p].SystemOverlay, p)
 			n.RuntimeOverlay.SetAlt(config.NodeProfiles[p].RuntimeOverlay, p)
 			n.Root.SetAlt(config.NodeProfiles[p].Root, p)
 			n.AssetKey.SetAlt(config.NodeProfiles[p].AssetKey, p)
 			n.Discoverable.SetAlt(config.NodeProfiles[p].Discoverable, p)
+
+			if config.NodeProfiles[p].KernelOverride != "" {
+				n.KernelOverride.SetAlt(config.NodeProfiles[p].KernelOverride, p)
+			} else if config.NodeProfiles[p].KernelVersion != "" {
+				n.KernelOverride.SetAlt(config.NodeProfiles[p].KernelVersion, p)
+			}
 
 			for devname, netdev := range config.NodeProfiles[p].NetDevs {
 				if _, ok := n.NetDevs[devname]; !ok {
@@ -204,7 +220,7 @@ func (config *nodeYaml) FindAllNodes() ([]NodeInfo, error) {
 	return ret, nil
 }
 
-func (config *nodeYaml) FindAllProfiles() ([]NodeInfo, error) {
+func (config *NodeYaml) FindAllProfiles() ([]NodeInfo, error) {
 	var ret []NodeInfo
 
 	for name, profile := range config.NodeProfiles {
@@ -218,7 +234,6 @@ func (config *nodeYaml) FindAllProfiles() ([]NodeInfo, error) {
 		p.ContainerName.Set(profile.ContainerName)
 		p.Ipxe.Set(profile.Ipxe)
 		p.Init.Set(profile.Init)
-		p.KernelVersion.Set(profile.KernelVersion)
 		p.KernelArgs.Set(profile.KernelArgs)
 		p.IpmiNetmask.Set(profile.IpmiNetmask)
 		p.IpmiPort.Set(profile.IpmiPort)
@@ -226,11 +241,19 @@ func (config *nodeYaml) FindAllProfiles() ([]NodeInfo, error) {
 		p.IpmiUserName.Set(profile.IpmiUserName)
 		p.IpmiPassword.Set(profile.IpmiPassword)
 		p.IpmiInterface.Set(profile.IpmiInterface)
+		p.IpmiWrite.SetB(profile.IpmiWrite)
 		p.RuntimeOverlay.Set(profile.RuntimeOverlay)
 		p.SystemOverlay.Set(profile.SystemOverlay)
 		p.Root.Set(profile.Root)
 		p.AssetKey.Set(profile.AssetKey)
 		p.Discoverable.Set(profile.Discoverable)
+
+
+		if profile.KernelOverride != "" {
+			p.KernelOverride.Set(profile.KernelOverride)
+		} else if profile.KernelVersion != "" {
+			p.KernelOverride.Set(profile.KernelVersion)
+		}
 
 		for devname, netdev := range profile.NetDevs {
 			if _, ok := p.NetDevs[devname]; !ok {
@@ -241,13 +264,19 @@ func (config *nodeYaml) FindAllProfiles() ([]NodeInfo, error) {
 			wwlog.Printf(wwlog.DEBUG, "Updating profile netdev: %s\n", devname)
 
 			p.NetDevs[devname].Device.Set(netdev.Device)
-			p.NetDevs[devname].Ipaddr.Set(netdev.Ipaddr)
 			p.NetDevs[devname].Netmask.Set(netdev.Netmask)
-			p.NetDevs[devname].Hwaddr.Set(netdev.Hwaddr)
 			p.NetDevs[devname].Gateway.Set(netdev.Gateway)
 			p.NetDevs[devname].Type.Set(netdev.Type)
 			p.NetDevs[devname].OnBoot.Set(netdev.OnBoot)
 			p.NetDevs[devname].Default.Set(netdev.Default)
+
+			// The following should not be set in a profile.
+			if netdev.Ipaddr != "" {
+				wwlog.Printf(wwlog.WARN, "Ignoring ip address %v in profile %v\n", netdev.Ipaddr, name)
+			}
+			if netdev.Hwaddr != "" {
+				wwlog.Printf(wwlog.WARN, "Ignoring hardware address %v in profile %v\n", netdev.Hwaddr, name)
+			}
 		}
 
 		// Merge Keys into Tags for backwards compatibility
@@ -286,7 +315,7 @@ func (config *nodeYaml) FindAllProfiles() ([]NodeInfo, error) {
 	return ret, nil
 }
 
-func (config *nodeYaml) FindDiscoverableNode() (NodeInfo, string, error) {
+func (config *NodeYaml) FindDiscoverableNode() (NodeInfo, string, error) {
 	var ret NodeInfo
 
 	nodes, _ := config.FindAllNodes()

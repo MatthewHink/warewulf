@@ -34,7 +34,7 @@ var (
 	}
 	SetComment        string
 	SetContainer      string
-	SetKernel         string
+	SetKernelOverride string
 	SetKernelArgs     string
 	SetNetName        string
 	SetNetDev         string
@@ -58,6 +58,7 @@ var (
 	SetIpmiUsername   string
 	SetIpmiPassword   string
 	SetIpmiInterface  string
+	SetIpmiWrite      string
 	SetNodeAll        bool
 	SetYes            bool
 	SetProfile        string
@@ -82,8 +83,8 @@ func init() {
 	}); err != nil {
 		log.Println(err)
 	}
-	baseCmd.PersistentFlags().StringVarP(&SetKernel, "kernel", "K", "", "Set Kernel version for nodes")
-	if err := baseCmd.RegisterFlagCompletionFunc("kernel", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	baseCmd.PersistentFlags().StringVarP(&SetKernelOverride, "kerneloverride", "K", "", "Set kernel override version for nodes")
+	if err := baseCmd.RegisterFlagCompletionFunc("kerneloverride", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		list, _ := kernel.ListKernels()
 		return list, cobra.ShellCompDirectiveNoFileComp
 	}); err != nil {
@@ -117,6 +118,7 @@ func init() {
 	baseCmd.PersistentFlags().StringVar(&SetIpmiUsername, "ipmiuser", "", "Set the node's IPMI username")
 	baseCmd.PersistentFlags().StringVar(&SetIpmiPassword, "ipmipass", "", "Set the node's IPMI password")
 	baseCmd.PersistentFlags().StringVar(&SetIpmiInterface, "ipmiinterface", "", "Set the node's IPMI interface (defaults: 'lan')")
+	baseCmd.PersistentFlags().StringVar(&SetIpmiWrite, "ipmiwrite", "", "Enable/disable the write of impi configuration (yes/no)")
 	baseCmd.PersistentFlags().StringSliceVar(&SetAddProfile, "addprofile", []string{}, "Add Profile(s) to node")
 	baseCmd.PersistentFlags().StringSliceVar(&SetDelProfile, "delprofile", []string{}, "Remove Profile(s) to node")
 	baseCmd.PersistentFlags().StringVarP(&SetProfile, "profile", "P", "", "Set the node's profile members (comma separated)")

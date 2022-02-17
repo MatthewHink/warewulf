@@ -10,6 +10,8 @@ import (
 	"google.golang.org/grpc"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	// wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
+
+	"google.golang.org/grpc/credentials/insecure" // TODO: Remove
 )
 
 // wwapic is intended as a sample wwapi client.
@@ -18,7 +20,8 @@ func main() {
 	log.Println("Client running")
 
 	// TODO: Remove hardcoded port. Config file.
-	conn, err := grpc.Dial(":9872", grpc.WithInsecure(), grpc.WithBlock())
+	//conn, err := grpc.Dial(":9872", grpc.WithInsecure(), grpc.WithBlock())
+	conn, err := grpc.Dial(":9872", grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
 	if err != nil {
 		log.Println("Error1:")
 		log.Fatalln(err)

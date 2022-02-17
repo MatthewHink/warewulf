@@ -4,12 +4,15 @@ import (
 	"context"
 	"log"
 	"net"
+	"fmt"
+	"os"
 
 	wwapi "github.com/hpcng/warewulf/internal/pkg/api/routes/wwapiv1"
 
 	"google.golang.org/grpc"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-	//wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
+	//wrapperspb "google.golang.org/protobuf/types/known/wrapperspb""
+	wwapidconf "github.com/hpcng/warewulf/internal/pkg/wwapidconf"
 )
 
 type apiServer struct {
@@ -18,6 +21,16 @@ type apiServer struct {
 
 func main() {
 	log.Println("Server running")
+
+	// Read the config file.
+	config, err := wwapidconf.New()
+	if err != nil {
+		// TODO: log
+		fmt.Printf("err: %v", err)
+		os.Exit(1)
+	}
+	fmt.Printf("config: %#v\n", config)
+
 
 	listen, err := net.Listen("tcp", ":9872") // TODO: Port in config file.
 	if err != nil {

@@ -13,26 +13,37 @@ import (
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	//wrapperspb "google.golang.org/protobuf/types/known/wrapperspb""
 	wwapidconf "github.com/hpcng/warewulf/internal/pkg/wwapidconf"
+	"github.com/hpcng/warewulf/internal/pkg/version"
 )
 
 type apiServer struct {
 	wwapi.UnimplementedWWApiServer
 }
 
+var apiPrefix string
+var apiVersion string
+
 func main() {
 	log.Println("Server running")
 
 	// Read the config file.
-	config, err := wwapidconf.New()
+	config, err := wwapidconf.New("") // TODO: path parameter
 	if err != nil {
-		// TODO: log
-		fmt.Printf("err: %v", err)
+		// TODO: wwapi log
+		log.Printf("err: %v", err)
 		os.Exit(1)
 	}
-	fmt.Printf("config: %#v\n", config)
+	log.Printf("config: %#v\n", config) // TODO: log
 
+	// Pull out config variables and log.
+	apiPrefix = config.ApiPrefix
+	apiVersion = config.ApiVersion
+	servicePort := config.Port
+	log.Printf("Starting wwapid. Version %s. Port %d. ApiPrefix %s\n",
+		apiVersion, servicePort, apiPrefix)
+	portString := fmt.Sprintf(":%d", servicePort)
 
-	listen, err := net.Listen("tcp", ":9872") // TODO: Port in config file.
+	listen, err := net.Listen("tcp", portString)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -44,15 +55,13 @@ func main() {
 }
 
 // Api implementation.
+
 func (s *apiServer) Version(ctx context.Context, request *emptypb.Empty) (response *wwapi.VersionResponse, err error) {
-	//str = wrapperspb.String("Version 0.0.0")
-	// TODO: Fix hardcoding.
-	// Version in config file and Makefile.
-	// Warewulf version from warewulf.
+
 	response = &wwapi.VersionResponse{
-		ApiPrefix: "v1",
-		ApiVersion: "1.0.0",
-		WarewulfVersion: "4.3",
+		ApiPrefix: apiPrefix,
+		ApiVersion: apiVersion,
+		WarewulfVersion: version.GetVersion(),
 	}
 	return
 }

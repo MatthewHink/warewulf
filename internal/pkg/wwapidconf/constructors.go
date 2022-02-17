@@ -4,7 +4,7 @@ import (
 	"github.com/hpcng/warewulf/internal/pkg/buildconfig"
 	"path"
 	"io/ioutil"
-	"fmt" // TODO: log
+	"log"
 	"gopkg.in/yaml.v2"
 )
 
@@ -16,9 +16,13 @@ type WwapidConf struct {
 	PublicKey string	`yaml:"publicKey"`
 }
 
-func New() (conf WwapidConf, err error) {
-	configFilePath := path.Join(buildconfig.SYSCONFDIR(), "warewulf/wwapid.conf")
-	fmt.Printf("configFilePath: %v\n", configFilePath)
+// New loads the wwapid config from the given configFilePath or the default if empty.
+func New(configFilePath string) (conf WwapidConf, err error) {
+
+	if configFilePath == "" {
+		configFilePath = path.Join(buildconfig.SYSCONFDIR(), "warewulf/wwapid.conf")
+	}
+	log.Printf("Loading wwapid configuration from: %v\n", configFilePath)
 
 	var fileBytes []byte
 	fileBytes, err = ioutil.ReadFile(configFilePath)
@@ -31,6 +35,6 @@ func New() (conf WwapidConf, err error) {
 		return
 	}
 
-	fmt.Printf("wwapid config: %#v\n", conf)
+	log.Printf("wwapid config: %#v\n", conf)
 	return
 }

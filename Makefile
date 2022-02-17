@@ -260,6 +260,9 @@ clean:
 #	rm -f config_defaults
 	rm -f config
 	rm -f Defaults.mk
+	rm -f wwapid
+	rm -f wwapic
+	rm -f wwapird
 
 install: files install_wwclient
 

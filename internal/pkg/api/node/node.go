@@ -8,7 +8,6 @@ import (
 )
 
 func NodeList(nodeNames []string) (nodeInfo []*wwapi.NodeInfo, err error) {
-	// TODO: All logic from wwctl node list goes here.
 
 	nodeDB, err := node.New()
 	if err != nil {
@@ -20,8 +19,8 @@ func NodeList(nodeNames []string) (nodeInfo []*wwapi.NodeInfo, err error) {
 		return
 	}
 
-	// Translate to the protobuf structure so wwapi can use this.
-	// This is the same logic as for wwctl.
+	// Translate to the protobuf structure so wwapi can use this across the wire.
+	// This is the same logic as was in wwctl.
 	for _, node := range node.FilterByName(nodes, nodeNames) {
 
 		var ni wwapi.NodeInfo

@@ -230,13 +230,13 @@ proto: ## wwapi generate code from protobuf
 		--go_out=. \
 		--go-grpc_out=. routes.proto
 
-wwapid: ## build the grpc api server
+wwapid: ## Build the grpc api server. TODO: not under make all.
 	go build -race -ldflags "-s -w" -o ./wwapid internal/app/api/wwapid/wwapid.go
 
-wwapic: ## buid the sample wwapi client.
+wwapic: ## Build the sample wwapi client. TODO: not under make all.
 	go build -race -ldflags "-s -w" -o ./wwapic  internal/app/api/wwapic/wwapic.go
 
-wwapird: ## build the rest api server (revese proxy to the grpc api server)
+wwapird: ## Build the rest api server (revese proxy to the grpc api server). TODO: Not under make all.
 	go build -race -ldflags "-s -w" -o ./wwapird internal/app/api/wwapird/wwapird.go
 
 install_wwapid: # Install the grpc wwapi daemon
@@ -244,7 +244,7 @@ install_wwapid: # Install the grpc wwapi daemon
 	test -f $(DESTDIR)$(SYSCONFDIR)/warewulf/wwapid.conf || install -m 644 etc/wwapid.conf $(DESTDIR)$(SYSCONFDIR)/warewulf/
 
 install_wwapid_force:
-	# TODO: Need to install as a service. This just copies in the config file with no clobber.
+	# TODO: Need to install as a service. This just copies in the config file with clobber.
 	install -m 644 etc/wwapid.conf $(DESTDIR)$(SYSCONFDIR)/warewulf/
 
 clean:

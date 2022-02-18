@@ -3,8 +3,6 @@
 
 syntax = "proto3";
 
-//option go_package = "pkg/api/v1;api";
-//option go_package = "pkg/api/wwapiv1;wwapiv1";
 option go_package = "internal/pkg/api/routes/wwapiv1;wwapiv1";
 
 package wwapi.v1;
@@ -13,6 +11,79 @@ import "google/protobuf/empty.proto";
 //import "google/protobuf/wrappers.proto";
 import "google/api/annotations.proto";
 
+message NodeNames {
+	repeated string nodeName = 1;
+}
+
+message NodeField {
+	//string fieldName = 1;
+	string source = 1;
+	string value = 2; // TODO: Variable name okay? Also this is weird since it could be a bool.
+}
+
+// NetDev is network devices (NICs) on a node.
+message NetDev {
+	NodeField device = 1;
+	NodeField hwaddr = 2;
+	NodeField ipaddr = 3;
+	NodeField netmask = 4;
+	NodeField gateway = 5;
+	NodeField type = 6;
+	NodeField onboot = 7;
+	NodeField default = 8;
+}
+
+// TODO: Needed?
+message NodeTags {
+	repeated NodeField tags = 1;
+}
+
+message NodeInfo {
+	string NodeName = 1;
+	NodeField id = 2;
+	NodeField comment = 3;
+	NodeField cluster = 4;
+	NodeField profiles = 5;
+	NodeField discoverable = 6;
+	NodeField container = 7;
+	NodeField kernel =  8;
+	NodeField kernelArgs = 9;
+	NodeField systemOverlay = 10;
+	NodeField runtimeOverlay = 11;
+	NodeField ipxe = 12;
+	NodeField init = 13;
+	NodeField root = 14;
+	NodeField assetKey = 15;
+	NodeField ipmiIpaddr = 16;
+	NodeField ipmiNetmask = 17;
+	NodeField ipmiPort = 18;
+	NodeField ipmiGateway = 19;
+	NodeField ipmiUserName = 20;
+	NodeField ipmiInterface = 21;
+
+	map<string, NetDev> NetDevs = 22;
+	map<string, NodeField> Tags = 23;
+	map<string, NodeField> Keys = 24; // TODO: We may not need this. Tags may be it. Ask Greg.
+}
+
+message NodeListResponse {
+	repeated NodeInfo nodes = 1;
+}
+
+/*
+// TODO:
+message NodeAddParameter {
+	string cluster = 1;
+	bool discoverable = 2;
+	string gateway = 3;
+	string hwaddr = 4;
+	string ipaddr = 5;
+	string netdev = 6;
+	string netname = 7;
+	string type = 8;
+	NodeNames nodeNames = 9;
+}
+*/
 
 message VersionResponse {
 	string apiPrefix = 1;
@@ -21,6 +92,16 @@ message VersionResponse {
 }
 
 service WWApi {
+
+	// Nodes
+
+	rpc NodeList(NodeNames) returns (NodeListResponse) {
+		option (google.api.http) = {
+			get: "/v1/node"
+		};
+	}
+
+
 	// Version returns the wwapi version. This is also useful for testing if 
 	// the service is up.
 	rpc Version(google.protobuf.Empty) returns (VersionResponse) {

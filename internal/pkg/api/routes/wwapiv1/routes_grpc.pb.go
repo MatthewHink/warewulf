@@ -23,6 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type WWApiClient interface {
+	NodeList(ctx context.Context, in *NodeNames, opts ...grpc.CallOption) (*NodeListResponse, error)
 	// Version returns the wwapi version. This is also useful for testing if
 	// the service is up.
 	Version(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*VersionResponse, error)
@@ -34,6 +35,15 @@ type wWApiClient struct {
 
 func NewWWApiClient(cc grpc.ClientConnInterface) WWApiClient {
 	return &wWApiClient{cc}
+}
+
+func (c *wWApiClient) NodeList(ctx context.Context, in *NodeNames, opts ...grpc.CallOption) (*NodeListResponse, error) {
+	out := new(NodeListResponse)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/NodeList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *wWApiClient) Version(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*VersionResponse, error) {
@@ -49,6 +59,7 @@ func (c *wWApiClient) Version(ctx context.Context, in *emptypb.Empty, opts ...gr
 // All implementations must embed UnimplementedWWApiServer
 // for forward compatibility
 type WWApiServer interface {
+	NodeList(context.Context, *NodeNames) (*NodeListResponse, error)
 	// Version returns the wwapi version. This is also useful for testing if
 	// the service is up.
 	Version(context.Context, *emptypb.Empty) (*VersionResponse, error)
@@ -59,6 +70,9 @@ type WWApiServer interface {
 type UnimplementedWWApiServer struct {
 }
 
+func (UnimplementedWWApiServer) NodeList(context.Context, *NodeNames) (*NodeListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NodeList not implemented")
+}
 func (UnimplementedWWApiServer) Version(context.Context, *emptypb.Empty) (*VersionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Version not implemented")
 }
@@ -73,6 +87,24 @@ type UnsafeWWApiServer interface {
 
 func RegisterWWApiServer(s grpc.ServiceRegistrar, srv WWApiServer) {
 	s.RegisterService(&WWApi_ServiceDesc, srv)
+}
+
+func _WWApi_NodeList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NodeNames)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WWApiServer).NodeList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/wwapi.v1.WWApi/NodeList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WWApiServer).NodeList(ctx, req.(*NodeNames))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _WWApi_Version_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -100,6 +132,10 @@ var WWApi_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "wwapi.v1.WWApi",
 	HandlerType: (*WWApiServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "NodeList",
+			Handler:    _WWApi_NodeList_Handler,
+		},
 		{
 			MethodName: "Version",
 			Handler:    _WWApi_Version_Handler,

@@ -10,7 +10,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	//gw "github.com/yourorg/yourrepo/proto/gen/go/your/service/v1/your_service"  // Update
 	gw "github.com/hpcng/warewulf/internal/pkg/api/routes/wwapiv1"
 )
 
@@ -48,4 +47,3 @@ func main() {
 		glog.Fatal(err)
 	}
 }
-

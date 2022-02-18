@@ -248,7 +248,7 @@ install_wwapid_force:
 	install -m 644 etc/wwapid.conf $(DESTDIR)$(SYSCONFDIR)/warewulf/
 
 clean:
-	rm -f wwclient00111
+	rm -f wwclient
 	rm -f wwctl
 	rm -rf .dist
 	rm -f warewulf-$(VERSION).tar.gz

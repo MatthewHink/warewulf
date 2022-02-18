@@ -12,13 +12,14 @@ import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
 
 message NodeNames {
-	repeated string nodeName = 1;
+	repeated string nodeNames = 1;
 }
 
 message NodeField {
 	//string fieldName = 1;
 	string source = 1;
 	string value = 2; // TODO: Variable name okay? Also this is weird since it could be a bool.
+	string print = 3; // Empty values printed as -- in wwctl.
 }
 
 // NetDev is network devices (NICs) on a node.
@@ -43,7 +44,6 @@ message NodeInfo {
 	NodeField id = 2;
 	NodeField comment = 3;
 	NodeField cluster = 4;
-	//NodeField profiles = 5;
 	NodeField discoverable = 5;
 	NodeField container = 6;
 	NodeField kernel =  7;

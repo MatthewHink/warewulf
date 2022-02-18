@@ -33,7 +33,8 @@ func CobraRunE(cmd *cobra.Command, args []string) (err error) {
 			fmt.Printf("%-20s %-18s %-12s %s\n", nodeName, "Id", ni.Id.Source, ni.Id.Value)
 			fmt.Printf("%-20s %-18s %-12s %s\n", nodeName, "Comment", ni.Comment.Source, ni.Comment.Value)
 			fmt.Printf("%-20s %-18s %-12s %s\n", nodeName, "Cluster", ni.Cluster.Source, ni.Cluster.Value)
-			fmt.Printf("%-20s %-18s %-12s %s\n", nodeName, "Profiles", "--", ni.Profiles.Value)
+			//fmt.Printf("%-20s %-18s %-12s %s\n", nodeName, "Profiles", "--", ni.Profiles.Value)
+			fmt.Printf("%-20s %-18s %-12s %s\n", nodeName, "Profiles", "--", strings.Join(ni.Profiles, ",'"))
 
 			fmt.Printf("%-20s %-18s %-12s %s\n", nodeName, "Discoverable", ni.Discoverable.Source, ni.Discoverable.Value)
 
@@ -92,6 +93,21 @@ func CobraRunE(cmd *cobra.Command, args []string) (err error) {
 		for i := 0; i < len(nodeInfo); i++ {
 			ni := nodeInfo[i]
 			nodeName := ni.NodeName
+			//fmt.Printf("ni: %#v\n", ni)
+			//fmt.Printf("ni.IpmiAddr: %#v\n", ni.IpmiIpaddr)
+			//fmt.Printf("ni.IpmiPort: %#v\n", ni.IpmiPort)
+			//fmt.Printf("ni.IpmiPort: %#v\n", ni.IpmiPort)
+			//fmt.Printf("ni.IpmiUserName: %#v\n", ni.IpmiUserName)
+			//fmt.Printf("ni.IpmiPassword: %#v\n", ni.IpmiPassword)
+			//fmt.Printf("ni.IpmiInterface: %#v\n", ni.IpmiInterface)
+
+			
+			//fmt.Printf("ni.IpmiAddr.Value: %#v\n", ni.IpmiIpaddr.Value)
+			//fmt.Printf("ni.IpmiPort.Value: %#v\n", ni.IpmiPort.Value)
+			//fmt.Printf("ni.IpmiPort.Value: %#v\n", ni.IpmiPort.Value)
+			//fmt.Printf("ni.IpmiUserName.Value: %#v\n", ni.IpmiUserName.Value)
+			//fmt.Printf("ni.IpmiPassword.Value: %#v\n", ni.IpmiPassword.Value)
+			//fmt.Printf("ni.IpmiInterface.Value: %#v\n", ni.IpmiInterface.Value)
 			fmt.Printf("%-22s %-16s %-10s %-20s %-20s %-14s\n", nodeName, ni.IpmiIpaddr.Value, ni.IpmiPort.Value, ni.IpmiUserName.Value, ni.IpmiPassword.Value, ni.IpmiInterface.Value)
 		}
 
@@ -111,7 +127,7 @@ func CobraRunE(cmd *cobra.Command, args []string) (err error) {
 
 		for i := 0; i < len(nodeInfo); i++ {
 			ni := nodeInfo[i]
-			//nodeName := ni.NodeName
+			nodeName := ni.NodeName
 			var netdevs []string
 			if len(ni.NetDevs) > 0 {
 				for name, dev := range ni.NetDevs {
@@ -122,6 +138,7 @@ func CobraRunE(cmd *cobra.Command, args []string) (err error) {
 
 			// TODO: Fix this.
 			//fmt.Printf("%-22s %-26s %s\n", nodeName, strings.Join(ni.Profiles.Value, ","), strings.Join(netdevs, ", "))
+			fmt.Printf("%-22s %-26s %s\n", nodeName, strings.Join(ni.Profiles, ","), strings.Join(netdevs, ", "))
 		}
 
 	}

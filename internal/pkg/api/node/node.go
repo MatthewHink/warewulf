@@ -3,7 +3,7 @@ package node
 import (
 	//"fmt"
 	"strconv"
-	"strings"
+	//"strings"
 	"github.com/hpcng/warewulf/internal/pkg/node"
 	wwapi "github.com/hpcng/warewulf/internal/pkg/api/routes/wwapiv1"
 )
@@ -62,10 +62,10 @@ func NodeList(nodeNames []string) (nodeInfo []*wwapi.NodeInfo, err error) {
 		//ni.Cluster.Value = node.ClusterName.Print()
 
 		// source unused here
-		ni.Profiles = &wwapi.NodeField{
-			Value: strings.Join(node.Profiles, ","),
-		}
-		//ni.Profiles.Value = strings.Join(node.Profiles, ",")
+		//ni.Profiles = &wwapi.NodeField{
+		//	Value: strings.Join(node.Profiles, ","),
+		//}
+		ni.Profiles = node.Profiles
 		
 		ni.Discoverable = &wwapi.NodeField {
 			Source: node.Discoverable.Source(),
@@ -172,6 +172,13 @@ func NodeList(nodeNames []string) (nodeInfo []*wwapi.NodeInfo, err error) {
 			Source: node.IpmiUserName.Source(),
 			Value: node.IpmiUserName.Print(),
 		}
+
+		ni.IpmiPassword = &wwapi.NodeField{
+			Source: node.IpmiPassword.Source(),
+			Value: node.IpmiPassword.Print(),
+		}
+		//fmt.Printf("--- ni.IpmiPassword: %#v\n", ni.IpmiPassword)
+
 		//ni.IpmiUserName.Source = node.IpmiUserName.Source()
 		//ni.IpmiUserName.Value = node.IpmiUserName.Print()
 

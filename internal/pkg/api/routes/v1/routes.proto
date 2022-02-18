@@ -43,28 +43,31 @@ message NodeInfo {
 	NodeField id = 2;
 	NodeField comment = 3;
 	NodeField cluster = 4;
-	NodeField profiles = 5;
-	NodeField discoverable = 6;
-	NodeField container = 7;
-	NodeField kernel =  8;
-	NodeField kernelArgs = 9;
-	NodeField systemOverlay = 10;
-	NodeField runtimeOverlay = 11;
-	NodeField ipxe = 12;
-	NodeField init = 13;
-	NodeField root = 14;
-	NodeField assetKey = 15;
-	NodeField ipmiIpaddr = 16;
-	NodeField ipmiNetmask = 17;
-	NodeField ipmiPort = 18;
-	NodeField ipmiGateway = 19;
-	NodeField ipmiUserName = 20;
-	NodeField ipmiInterface = 21;
-	NodeField ipmiPassword = 22; // Nothing at all is terrifying about this.
+	//NodeField profiles = 5;
+	NodeField discoverable = 5;
+	NodeField container = 6;
+	NodeField kernel =  7;
+	NodeField kernelArgs = 8;
+	NodeField systemOverlay = 9;
+	NodeField runtimeOverlay = 10;
+	NodeField ipxe = 11;
+	NodeField init = 12;
+	NodeField root = 13;
+	NodeField assetKey = 14;
+	NodeField ipmiIpaddr = 15;
+	NodeField ipmiNetmask = 16;
+	NodeField ipmiPort = 17;
+	NodeField ipmiGateway = 18;
+	NodeField ipmiUserName = 19;
+	NodeField ipmiInterface = 20;
+	NodeField ipmiPassword = 21; // Nothing at all is terrifying about this.
 
-	map<string, NetDev> NetDevs = 23;
-	map<string, NodeField> Tags = 24;
-	map<string, NodeField> Keys = 25; // TODO: We may not need this. Tags may be it. Ask Greg.
+	repeated string profiles = 22;
+	repeated string groupProfiles = 23; // TODO: Sort out if we need this or not.
+
+	map<string, NetDev> NetDevs = 24;
+	map<string, NodeField> Tags = 25;
+	map<string, NodeField> Keys = 26; // TODO: We may not need this. Tags may be it. Ask Greg.
 }
 
 message NodeListResponse {

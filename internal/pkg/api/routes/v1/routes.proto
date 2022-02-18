@@ -60,10 +60,11 @@ message NodeInfo {
 	NodeField ipmiGateway = 19;
 	NodeField ipmiUserName = 20;
 	NodeField ipmiInterface = 21;
+	NodeField ipmiPassword = 22; // Nothing at all is terrifying about this.
 
-	map<string, NetDev> NetDevs = 22;
-	map<string, NodeField> Tags = 23;
-	map<string, NodeField> Keys = 24; // TODO: We may not need this. Tags may be it. Ask Greg.
+	map<string, NetDev> NetDevs = 23;
+	map<string, NodeField> Tags = 24;
+	map<string, NodeField> Keys = 25; // TODO: We may not need this. Tags may be it. Ask Greg.
 }
 
 message NodeListResponse {

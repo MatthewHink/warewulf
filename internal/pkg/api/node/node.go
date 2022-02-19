@@ -3,9 +3,152 @@ package node
 import (
 	"strconv"
 	"github.com/hpcng/warewulf/internal/pkg/node"
+	"github.com/hpcng/warewulf/internal/pkg/util"
+	"github.com/hpcng/warewulf/internal/pkg/warewulfd"
+	"github.com/hpcng/warewulf/internal/pkg/wwlog"
 	"github.com/hpcng/warewulf/pkg/hostlist"
+	"github.com/pkg/errors"
+
 	wwapi "github.com/hpcng/warewulf/internal/pkg/api/routes/wwapiv1"
 )
+
+func NodeAdd(nap *wwapi.NodeAddParameter) (err error) {
+	var count uint
+	nodeDB, err := node.New()
+	if err != nil {
+		return errors.Wrap(err, "failed to open node database")
+	}
+
+	node_args := hostlist.Expand(nap.NodeNames.NodeNames)
+
+	for _, a := range node_args {
+		n, err := nodeDB.AddNode(a)
+		if err != nil {
+			return errors.Wrap(err, "failed to add node")
+		}
+		wwlog.Printf(wwlog.INFO, "Added node: %s\n", a)
+
+		if nap.Cluster != "" {
+			wwlog.Printf(wwlog.VERBOSE, "Node: %s, Setting cluster name to: %s\n", n.Id.Get(), nap.Cluster)
+			n.ClusterName.Set(nap.Cluster)
+			err := nodeDB.NodeUpdate(n)
+			if err != nil {
+				return errors.Wrap(err, "failed to update node")
+			}
+		}
+
+		if nap.Netdev != "" {
+			if nap.Netname == "" {
+				return errors.New("you must include the '--netname' option")
+			}
+
+			if _, ok := n.NetDevs[nap.Netname]; !ok {
+				var netdev node.NetDevEntry
+				n.NetDevs[nap.Netname] = &netdev
+			}
+
+			wwlog.Printf(wwlog.VERBOSE, "Node: %s:%s, Setting Device to: %s\n", n.Id.Get(), nap.Netname, nap.Netdev)
+
+			n.NetDevs[nap.Netname].Device.Set(nap.Netdev)
+			n.NetDevs[nap.Netname].OnBoot.SetB(true)
+		}
+
+		if nap.Ipaddr != "" {
+			if nap.Netname == "" {
+				return errors.New("you must include the '--netname' option")
+			}
+
+			NewIpaddr := util.IncrementIPv4(nap.Ipaddr, count)
+
+			if _, ok := n.NetDevs[nap.Netname]; !ok {
+				var netdev node.NetDevEntry
+				n.NetDevs[nap.Netname] = &netdev
+			}
+
+			wwlog.Printf(wwlog.VERBOSE, "Node: %s:%s, Setting Ipaddr to: %s\n", n.Id.Get(), nap.Netname, NewIpaddr)
+
+			n.NetDevs[nap.Netname].Ipaddr.Set(NewIpaddr)
+			n.NetDevs[nap.Netname].OnBoot.SetB(true)
+		}
+
+		if nap.Netmask != "" {
+			if nap.Netname == "" {
+				return errors.New("you must include the '--netname' option")
+			}
+
+			if _, ok := n.NetDevs[nap.Netname]; !ok {
+				return errors.New("network device does not exist: " + nap.Netname)
+			}
+			wwlog.Printf(wwlog.VERBOSE, "Node: %s:%s, Setting netmask to: %s\n", n.Id.Get(), nap.Netname, nap.Netmask)
+
+			n.NetDevs[nap.Netname].Netmask.Set(nap.Netmask)
+		}
+
+		if nap.Gateway != "" {
+			if nap.Netname == "" {
+				return errors.New("you must include the '--netname' option")
+			}
+
+			if _, ok := n.NetDevs[nap.Netname]; !ok {
+				return errors.New("network device does not exist: " + nap.Netname)
+			}
+			wwlog.Printf(wwlog.VERBOSE, "Node: %s:%s, Setting gateway to: %s\n", n.Id.Get(), nap.Netname, nap.Gateway)
+
+			n.NetDevs[nap.Netname].Gateway.Set(nap.Gateway)
+		}
+
+		if nap.Hwaddr != "" {
+			if nap.Netname == "" {
+				return errors.New("you must include the '--netname' option")
+			}
+
+			if _, ok := n.NetDevs[nap.Netname]; !ok {
+				return errors.New("network device does not exist: " + nap.Netname)
+			}
+			wwlog.Printf(wwlog.VERBOSE, "Node: %s:%s, Setting HW address to: %s\n", n.Id.Get(), nap.Netname, nap.Hwaddr)
+
+			n.NetDevs[nap.Netname].Hwaddr.Set(nap.Hwaddr)
+			n.NetDevs[nap.Netname].OnBoot.SetB(true)
+		}
+
+		if nap.Type != "" {
+			if nap.Netname == "" {
+				return errors.New("you must include the '--netname' option")
+			}
+
+			if _, ok := n.NetDevs[nap.Netname]; !ok {
+				return errors.New("network device does not exist: " + nap.Netname)
+			}
+			wwlog.Printf(wwlog.VERBOSE, "Node: %s:%s, Setting Type to: %s\n", n.Id.Get(), nap.Netname, nap.Type)
+
+			n.NetDevs[nap.Netname].Type.Set(nap.Type)
+		}
+
+		if nap.Discoverable {
+			wwlog.Printf(wwlog.VERBOSE, "Node: %s, Setting node to discoverable\n", n.Id.Get())
+
+			n.Discoverable.SetB(true)
+		}
+
+		err = nodeDB.NodeUpdate(n)
+		if err != nil {
+			return errors.Wrap(err, "failed to update nodedb")
+		}
+
+		count++
+	} // end for
+	
+	err = nodeDB.Persist()
+	if err != nil {
+		return errors.Wrap(err, "failed to persist new node")
+	}
+
+	err = warewulfd.DaemonReload()
+	if err != nil {
+		return errors.Wrap(err, "failed to reload warewulf daemon")
+	}
+	return
+}
 
 func NodeList(nodeNames []string) (nodeInfo []*wwapi.NodeInfo, err error) {
 
@@ -47,7 +190,6 @@ func NodeList(nodeNames []string) (nodeInfo []*wwapi.NodeInfo, err error) {
 			Print: node.ClusterName.Print(),
 		}
 
-		// source unused here
 		ni.Profiles = node.Profiles
 		
 		ni.Discoverable = &wwapi.NodeField {

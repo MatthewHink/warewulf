@@ -74,8 +74,6 @@ message NodeListResponse {
 	repeated NodeInfo nodes = 1;
 }
 
-/*
-// TODO:
 message NodeAddParameter {
 	string cluster = 1;
 	bool discoverable = 2;
@@ -83,11 +81,11 @@ message NodeAddParameter {
 	string hwaddr = 4;
 	string ipaddr = 5;
 	string netdev = 6;
-	string netname = 7;
-	string type = 8;
-	NodeNames nodeNames = 9;
+	string netmask = 7;
+	string netname = 8;
+	string type = 9;
+	NodeNames nodeNames = 10;
 }
-*/
 
 message VersionResponse {
 	string apiPrefix = 1;
@@ -98,6 +96,14 @@ message VersionResponse {
 service WWApi {
 
 	// Nodes
+
+
+	rpc NodeAdd(NodeAddParameter) returns (google.protobuf.Empty) {
+		option (google.api.http) = {
+			post: "/v1/node"
+			body: "*"
+		};
+	}
 
 	rpc NodeList(NodeNames) returns (NodeListResponse) {
 		option (google.api.http) = {

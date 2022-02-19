@@ -11,6 +11,9 @@ import (
 	"github.com/hpcng/warewulf/internal/pkg/api/node"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/status"
+	"google.golang.org/grpc/codes"
+
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	//wrapperspb "google.golang.org/protobuf/types/known/wrapperspb""
 	wwapidconf "github.com/hpcng/warewulf/internal/pkg/wwapidconf"
@@ -56,18 +59,30 @@ func main() {
 }
 
 // Api implementation.
-// TODO: Add node list. Test it.
+
+// TODO: Needs testing.
+func (s *apiServer) NodeAdd(ctx context.Context, request *wwapi.NodeAddParameter) (response *emptypb.Empty, err error) {
+
+	if request == nil {
+		return response, status.Errorf(codes.InvalidArgument, "nil request")
+	}
+	
+	err = node.NodeAdd(request)
+	return
+}
+
 func (s *apiServer) NodeList(ctx context.Context, request *wwapi.NodeNames) (response *wwapi.NodeListResponse, err error) {
 
-	log.Printf("Node List Start\n")
+	if request == nil {
+		return response, status.Errorf(codes.InvalidArgument, "nil request")
+	}
+
 	var nodes []*wwapi.NodeInfo
 	nodes, err = node.NodeList(request.NodeNames)
 	if err != nil {
 		return
 	}
-	log.Printf("nodes: %v\n", nodes)
-	log.Printf("response: %T, %#v\n", response, response)
-	//response.Nodes = nodes
+
 	response = &wwapi.NodeListResponse{
 		Nodes: nodes,
 	}

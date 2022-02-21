@@ -170,8 +170,6 @@ func NodeList(nodeNames []string) (nodeInfo []*wwapi.NodeInfo, err error) {
 
 		var ni wwapi.NodeInfo
 		
-		ni.NodeName = node.Id.Get()
-
 		ni.Id = &wwapi.NodeField{
 			Source: node.Id.Source(),
 			Value: node.Id.Get(),

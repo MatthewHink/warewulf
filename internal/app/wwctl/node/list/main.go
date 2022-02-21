@@ -21,7 +21,7 @@ func CobraRunE(cmd *cobra.Command, args []string) (err error) {
 	if ShowAll {
 		for i := 0; i < len(nodeInfo); i++ {
 			ni := nodeInfo[i]
-			nodeName := ni.NodeName
+			nodeName := ni.Id.Value
 
 			fmt.Printf("################################################################################\n")
 			fmt.Printf("%-20s %-18s %-12s %s\n", "NODE", "FIELD", "PROFILE", "VALUE")
@@ -70,7 +70,7 @@ func CobraRunE(cmd *cobra.Command, args []string) (err error) {
 
 		for i := 0; i < len(nodeInfo); i++ {
 			ni := nodeInfo[i]
-			nodeName := ni.NodeName
+			nodeName := ni.Id.Value
 
 			if len(ni.NetDevs) > 0 {
 				for name, dev := range ni.NetDevs {
@@ -86,7 +86,8 @@ func CobraRunE(cmd *cobra.Command, args []string) (err error) {
 
 		for i := 0; i < len(nodeInfo); i++ {
 			ni := nodeInfo[i]
-			nodeName := ni.NodeName
+			nodeName := ni.Id.Value
+
 			fmt.Printf("%-22s %-16s %-10s %-20s %-20s %-14s\n", nodeName, ni.IpmiIpaddr.Print, ni.IpmiPort.Print, ni.IpmiUserName.Print, ni.IpmiPassword.Print, ni.IpmiInterface.Print)
 		}
 
@@ -96,7 +97,8 @@ func CobraRunE(cmd *cobra.Command, args []string) (err error) {
 
 		for i := 0; i < len(nodeInfo); i++ {
 			ni := nodeInfo[i]
-			nodeName := ni.NodeName
+			nodeName := ni.Id.Value
+
 			fmt.Printf("%-22s %-26s %-35s %s\n", nodeName, ni.Kernel.Print, ni.Container.Print, ni.SystemOverlay.Print+"/"+ni.RuntimeOverlay.Print)
 		}
 
@@ -106,7 +108,8 @@ func CobraRunE(cmd *cobra.Command, args []string) (err error) {
 
 		for i := 0; i < len(nodeInfo); i++ {
 			ni := nodeInfo[i]
-			nodeName := ni.NodeName
+			nodeName := ni.Id.Value
+
 			var netdevs []string
 			if len(ni.NetDevs) > 0 {
 				for name, dev := range ni.NetDevs {

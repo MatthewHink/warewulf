@@ -224,6 +224,29 @@ dist: vendor config
 	cd .dist; tar -czf ../warewulf-$(VERSION).tar.gz warewulf-$(VERSION)
 	rm -rf .dist
 
+proto: ## wwapi generate code from protobuf
+	protoc -I internal/pkg/api/routes/v1 -I=. \
+		--grpc-gateway_out=. \
+		--go_out=. \
+		--go-grpc_out=. routes.proto
+
+wwapid: ## Build the grpc api server. TODO: not under make all.
+	go build -race -ldflags "-s -w" -o ./wwapid internal/app/api/wwapid/wwapid.go
+
+wwapic: ## Build the sample wwapi client. TODO: not under make all.
+	go build -race -ldflags "-s -w" -o ./wwapic  internal/app/api/wwapic/wwapic.go
+
+wwapird: ## Build the rest api server (revese proxy to the grpc api server). TODO: Not under make all.
+	go build -race -ldflags "-s -w" -o ./wwapird internal/app/api/wwapird/wwapird.go
+
+install_wwapid: # Install the grpc wwapi daemon
+	# TODO: Need to install as a service. This just copies in the config file with no clobber.
+	test -f $(DESTDIR)$(SYSCONFDIR)/warewulf/wwapid.conf || install -m 644 etc/wwapid.conf $(DESTDIR)$(SYSCONFDIR)/warewulf/
+
+install_wwapid_force:
+	# TODO: Need to install as a service. This just copies in the config file with clobber.
+	install -m 644 etc/wwapid.conf $(DESTDIR)$(SYSCONFDIR)/warewulf/
+
 clean:
 	rm -f wwclient
 	rm -f wwctl

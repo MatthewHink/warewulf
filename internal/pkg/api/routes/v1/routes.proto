@@ -1,0 +1,112 @@
+// Routes for wwapi.
+// TODO: Try protoc-gen-doc for generating documentation.
+
+syntax = "proto3";
+
+option go_package = "internal/pkg/api/routes/wwapiv1;wwapiv1";
+
+package wwapi.v1;
+
+import "google/protobuf/empty.proto";
+//import "google/protobuf/wrappers.proto";
+import "google/api/annotations.proto";
+
+message NodeNames {
+	repeated string nodeNames = 1;
+}
+
+// NetDev is network devices (NICs) on a node.
+message NetDev {
+	string device = 1;
+	string hwaddr = 2;
+	string ipaddr = 3;
+	string netmask = 4;
+	string gateway = 5;
+	string type = 6;
+	bool onboot = 7;
+	bool default = 8;
+}
+
+// TODO: Needed?
+message NodeTags {
+	repeated string tags = 1;
+}
+
+message NodeInfo {
+	string id = 1;
+	string cid = 2;
+	string comment = 3;
+	string clusterName = 4;
+	string containerName = 5;
+	string ipxe = 6;
+	string kernelVersion =  7;
+	string kernelArgs = 8;
+	string ipmiIpaddr = 9;
+	string ipmiNetmask = 10;
+	string ipmiPort = 11;
+	string ipmiGateway = 12;
+	string ipmiUserName = 13;
+	string ipmiPassword = 14;
+	string ipmiInterface = 15;
+	string systemOverlay = 16;
+	string runtimeOverlay = 17;
+	string root = 18;
+	bool discoverable = 19;
+	string init = 20;
+	string assetKey = 21;
+	repeated string profiles = 22;
+	repeated string groupProfiles = 23; // TODO: Sort out if we need this or not.
+	map<string, NetDev> NetDevs = 24;
+	map<string, string> Tags = 25;
+	//map<string, string> Keys = 26; // TODO: We may not need this. Tags may be it. Ask Greg.
+}
+
+
+message NodeListResponse {
+	repeated NodeInfo nodes = 1;
+}
+
+message NodeAddParameter {
+	string cluster = 1;
+	bool discoverable = 2;
+	string gateway = 3;
+	string hwaddr = 4;
+	string ipaddr = 5;
+	string netdev = 6;
+	string netmask = 7;
+	string netname = 8;
+	string type = 9;
+	NodeNames nodeNames = 10;
+}
+
+message VersionResponse {
+	string apiPrefix = 1;
+	string apiVersion = 2;
+	string warewulfVersion = 3;
+}
+
+service WWApi {
+
+	// Nodes
+
+	rpc NodeAdd(NodeAddParameter) returns (google.protobuf.Empty) {
+		option (google.api.http) = {
+			post: "/v1/node"
+			body: "*"
+		};
+	}
+
+	rpc NodeList(NodeNames) returns (NodeListResponse) {
+		option (google.api.http) = {
+			get: "/v1/node"
+		};
+	}
+
+	// Version returns the wwapi version. This is also useful for testing if 
+	// the service is up.
+	rpc Version(google.protobuf.Empty) returns (VersionResponse) {
+        option (google.api.http) = {
+            get: "/version"
+        };
+    }
+}

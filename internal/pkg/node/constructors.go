@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/hpcng/warewulf/internal/pkg/buildconfig"
+	//"github.com/hpcng/warewulf/internal/pkg/api/routes/wwapiv1"
 	"github.com/hpcng/warewulf/internal/pkg/wwlog"
 
 	"gopkg.in/yaml.v2"
@@ -43,7 +44,7 @@ func New() (nodeYaml, error) {
 
 func (config *nodeYaml) FindAllNodes() ([]NodeInfo, error) {
 	var ret []NodeInfo
-
+	
 	wwlog.Printf(wwlog.DEBUG, "Finding all nodes...\n")
 	for nodename, node := range config.Nodes {
 		var n NodeInfo

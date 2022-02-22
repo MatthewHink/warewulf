@@ -29,11 +29,11 @@ var (
 		},
 	}
 	SetYes   bool
-	SetForce string
+	SetForce bool // currently unused
 )
 
 func init() {
-	baseCmd.PersistentFlags().StringVarP(&SetForce, "force", "f", "", "Force node delete")
+	baseCmd.PersistentFlags().BoolVarP(&SetForce, "force", "f", false, "Force node delete")
 	baseCmd.PersistentFlags().BoolVarP(&SetYes, "yes", "y", false, "Set 'yes' to all questions asked")
 
 }

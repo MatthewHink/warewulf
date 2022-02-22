@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type WWApiClient interface {
 	NodeAdd(ctx context.Context, in *NodeAddParameter, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	NodeDelete(ctx context.Context, in *NodeDeleteParameter, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	NodeList(ctx context.Context, in *NodeNames, opts ...grpc.CallOption) (*NodeListResponse, error)
 	// Version returns the wwapi version. This is also useful for testing if
 	// the service is up.
@@ -41,6 +42,15 @@ func NewWWApiClient(cc grpc.ClientConnInterface) WWApiClient {
 func (c *wWApiClient) NodeAdd(ctx context.Context, in *NodeAddParameter, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/NodeAdd", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *wWApiClient) NodeDelete(ctx context.Context, in *NodeDeleteParameter, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/NodeDelete", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -70,6 +80,7 @@ func (c *wWApiClient) Version(ctx context.Context, in *emptypb.Empty, opts ...gr
 // for forward compatibility
 type WWApiServer interface {
 	NodeAdd(context.Context, *NodeAddParameter) (*emptypb.Empty, error)
+	NodeDelete(context.Context, *NodeDeleteParameter) (*emptypb.Empty, error)
 	NodeList(context.Context, *NodeNames) (*NodeListResponse, error)
 	// Version returns the wwapi version. This is also useful for testing if
 	// the service is up.
@@ -83,6 +94,9 @@ type UnimplementedWWApiServer struct {
 
 func (UnimplementedWWApiServer) NodeAdd(context.Context, *NodeAddParameter) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NodeAdd not implemented")
+}
+func (UnimplementedWWApiServer) NodeDelete(context.Context, *NodeDeleteParameter) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NodeDelete not implemented")
 }
 func (UnimplementedWWApiServer) NodeList(context.Context, *NodeNames) (*NodeListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NodeList not implemented")
@@ -117,6 +131,24 @@ func _WWApi_NodeAdd_Handler(srv interface{}, ctx context.Context, dec func(inter
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).NodeAdd(ctx, req.(*NodeAddParameter))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WWApi_NodeDelete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NodeDeleteParameter)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WWApiServer).NodeDelete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/wwapi.v1.WWApi/NodeDelete",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WWApiServer).NodeDelete(ctx, req.(*NodeDeleteParameter))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -167,6 +199,10 @@ var WWApi_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "NodeAdd",
 			Handler:    _WWApi_NodeAdd_Handler,
+		},
+		{
+			MethodName: "NodeDelete",
+			Handler:    _WWApi_NodeDelete_Handler,
 		},
 		{
 			MethodName: "NodeList",

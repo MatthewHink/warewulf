@@ -1,6 +1,8 @@
 package node
 
 import (
+	"fmt"
+	"os"
 	"strconv"
 	"github.com/hpcng/warewulf/internal/pkg/node"
 	"github.com/hpcng/warewulf/internal/pkg/util"
@@ -12,6 +14,8 @@ import (
 	wwapi "github.com/hpcng/warewulf/internal/pkg/api/routes/wwapiv1"
 )
 
+// TODO: null checks on all pointer parameters
+
 func NodeAdd(nap *wwapi.NodeAddParameter) (err error) {
 	var count uint
 	nodeDB, err := node.New()
@@ -19,7 +23,8 @@ func NodeAdd(nap *wwapi.NodeAddParameter) (err error) {
 		return errors.Wrap(err, "failed to open node database")
 	}
 
-	node_args := hostlist.Expand(nap.NodeNames.NodeNames)
+	//node_args := hostlist.Expand(nap.NodeNames.NodeNames)
+	node_args := hostlist.Expand(nap.NodeNames)
 
 	for _, a := range node_args {
 		n, err := nodeDB.AddNode(a)
@@ -149,6 +154,68 @@ func NodeAdd(nap *wwapi.NodeAddParameter) (err error) {
 	}
 	return
 }
+
+func NodeDelete(ndp *wwapi.NodeDeleteParameter) (err error) {
+	var count int
+	var nodeList []node.NodeInfo
+
+	nodeDB, err := node.New()
+	if err != nil {
+		wwlog.Printf(wwlog.ERROR, "Failed to open node database: %s\n", err)
+		return
+	}
+
+	nodes, err := nodeDB.FindAllNodes()
+	if err != nil {
+		wwlog.Printf(wwlog.ERROR, "Could not get node list: %s\n", err)
+		return
+	}
+
+	//node_args := hostlist.Expand(ndp.NodeNames.NodeNames)
+	node_args := hostlist.Expand(ndp.NodeNames)
+
+	for _, r := range node_args {
+		var match bool
+		for _, n := range nodes {
+			if n.Id.Get() == r {
+				nodeList = append(nodeList, n)
+				match = true
+			}
+		}
+
+		if !match {
+			fmt.Fprintf(os.Stderr, "ERROR: No match for node: %s\n", r)
+		}
+	}
+
+	if len(nodeList) == 0 {
+		fmt.Printf("No nodes found\n")
+		return
+	}
+
+	for _, n := range nodeList {
+		err := nodeDB.DelNode(n.Id.Get())
+		if err != nil {
+			wwlog.Printf(wwlog.ERROR, "%s\n", err)
+		} else {
+			count++
+			fmt.Printf("Deleting node: %s\n", n.Id.Print())
+		}
+	}
+
+	err = nodeDB.Persist()
+	if err != nil {
+		return errors.Wrap(err, "failed to persist nodedb")
+	}
+
+	err = warewulfd.DaemonReload()
+	if err != nil {
+		return errors.Wrap(err, "failed to reload warewulf daemon")
+	}
+
+	return
+}
+
 
 func NodeList(nodeNames []string) (nodeInfo []*wwapi.NodeInfo, err error) {
 

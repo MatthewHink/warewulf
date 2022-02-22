@@ -61,17 +61,39 @@ func main() {
 // Api implementation.
 
 // TODO: Needs testing.
+// TODO: Need nil check on nodeNames arrays.
 func (s *apiServer) NodeAdd(ctx context.Context, request *wwapi.NodeAddParameter) (response *emptypb.Empty, err error) {
+
+	log.Println("NodeAdd start")
+	log.Printf("request: %T, %#v\n", request, request)
 
 	if request == nil {
 		return response, status.Errorf(codes.InvalidArgument, "nil request")
 	}
 	
+	response = new(emptypb.Empty)
 	err = node.NodeAdd(request)
 	return
 }
 
+func (s *apiServer) NodeDelete(ctx context.Context, request *wwapi.NodeDeleteParameter) (response *emptypb.Empty, err error) {
+
+	log.Println("NodeDelete start")
+	log.Printf("request: %T, %#v\n", request, request)
+
+	if request == nil {
+		return response, status.Errorf(codes.InvalidArgument, "nil request")
+	}
+
+	response = new(emptypb.Empty)
+	err = node.NodeDelete(request)
+	return
+}
+
 func (s *apiServer) NodeList(ctx context.Context, request *wwapi.NodeNames) (response *wwapi.NodeListResponse, err error) {
+
+	log.Println("NodeList start")
+	log.Printf("request: %T, %#v\n", request, request)
 
 	if request == nil {
 		return response, status.Errorf(codes.InvalidArgument, "nil request")

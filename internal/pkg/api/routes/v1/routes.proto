@@ -83,7 +83,12 @@ message NodeAddParameter {
 	string netmask = 7;
 	string netname = 8;
 	string type = 9;
-	NodeNames nodeNames = 10;
+	repeated string nodeNames = 10;
+}
+
+message NodeDeleteParameter {
+	bool force = 1;
+	repeated string nodeNames = 2;
 }
 
 message VersionResponse {
@@ -101,6 +106,12 @@ service WWApi {
 		option (google.api.http) = {
 			post: "/v1/node"
 			body: "*"
+		};
+	}
+
+	rpc NodeDelete(NodeDeleteParameter) returns (google.protobuf.Empty) {
+		option (google.api.http) = {
+			delete: "/v1/node"
 		};
 	}
 

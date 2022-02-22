@@ -227,8 +227,10 @@ dist: vendor config
 proto: ## wwapi generate code from protobuf
 	protoc -I internal/pkg/api/routes/v1 -I=. \
 		--grpc-gateway_out=. \
+		--grpc-gateway_opt logtostderr=true \
 		--go_out=. \
-		--go-grpc_out=. routes.proto
+		--go-grpc_out=. \
+		routes.proto
 
 wwapid: ## Build the grpc api server. TODO: not under make all.
 	go build -race -ldflags "-s -w" -o ./wwapid internal/app/api/wwapid/wwapid.go

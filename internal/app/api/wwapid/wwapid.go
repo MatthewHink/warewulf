@@ -111,6 +111,20 @@ func (s *apiServer) NodeList(ctx context.Context, request *wwapi.NodeNames) (res
 	return
 }
 
+func (s *apiServer) NodeSet(ctx context.Context, request *wwapi.NodeSetParameter) (response *emptypb.Empty, err error) {
+
+	log.Println("NodeSet start")
+	log.Printf("request: %T, %#v\n", request, request)
+
+	if request == nil {
+		return response, status.Errorf(codes.InvalidArgument, "nil request")
+	}
+
+	response = new(emptypb.Empty)
+	err = node.NodeSet(request)
+	return
+}
+
 func (s *apiServer) Version(ctx context.Context, request *emptypb.Empty) (response *wwapi.VersionResponse, err error) {
 
 	response = &wwapi.VersionResponse{

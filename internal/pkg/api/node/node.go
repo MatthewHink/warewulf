@@ -10,6 +10,7 @@ import (
 	"github.com/hpcng/warewulf/internal/pkg/warewulfd"
 	"github.com/hpcng/warewulf/internal/pkg/wwlog"
 	"github.com/hpcng/warewulf/pkg/hostlist"
+	"github.com/manifoldco/promptui"
 	"github.com/pkg/errors"
 
 	wwapi "github.com/hpcng/warewulf/internal/pkg/api/routes/wwapiv1"
@@ -27,7 +28,8 @@ func NodeAdd(nap *wwapi.NodeAddParameter) (err error) {
 	node_args := hostlist.Expand(nap.NodeNames)
 
 	for _, a := range node_args {
-		n, err := nodeDB.AddNode(a)
+		var n node.NodeInfo
+		n, err = nodeDB.AddNode(a)
 		if err != nil {
 			return errors.Wrap(err, "failed to add node")
 		}
@@ -36,15 +38,16 @@ func NodeAdd(nap *wwapi.NodeAddParameter) (err error) {
 		if nap.Cluster != "" {
 			wwlog.Printf(wwlog.VERBOSE, "Node: %s, Setting cluster name to: %s\n", n.Id.Get(), nap.Cluster)
 			n.ClusterName.Set(nap.Cluster)
-			err := nodeDB.NodeUpdate(n)
+			err = nodeDB.NodeUpdate(n)
 			if err != nil {
 				return errors.Wrap(err, "failed to update node")
 			}
 		}
 
 		if nap.Netdev != "" {
-			if nap.Netname == "" {
-				return errors.New("you must include the '--netname' option")
+			err = checkNetNameRequired(nap.Netname)
+			if err != nil {
+				return
 			}
 
 			if _, ok := n.NetDevs[nap.Netname]; !ok {
@@ -59,8 +62,9 @@ func NodeAdd(nap *wwapi.NodeAddParameter) (err error) {
 		}
 
 		if nap.Ipaddr != "" {
-			if nap.Netname == "" {
-				return errors.New("you must include the '--netname' option")
+			err = checkNetNameRequired(nap.Netname)
+			if err != nil {
+				return
 			}
 
 			NewIpaddr := util.IncrementIPv4(nap.Ipaddr, count)
@@ -77,8 +81,9 @@ func NodeAdd(nap *wwapi.NodeAddParameter) (err error) {
 		}
 
 		if nap.Netmask != "" {
-			if nap.Netname == "" {
-				return errors.New("you must include the '--netname' option")
+			err = checkNetNameRequired(nap.Netname)
+			if err != nil {
+				return
 			}
 
 			if _, ok := n.NetDevs[nap.Netname]; !ok {
@@ -90,8 +95,9 @@ func NodeAdd(nap *wwapi.NodeAddParameter) (err error) {
 		}
 
 		if nap.Gateway != "" {
-			if nap.Netname == "" {
-				return errors.New("you must include the '--netname' option")
+			err = checkNetNameRequired(nap.Netname)
+			if err != nil {
+				return
 			}
 
 			if _, ok := n.NetDevs[nap.Netname]; !ok {
@@ -415,13 +421,23 @@ func NodeList(nodeNames []string) (nodeInfo []*wwapi.NodeInfo, err error) {
 	return
 }
 
+// NodeSet is the wwapi implmentation for updating node fields.
+func NodeSet(set *wwapi.NodeSetParameter) (err error) {
+	var nodeDB node.NodeYaml
+	nodeDB, _, err = NodeSetParameterCheck(set, false)
+	if err != nil {
+		return
+	}
+	return nodeDbSave(&nodeDB)
+}
+
 // NodeSetParameterCheck does error checking on NodeSetParameter.
 // Output to the console if console is true.
 // TODO: Determine if the console switch does wwlog or not.
 // - console may end up being textOutput?
-func NodeSetParameterCheck(set * wwapi.NodeSetParameter, console bool) (err error) {
+func NodeSetParameterCheck(set * wwapi.NodeSetParameter, console bool) (nodeDB node.NodeYaml, nodeCount uint, err error) {
 	//var err error
-	var count uint
+	//var count uint
 	var setProfiles []string // TODO: Look at this. Is there an issue here?
 
 	// TODO: Need these checks elsewhere.
@@ -429,7 +445,7 @@ func NodeSetParameterCheck(set * wwapi.NodeSetParameter, console bool) (err erro
 		err = fmt.Errorf("Node set parameter is null")
 		if console {
 			fmt.Printf("%v\n", err)
-			return err
+			return
 		}
 	}
 
@@ -437,11 +453,11 @@ func NodeSetParameterCheck(set * wwapi.NodeSetParameter, console bool) (err erro
 		err = fmt.Errorf("Node set parameter: NodeNames is null")
 		if console {
 			fmt.Printf("%v\n", err)
-			return err
+			return
 		}
 	}
 
-	nodeDB, err := node.New()
+	nodeDB, err = node.New()
 	if err != nil {
 		wwlog.Printf(wwlog.ERROR, "Could not open node configuration: %s\n", err)
 		return
@@ -529,7 +545,7 @@ func NodeSetParameterCheck(set * wwapi.NodeSetParameter, console bool) (err erro
 		}
 
 		if set.IpmiIpaddr != "" {
-			newIpaddr := util.IncrementIPv4(set.IpmiIpaddr, count)
+			newIpaddr := util.IncrementIPv4(set.IpmiIpaddr, nodeCount)
 			wwlog.Printf(wwlog.VERBOSE, "Node: %s, Setting IPMI IP address to: %s\n", n.Id.Get(), newIpaddr)
 			n.IpmiIpaddr.Set(newIpaddr)
 		}
@@ -617,13 +633,11 @@ func NodeSetParameterCheck(set * wwapi.NodeSetParameter, console bool) (err erro
 			if def {
 				set.NetDefault = "yes"
 			}
-
 		}
 
 		if set.Netdev != "" {
-			if set.Netname == "" {
-				err = fmt.Errorf("You must include the '--netname' option")
-				wwlog.Printf(wwlog.ERROR, fmt.Sprintf("%v\n", err.Error()))
+			err = checkNetNameRequired(set.Netname)
+			if err != nil {
 				return
 			}
 
@@ -632,22 +646,20 @@ func NodeSetParameterCheck(set * wwapi.NodeSetParameter, console bool) (err erro
 		}
 
 		if set.Ipaddr != "" {
-			if set.Netname == "" {
-				err = fmt.Errorf("You must include the '--netname' option")
-				wwlog.Printf(wwlog.ERROR, fmt.Sprintf("%v\n", err.Error()))
+			err = checkNetNameRequired(set.Netname)
+			if err != nil {
 				return
 			}
 
-			newIpaddr := util.IncrementIPv4(set.Ipaddr, count)
+			newIpaddr := util.IncrementIPv4(set.Ipaddr, nodeCount)
 
 			wwlog.Printf(wwlog.VERBOSE, "Node: %s:%s, Setting Ipaddr to: %s\n", n.Id.Get(), set.Netname, newIpaddr)
 			n.NetDevs[set.Netname].Ipaddr.Set(newIpaddr)
 		}
 
 		if set.Netmask != "" {
-			if set.Netname == "" {
-				err = fmt.Errorf("You must include the '--netname' option")
-				wwlog.Printf(wwlog.ERROR, fmt.Sprintf("%v\n", err.Error()))
+			err = checkNetNameRequired(set.Netname)
+			if err != nil {
 				return
 			}
 
@@ -656,9 +668,8 @@ func NodeSetParameterCheck(set * wwapi.NodeSetParameter, console bool) (err erro
 		}
 
 		if set.Gateway != "" {
-			if set.Netname == "" {
-				err = fmt.Errorf("You must include the '--netname' option")
-				wwlog.Printf(wwlog.ERROR, fmt.Sprintf("%v\n", err.Error()))
+			err = checkNetNameRequired(set.Netname)
+			if err != nil {
 				return
 			}
 
@@ -667,10 +678,8 @@ func NodeSetParameterCheck(set * wwapi.NodeSetParameter, console bool) (err erro
 		}
 
 		if set.Hwaddr != "" {
-			// TODO: Make this code block a private function.
-			if set.Netname == "" {
-				err = fmt.Errorf("You must include the '--netname' option")
-				wwlog.Printf(wwlog.ERROR, fmt.Sprintf("%v\n", err.Error()))
+			err = checkNetNameRequired(set.Netname)
+			if err != nil {
 				return
 			}
 
@@ -679,9 +688,8 @@ func NodeSetParameterCheck(set * wwapi.NodeSetParameter, console bool) (err erro
 		}
 
 		if set.Type != "" {
-			if set.Netname == "" {
-				err = fmt.Errorf("You must include the '--netname' option")
-				wwlog.Printf(wwlog.ERROR, fmt.Sprintf("%v\n", err.Error()))
+			err = checkNetNameRequired(set.Netname)
+			if err != nil {
 				return
 			}
 
@@ -690,9 +698,8 @@ func NodeSetParameterCheck(set * wwapi.NodeSetParameter, console bool) (err erro
 		}
 
 		if set.Onboot != "" {
-			if set.Netname == "" {
-				err = fmt.Errorf("You must include the '--netname' option")
-				wwlog.Printf(wwlog.ERROR, fmt.Sprintf("%v\n", err.Error()))
+			err = checkNetNameRequired(set.Netname)
+			if err != nil {
 				return
 			}
 
@@ -728,9 +735,8 @@ func NodeSetParameterCheck(set * wwapi.NodeSetParameter, console bool) (err erro
 		}
 
 		if set.NetdevDelete {
-			if set.Netname == "" {
-				err = fmt.Errorf("You must include the '--netname' option")
-				wwlog.Printf(wwlog.ERROR, fmt.Sprintf("%v\n", err.Error()))
+			err = checkNetNameRequired(set.Netname)
+			if err != nil {
 				return
 			}
 
@@ -780,46 +786,45 @@ func NodeSetParameterCheck(set * wwapi.NodeSetParameter, console bool) (err erro
 			os.Exit(1)
 		}
 
-		count++
+		nodeCount++
+	}
+	return
+}
+
+// NodeSetPrompt prompt is a blocking confirmation prompt.
+// Returns true on y or yes.
+func NodeSetPrompt(label string) (yes bool) {
+
+	prompt := promptui.Prompt{
+		Label: label,
+		IsConfirm: true,
 	}
 
-	// TODO: Prompt
-	// TODO: Save if okay.
-	/*
-
-	if SetYes {
-		err := nodeDB.Persist()
-		if err != nil {
-			return errors.Wrap(err, "failed to persist nodedb")
-		}
-
-		err = warewulfd.DaemonReload()
-		if err != nil {
-			return errors.Wrap(err, "failed to reload warewulf daemon")
-		}
-	} else {
-		q := fmt.Sprintf("Are you sure you want to modify %d nodes(s)", len(nodes))
-
-		prompt := promptui.Prompt{
-			Label:     q,
-			IsConfirm: true,
-		}
-
-		result, _ := prompt.Run()
-
-		if result == "y" || result == "yes" {
-			err := nodeDB.Persist()
-			if err != nil {
-				return errors.Wrap(err, "failed to persist nodedb")
-			}
-
-			err = warewulfd.DaemonReload()
-			if err != nil {
-				return errors.Wrap(err, "failed to reload warewulf daemon")
-			}
-		}
+	result, _ := prompt.Run()
+	if result == "y" || result == "yes" {
+		yes = true
 	}
-	*/
+	return
+}
 
+func checkNetNameRequired(netname string) (err error) {
+	if netname == "" {
+		err = fmt.Errorf("You must include the '--netname' option")
+		wwlog.Printf(wwlog.ERROR, fmt.Sprintf("%v\n", err.Error()))
+	}
+	return
+}
+
+// nodeDbSave persists the nodeDB to disk and restarts warewulfd.
+func nodeDbSave(nodeDB *node.NodeYaml) (err error) {
+	err = nodeDB.Persist()
+	if err != nil {
+		return errors.Wrap(err, "failed to persist nodedb")
+	}
+
+	err = warewulfd.DaemonReload()
+	if err != nil {
+		return errors.Wrap(err, "failed to reload warewulf daemon")
+	}
 	return
 }

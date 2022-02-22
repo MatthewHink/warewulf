@@ -13,10 +13,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CobraRunE(cmd *cobra.Command, args []string) error {
+func CobraRunE(cmd *cobra.Command, args []string) (err error) {
 
 	// For a blocking prompt, expand the node list first.
 	// We do this again at the API layer, but an API should not have a blocking prompt.
+	// TODO: Break this up into:
+	// - NodeDeleteParamCheck(consoleOutputOnOff)
+	// - NodeDeletePrompt.
 	if !SetYes {
 		var count int
 		var nodeList []node.NodeInfo
@@ -24,13 +27,13 @@ func CobraRunE(cmd *cobra.Command, args []string) error {
 		nodeDB, err := node.New()
 		if err != nil {
 			wwlog.Printf(wwlog.ERROR, "Failed to open node database: %s\n", err)
-			return
+			return err
 		}
 
 		nodes, err := nodeDB.FindAllNodes()
 		if err != nil {
 			wwlog.Printf(wwlog.ERROR, "Could not get node list: %s\n", err)
-			return
+			return err
 		}
 
 		args = hostlist.Expand(args)
@@ -51,7 +54,7 @@ func CobraRunE(cmd *cobra.Command, args []string) error {
 
 		if len(nodeList) == 0 {
 			fmt.Printf("No nodes found\n")
-			return
+			return nil
 		}
 
 		for _, n := range nodeList {

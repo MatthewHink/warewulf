@@ -91,6 +91,48 @@ message NodeDeleteParameter {
 	repeated string nodeNames = 2;
 }
 
+message NodeSetParameter {
+	string comment = 1;
+	string container = 2;
+	string kernel = 3;
+	string kernelArgs = 4;
+	string netname = 5;
+	string netdev = 6;
+	string ipaddr = 7;
+	string netmask = 8;
+	string gateway = 9;
+	string hwaddr = 10;
+	string type = 11;
+	string onboot = 12;
+	string netDefault = 13;
+	bool netdevDelete = 14;
+	string cluster = 15;
+	string ipxe = 16;
+	string initOverlay = 17;
+	string runtimeOverlay = 18;
+	string systemOverlay = 19;
+	string ipmiIpaddr = 20;
+	string ipmiNetmask = 21;
+	string ipmiPort = 22;
+	string ipmiGateway = 23;
+	string ipmiUsername = 24;
+	string ipmiPassword = 25;
+	string ipmiInterface = 26;
+	bool allNodes = 27;
+	string profile = 28;
+	repeated string profileAdd = 29;
+	repeated string profileDelete = 30;
+	bool force = 31;
+	string init = 32;
+	bool discoverable = 33;
+	bool undiscoverable = 34;
+	string root = 35;
+	repeated string tags = 36;
+	repeated string tagsDelete = 37;
+	string assetKey = 38;
+	repeated string NodeNames = 39;
+}
+
 message VersionResponse {
 	string apiPrefix = 1;
 	string apiVersion = 2;
@@ -100,7 +142,6 @@ message VersionResponse {
 service WWApi {
 
 	// Nodes
-
 
 	rpc NodeAdd(NodeAddParameter) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
@@ -118,6 +159,12 @@ service WWApi {
 	rpc NodeList(NodeNames) returns (NodeListResponse) {
 		option (google.api.http) = {
 			get: "/v1/node"
+		};
+	}
+
+	rpc NodeSet(NodeSetParameter) returns (google.protobuf.Empty) {
+		option (google.api.http) = {
+			patch: "/v1/node"
 		};
 	}
 

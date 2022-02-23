@@ -146,6 +146,21 @@ func (s *apiServer) NodeSet(ctx context.Context, request *wwapi.NodeSetParameter
 	return s.nodeListInternal(request.NodeNames)
 }
 
+func (s *apiServer) NodeStatus(ctx context.Context, request *wwapi.NodeNames) (response *wwapi.NodeStatusResponse, err error) {
+
+	log.Println("NodeStatus start")
+	log.Printf("request: %T, %#v\n", request, request)
+
+	// Parameter checks. request.NodeNames can be nil.
+	if request == nil {
+		return response, status.Errorf(codes.InvalidArgument, "nil request")
+	}
+
+	return node.NodeStatus(request.NodeNames)
+}
+
+// Version returns the versions of the wwapi and warewulf as well as the api
+// prefix for http routes.
 func (s *apiServer) Version(ctx context.Context, request *emptypb.Empty) (response *wwapi.VersionResponse, err error) {
 
 	response = &wwapi.VersionResponse{

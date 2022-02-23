@@ -1,12 +1,17 @@
 package node
 
 import (
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"strconv"
 	"strings"
+	//"time"
+
 	"github.com/hpcng/warewulf/internal/pkg/node"
 	"github.com/hpcng/warewulf/internal/pkg/util"
+	"github.com/hpcng/warewulf/internal/pkg/warewulfconf"
 	"github.com/hpcng/warewulf/internal/pkg/warewulfd"
 	"github.com/hpcng/warewulf/internal/pkg/wwlog"
 	"github.com/hpcng/warewulf/pkg/hostlist"
@@ -816,6 +821,91 @@ func NodeSetPrompt(label string) (yes bool) {
 	if result == "y" || result == "yes" {
 		yes = true
 	}
+	return
+}
+
+// NodeStatus returns the imaging state for nodes.
+// This requires warewulfd.
+func NodeStatus(nodeNames []string) (nodeStatusResponse *wwapi.NodeStatusResponse, err error) {
+
+	// Local structs for translating json from warewulfd.
+	type nodeStatusInternal struct {
+		NodeName string `json:"node name"`
+		Stage    string `json:"stage"`
+		Sent     string `json:"sent"`
+		Ipaddr   string `json:"ipaddr"`
+		Lastseen int64  `json:"last seen"`
+	}
+
+	// all status is a map with one key (nodes)
+	// and maps of [nodeName]NodeStatus underneath.
+	type allStatus struct {
+		Nodes map[string]*nodeStatusInternal `json:"nodes"`
+	}
+
+	controller, err := warewulfconf.New()
+	if err != nil {
+		wwlog.Printf(wwlog.ERROR, "%s\n", err)
+		return
+	}
+
+	if controller.Ipaddr == "" {
+		err = fmt.Errorf("The Warewulf Server IP Address is not properly configured")
+		wwlog.Printf(wwlog.ERROR, fmt.Sprintf("%v\n", err.Error()))
+		return
+	}
+
+	statusURL := fmt.Sprintf("http://%s:%d/status", controller.Ipaddr, controller.Warewulf.Port)
+	wwlog.Printf(wwlog.VERBOSE, "Connecting to: %s\n", statusURL)
+
+	resp, err := http.Get(statusURL)
+	if err != nil {
+		wwlog.Printf(wwlog.ERROR, "Could not connect to Warewulf server: %s\n", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	decoder := json.NewDecoder(resp.Body)
+	var wwNodeStatus allStatus
+
+	err = decoder.Decode(&wwNodeStatus)
+	if err != nil {
+		wwlog.Printf(wwlog.ERROR, "Could not decode JSON: %s\n", err)
+		return
+	}
+
+	// Translate struct and filter.
+	nodeStatusResponse = &wwapi.NodeStatusResponse{}
+
+	if len(nodeNames) == 0 {
+		for _, v := range wwNodeStatus.Nodes {
+			nodeStatusResponse.NodeStatus = append(nodeStatusResponse.NodeStatus,
+				&wwapi.NodeStatus{
+					NodeName: v.NodeName,
+					Stage: v.Stage,
+					Sent: v.Sent,
+					Ipaddr: v.Ipaddr,
+					Lastseen: v.Lastseen,
+				})
+		}
+	} else {
+		nodeList := hostlist.Expand(nodeNames)
+		for _, v := range wwNodeStatus.Nodes {
+			for j := 0; j < len(nodeList); j++ {
+				if v.NodeName == nodeList[j] {
+					nodeStatusResponse.NodeStatus = append(nodeStatusResponse.NodeStatus,
+						&wwapi.NodeStatus{
+							NodeName: v.NodeName,
+							Stage: v.Stage,
+							Sent: v.Sent,
+							Ipaddr: v.Ipaddr,
+							Lastseen: v.Lastseen,
+						})
+						break
+					}
+			}
+		}
+	}	
 	return
 }
 

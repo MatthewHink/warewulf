@@ -47,7 +47,10 @@ curl -d '{"nodeNames": ["testApiNode0"], "ipmiIpAddr": "10.0.8.220", "updateMask
 # Node set with post: WORKS!!!
 curl -d '{"nodeNames": ["testApiNode0"], "ipmiIpaddr": "6.7.8.9"}' -H "Content-Type: application/json" -X POST http://localhost:9871/v1/nodeset 
 
+# node status
+curl http://localhost:9871/v1/nodestatus
 
+curl http://localhost:9871/v1/nodestatus?nodeNames=testApiNode0
 
 # node delete single node
 curl -X DELETE http://localhost:9871/v1/node?nodeNames=testApiNode0

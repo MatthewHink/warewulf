@@ -32,6 +32,9 @@ type WWApiClient interface {
 	NodeList(ctx context.Context, in *NodeNames, opts ...grpc.CallOption) (*NodeListResponse, error)
 	// NodeSet updates node fields for one or more nodes.
 	NodeSet(ctx context.Context, in *NodeSetParameter, opts ...grpc.CallOption) (*NodeListResponse, error)
+	// NodeStatus returns the imaging state for nodes.
+	// This requires warewulfd.
+	NodeStatus(ctx context.Context, in *NodeNames, opts ...grpc.CallOption) (*NodeStatusResponse, error)
 	// Version returns the wwapi version, the api prefix, and the Warewulf
 	// version. This is also useful for testing if the service is up.
 	Version(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*VersionResponse, error)
@@ -81,6 +84,15 @@ func (c *wWApiClient) NodeSet(ctx context.Context, in *NodeSetParameter, opts ..
 	return out, nil
 }
 
+func (c *wWApiClient) NodeStatus(ctx context.Context, in *NodeNames, opts ...grpc.CallOption) (*NodeStatusResponse, error) {
+	out := new(NodeStatusResponse)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/NodeStatus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *wWApiClient) Version(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*VersionResponse, error) {
 	out := new(VersionResponse)
 	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/Version", in, out, opts...)
@@ -103,6 +115,9 @@ type WWApiServer interface {
 	NodeList(context.Context, *NodeNames) (*NodeListResponse, error)
 	// NodeSet updates node fields for one or more nodes.
 	NodeSet(context.Context, *NodeSetParameter) (*NodeListResponse, error)
+	// NodeStatus returns the imaging state for nodes.
+	// This requires warewulfd.
+	NodeStatus(context.Context, *NodeNames) (*NodeStatusResponse, error)
 	// Version returns the wwapi version, the api prefix, and the Warewulf
 	// version. This is also useful for testing if the service is up.
 	Version(context.Context, *emptypb.Empty) (*VersionResponse, error)
@@ -124,6 +139,9 @@ func (UnimplementedWWApiServer) NodeList(context.Context, *NodeNames) (*NodeList
 }
 func (UnimplementedWWApiServer) NodeSet(context.Context, *NodeSetParameter) (*NodeListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NodeSet not implemented")
+}
+func (UnimplementedWWApiServer) NodeStatus(context.Context, *NodeNames) (*NodeStatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NodeStatus not implemented")
 }
 func (UnimplementedWWApiServer) Version(context.Context, *emptypb.Empty) (*VersionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Version not implemented")
@@ -213,6 +231,24 @@ func _WWApi_NodeSet_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WWApi_NodeStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NodeNames)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WWApiServer).NodeStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/wwapi.v1.WWApi/NodeStatus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WWApiServer).NodeStatus(ctx, req.(*NodeNames))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _WWApi_Version_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
@@ -253,6 +289,10 @@ var WWApi_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "NodeSet",
 			Handler:    _WWApi_NodeSet_Handler,
+		},
+		{
+			MethodName: "NodeStatus",
+			Handler:    _WWApi_NodeStatus_Handler,
 		},
 		{
 			MethodName: "Version",

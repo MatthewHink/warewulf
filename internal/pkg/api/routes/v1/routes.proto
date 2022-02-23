@@ -138,6 +138,20 @@ message NodeSetParameter {
 	repeated string nodeNames = 39;
 }
 
+// NodeStatus contains information about the imaging status per node.
+message NodeStatus {
+	string nodeName = 1;	// Name (Id) of the node.
+	string stage = 2;		// Stage of imaging.
+	string sent = 3;		// Last overlay sent.
+	string ipaddr = 4;		// Node IP address.
+	int64 lastseen = 5;		// Time in seconds since the node was last seen.
+}
+
+// NodeStatusResponse contains NodeStatus for zero or more nodes.
+message NodeStatusResponse {
+	repeated NodeStatus nodeStatus = 1;
+}
+
 // VersionReponse contains versions of the software.
 message VersionResponse {
 	string apiPrefix = 1;
@@ -178,6 +192,14 @@ service WWApi {
 		option (google.api.http) = {
 			post: "/v1/nodeset" // TODO: This should be a patch.
 			body: "*"
+		};
+	}
+
+	// NodeStatus returns the imaging state for nodes.
+	// This requires warewulfd.
+	rpc NodeStatus(NodeNames) returns (NodeStatusResponse) {
+		option (google.api.http) = {
+			get: "/v1/nodestatus"
 		};
 	}
 

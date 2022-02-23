@@ -16,9 +16,12 @@ import (
 	wwapi "github.com/hpcng/warewulf/internal/pkg/api/routes/wwapiv1"
 )
 
-// TODO: null checks on all pointer parameters
-
 func NodeAdd(nap *wwapi.NodeAddParameter) (err error) {
+
+	if nap == nil {
+		return fmt.Errorf("NodeAddParameter is nil")
+	}
+
 	var count uint
 	nodeDB, err := node.New()
 	if err != nil {
@@ -162,6 +165,11 @@ func NodeAdd(nap *wwapi.NodeAddParameter) (err error) {
 }
 
 func NodeDelete(ndp *wwapi.NodeDeleteParameter) (err error) {
+
+	if ndp == nil {
+		return fmt.Errorf("NodeDeleteParameter is nil")
+	}
+
 	var count int
 	var nodeList []node.NodeInfo
 
@@ -222,6 +230,8 @@ func NodeDelete(ndp *wwapi.NodeDeleteParameter) (err error) {
 
 
 func NodeList(nodeNames []string) (nodeInfo []*wwapi.NodeInfo, err error) {
+
+	// nil is okay for nodeNames
 
 	nodeDB, err := node.New()
 	if err != nil {
@@ -423,6 +433,11 @@ func NodeList(nodeNames []string) (nodeInfo []*wwapi.NodeInfo, err error) {
 
 // NodeSet is the wwapi implmentation for updating node fields.
 func NodeSet(set *wwapi.NodeSetParameter) (err error) {
+
+	if set == nil {
+		return fmt.Errorf("NodeAddParameter is nil")
+	}
+
 	var nodeDB node.NodeYaml
 	nodeDB, _, err = NodeSetParameterCheck(set, false)
 	if err != nil {
@@ -436,11 +451,7 @@ func NodeSet(set *wwapi.NodeSetParameter) (err error) {
 // TODO: Determine if the console switch does wwlog or not.
 // - console may end up being textOutput?
 func NodeSetParameterCheck(set * wwapi.NodeSetParameter, console bool) (nodeDB node.NodeYaml, nodeCount uint, err error) {
-	//var err error
-	//var count uint
-	var setProfiles []string // TODO: Look at this. Is there an issue here?
 
-	// TODO: Need these checks elsewhere.
 	if set == nil {
 		err = fmt.Errorf("Node set parameter is null")
 		if console {
@@ -457,6 +468,7 @@ func NodeSetParameterCheck(set * wwapi.NodeSetParameter, console bool) (nodeDB n
 		}
 	}
 
+	var setProfiles []string // TODO: Look at this. Is there an issue here?
 	nodeDB, err = node.New()
 	if err != nil {
 		wwlog.Printf(wwlog.ERROR, "Could not open node configuration: %s\n", err)
@@ -807,6 +819,8 @@ func NodeSetPrompt(label string) (yes bool) {
 	return
 }
 
+// checkNetNameRequired is a helper for determining if netname is set.
+// Certain settings require it.
 func checkNetNameRequired(netname string) (err error) {
 	if netname == "" {
 		err = fmt.Errorf("You must include the '--netname' option")
@@ -816,6 +830,10 @@ func checkNetNameRequired(netname string) (err error) {
 }
 
 // nodeDbSave persists the nodeDB to disk and restarts warewulfd.
+// TODO: We will likely need locking around anything changing nodeDB
+// or restarting warewulfd. Determine if the reason for restart is
+// just to reinitialize warewulfd with the new nodeDB or if there is
+// something more to it.
 func nodeDbSave(nodeDB *node.NodeYaml) (err error) {
 	err = nodeDB.Persist()
 	if err != nil {

@@ -23,12 +23,17 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type WWApiClient interface {
-	NodeAdd(ctx context.Context, in *NodeAddParameter, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// NodeAdd adds one or more nodes for management by Warewulf and returns
+	// the added nodes. Node fields may be shimmed in per profiles.
+	NodeAdd(ctx context.Context, in *NodeAddParameter, opts ...grpc.CallOption) (*NodeListResponse, error)
+	// NodeDelete removes one or more nodes from Warewulf management.
 	NodeDelete(ctx context.Context, in *NodeDeleteParameter, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// NodeList lists some or all nodes managed by Warewulf.
 	NodeList(ctx context.Context, in *NodeNames, opts ...grpc.CallOption) (*NodeListResponse, error)
-	NodeSet(ctx context.Context, in *NodeSetParameter, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// Version returns the wwapi version. This is also useful for testing if
-	// the service is up.
+	// NodeSet updates node fields for one or more nodes.
+	NodeSet(ctx context.Context, in *NodeSetParameter, opts ...grpc.CallOption) (*NodeListResponse, error)
+	// Version returns the wwapi version, the api prefix, and the Warewulf
+	// version. This is also useful for testing if the service is up.
 	Version(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*VersionResponse, error)
 }
 
@@ -40,8 +45,8 @@ func NewWWApiClient(cc grpc.ClientConnInterface) WWApiClient {
 	return &wWApiClient{cc}
 }
 
-func (c *wWApiClient) NodeAdd(ctx context.Context, in *NodeAddParameter, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
+func (c *wWApiClient) NodeAdd(ctx context.Context, in *NodeAddParameter, opts ...grpc.CallOption) (*NodeListResponse, error) {
+	out := new(NodeListResponse)
 	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/NodeAdd", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -67,8 +72,8 @@ func (c *wWApiClient) NodeList(ctx context.Context, in *NodeNames, opts ...grpc.
 	return out, nil
 }
 
-func (c *wWApiClient) NodeSet(ctx context.Context, in *NodeSetParameter, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
+func (c *wWApiClient) NodeSet(ctx context.Context, in *NodeSetParameter, opts ...grpc.CallOption) (*NodeListResponse, error) {
+	out := new(NodeListResponse)
 	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/NodeSet", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -89,12 +94,17 @@ func (c *wWApiClient) Version(ctx context.Context, in *emptypb.Empty, opts ...gr
 // All implementations must embed UnimplementedWWApiServer
 // for forward compatibility
 type WWApiServer interface {
-	NodeAdd(context.Context, *NodeAddParameter) (*emptypb.Empty, error)
+	// NodeAdd adds one or more nodes for management by Warewulf and returns
+	// the added nodes. Node fields may be shimmed in per profiles.
+	NodeAdd(context.Context, *NodeAddParameter) (*NodeListResponse, error)
+	// NodeDelete removes one or more nodes from Warewulf management.
 	NodeDelete(context.Context, *NodeDeleteParameter) (*emptypb.Empty, error)
+	// NodeList lists some or all nodes managed by Warewulf.
 	NodeList(context.Context, *NodeNames) (*NodeListResponse, error)
-	NodeSet(context.Context, *NodeSetParameter) (*emptypb.Empty, error)
-	// Version returns the wwapi version. This is also useful for testing if
-	// the service is up.
+	// NodeSet updates node fields for one or more nodes.
+	NodeSet(context.Context, *NodeSetParameter) (*NodeListResponse, error)
+	// Version returns the wwapi version, the api prefix, and the Warewulf
+	// version. This is also useful for testing if the service is up.
 	Version(context.Context, *emptypb.Empty) (*VersionResponse, error)
 	mustEmbedUnimplementedWWApiServer()
 }
@@ -103,7 +113,7 @@ type WWApiServer interface {
 type UnimplementedWWApiServer struct {
 }
 
-func (UnimplementedWWApiServer) NodeAdd(context.Context, *NodeAddParameter) (*emptypb.Empty, error) {
+func (UnimplementedWWApiServer) NodeAdd(context.Context, *NodeAddParameter) (*NodeListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NodeAdd not implemented")
 }
 func (UnimplementedWWApiServer) NodeDelete(context.Context, *NodeDeleteParameter) (*emptypb.Empty, error) {
@@ -112,7 +122,7 @@ func (UnimplementedWWApiServer) NodeDelete(context.Context, *NodeDeleteParameter
 func (UnimplementedWWApiServer) NodeList(context.Context, *NodeNames) (*NodeListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NodeList not implemented")
 }
-func (UnimplementedWWApiServer) NodeSet(context.Context, *NodeSetParameter) (*emptypb.Empty, error) {
+func (UnimplementedWWApiServer) NodeSet(context.Context, *NodeSetParameter) (*NodeListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NodeSet not implemented")
 }
 func (UnimplementedWWApiServer) Version(context.Context, *emptypb.Empty) (*VersionResponse, error) {

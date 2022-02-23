@@ -60,29 +60,45 @@ func main() {
 
 // Api implementation.
 
-// TODO: Needs testing.
-// TODO: Need nil check on nodeNames arrays.
-func (s *apiServer) NodeAdd(ctx context.Context, request *wwapi.NodeAddParameter) (response *emptypb.Empty, err error) {
+// NodeAdd adds one or more nodes for management by Warewulf and returns the added nodes.
+func (s *apiServer) NodeAdd(ctx context.Context, request *wwapi.NodeAddParameter) (response *wwapi.NodeListResponse, err error) {
 
+	// TODO: Remove traces on PR. (here and across the interface)
 	log.Println("NodeAdd start")
 	log.Printf("request: %T, %#v\n", request, request)
 
+	// Parameter checks.
 	if request == nil {
 		return response, status.Errorf(codes.InvalidArgument, "nil request")
 	}
+
+	if request.NodeNames == nil {
+		return response, status.Errorf(codes.InvalidArgument, "nil request.NodeNames")
+	}
 	
-	response = new(emptypb.Empty)
+	// Add the node(s).
 	err = node.NodeAdd(request)
-	return
+	if err != nil {
+		return
+	}
+
+	// Return the added nodes as per REST.
+	return s.nodeListInternal(request.NodeNames)
 }
 
+// NodeDelete deletes one or more nodes for removal of management by Warewulf.
 func (s *apiServer) NodeDelete(ctx context.Context, request *wwapi.NodeDeleteParameter) (response *emptypb.Empty, err error) {
 
 	log.Println("NodeDelete start")
 	log.Printf("request: %T, %#v\n", request, request)
 
+	// Parameter checks.
 	if request == nil {
 		return response, status.Errorf(codes.InvalidArgument, "nil request")
+	}
+
+	if request.NodeNames == nil {
+		return response, status.Errorf(codes.InvalidArgument, "nil request.NodeNames")
 	}
 
 	response = new(emptypb.Empty)
@@ -90,39 +106,44 @@ func (s *apiServer) NodeDelete(ctx context.Context, request *wwapi.NodeDeletePar
 	return
 }
 
+// NodeList returns details about zero or more nodes.
 func (s *apiServer) NodeList(ctx context.Context, request *wwapi.NodeNames) (response *wwapi.NodeListResponse, err error) {
 
 	log.Println("NodeList start")
 	log.Printf("request: %T, %#v\n", request, request)
 
+	// Parameter checks. request.NodeNames can be nil.
 	if request == nil {
 		return response, status.Errorf(codes.InvalidArgument, "nil request")
 	}
 
-	var nodes []*wwapi.NodeInfo
-	nodes, err = node.NodeList(request.NodeNames)
-	if err != nil {
-		return
-	}
-
-	response = &wwapi.NodeListResponse{
-		Nodes: nodes,
-	}
-	return
+	// Perform the list.
+	return s.nodeListInternal(request.NodeNames)
 }
 
-func (s *apiServer) NodeSet(ctx context.Context, request *wwapi.NodeSetParameter) (response *emptypb.Empty, err error) {
+// NodeSet updates fields for zero or more nodes and returns the updated nodes.
+func (s *apiServer) NodeSet(ctx context.Context, request *wwapi.NodeSetParameter) (response *wwapi.NodeListResponse, err error) {
+
+	// Parameter checks.
+	if request == nil {
+		return response, status.Errorf(codes.InvalidArgument, "nil request")
+	}
+
+	if request.NodeNames == nil {
+		return response, status.Errorf(codes.InvalidArgument, "nil request.NodeNames")
+	}
 
 	log.Println("NodeSet start")
 	log.Printf("request: %T, %#v\n", request, request)
 
-	if request == nil {
-		return response, status.Errorf(codes.InvalidArgument, "nil request")
+	// Perform the NodeSet.
+	err = node.NodeSet(request)
+	if err != nil {
+		return
 	}
 
-	response = new(emptypb.Empty)
-	err = node.NodeSet(request)
-	return
+	// Return the updated nodes as per REST.
+	return s.nodeListInternal(request.NodeNames)
 }
 
 func (s *apiServer) Version(ctx context.Context, request *emptypb.Empty) (response *wwapi.VersionResponse, err error) {
@@ -131,6 +152,24 @@ func (s *apiServer) Version(ctx context.Context, request *emptypb.Empty) (respon
 		ApiPrefix: apiPrefix,
 		ApiVersion: apiVersion,
 		WarewulfVersion: version.GetVersion(),
+	}
+	return
+}
+
+// Private helpers.
+
+// nodeListInternal calls NodeList and returns NodeListResponse.
+// This does not contain parameter checks.
+func (s *apiServer) nodeListInternal(nodeNames []string) (response *wwapi.NodeListResponse, err error) {
+
+	var nodes []*wwapi.NodeInfo
+	nodes, err = node.NodeList(nodeNames)
+	if err != nil {
+		return
+	}
+
+	response = &wwapi.NodeListResponse{
+		Nodes: nodes,
 	}
 	return
 }

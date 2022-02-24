@@ -61,6 +61,26 @@ func main() {
 
 // Api implementation.
 
+// ContainerDelete deletes one or more containers from Warewulf.
+func (s *apiServer) ContainerDelete(ctx context.Context, request *wwapi.ContainerDeleteParameter) (response *emptypb.Empty, err error) {
+
+	response = new(emptypb.Empty)
+	log.Println("ContainerDelete start")
+	log.Printf("request: %T, %#v\n", request, request)
+
+	// Parameter checks.
+	if request == nil {
+		return response, status.Errorf(codes.InvalidArgument, "nil request")
+	}
+
+	if request.ContainerNames == nil {
+		return response, status.Errorf(codes.InvalidArgument, "nil request.ContainerNames")
+	}
+
+	err = container.ContainerDelete(request)
+	return
+}
+
 func (s *apiServer) ContainerImport(ctx context.Context, request *wwapi.ContainerImportParameter) (response *wwapi.ContainerListResponse, err error) {
 	// TODO: Remove traces on PR. (here and across the interface)
 	log.Println("ContainerImport start")
@@ -141,6 +161,7 @@ func (s *apiServer) NodeAdd(ctx context.Context, request *wwapi.NodeAddParameter
 // NodeDelete deletes one or more nodes for removal of management by Warewulf.
 func (s *apiServer) NodeDelete(ctx context.Context, request *wwapi.NodeDeleteParameter) (response *emptypb.Empty, err error) {
 
+	response = new(emptypb.Empty)
 	log.Println("NodeDelete start")
 	log.Printf("request: %T, %#v\n", request, request)
 
@@ -153,7 +174,6 @@ func (s *apiServer) NodeDelete(ctx context.Context, request *wwapi.NodeDeletePar
 		return response, status.Errorf(codes.InvalidArgument, "nil request.NodeNames")
 	}
 
-	response = new(emptypb.Empty)
 	err = node.NodeDelete(request)
 	return
 }

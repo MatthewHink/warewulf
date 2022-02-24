@@ -23,6 +23,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type WWApiClient interface {
+	// ContainerDelete removes one or more container from Warewulf management.
+	ContainerDelete(ctx context.Context, in *ContainerDeleteParameter, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// ContainerImport imports a container to Warewulf.
 	ContainerImport(ctx context.Context, in *ContainerImportParameter, opts ...grpc.CallOption) (*ContainerListResponse, error)
 	// ContainerList lists ContainerInfo for each container.
@@ -50,6 +52,15 @@ type wWApiClient struct {
 
 func NewWWApiClient(cc grpc.ClientConnInterface) WWApiClient {
 	return &wWApiClient{cc}
+}
+
+func (c *wWApiClient) ContainerDelete(ctx context.Context, in *ContainerDeleteParameter, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/ContainerDelete", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *wWApiClient) ContainerImport(ctx context.Context, in *ContainerImportParameter, opts ...grpc.CallOption) (*ContainerListResponse, error) {
@@ -128,6 +139,8 @@ func (c *wWApiClient) Version(ctx context.Context, in *emptypb.Empty, opts ...gr
 // All implementations must embed UnimplementedWWApiServer
 // for forward compatibility
 type WWApiServer interface {
+	// ContainerDelete removes one or more container from Warewulf management.
+	ContainerDelete(context.Context, *ContainerDeleteParameter) (*emptypb.Empty, error)
 	// ContainerImport imports a container to Warewulf.
 	ContainerImport(context.Context, *ContainerImportParameter) (*ContainerListResponse, error)
 	// ContainerList lists ContainerInfo for each container.
@@ -154,6 +167,9 @@ type WWApiServer interface {
 type UnimplementedWWApiServer struct {
 }
 
+func (UnimplementedWWApiServer) ContainerDelete(context.Context, *ContainerDeleteParameter) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ContainerDelete not implemented")
+}
 func (UnimplementedWWApiServer) ContainerImport(context.Context, *ContainerImportParameter) (*ContainerListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ContainerImport not implemented")
 }
@@ -189,6 +205,24 @@ type UnsafeWWApiServer interface {
 
 func RegisterWWApiServer(s grpc.ServiceRegistrar, srv WWApiServer) {
 	s.RegisterService(&WWApi_ServiceDesc, srv)
+}
+
+func _WWApi_ContainerDelete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ContainerDeleteParameter)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WWApiServer).ContainerDelete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/wwapi.v1.WWApi/ContainerDelete",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WWApiServer).ContainerDelete(ctx, req.(*ContainerDeleteParameter))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _WWApi_ContainerImport_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -342,6 +376,10 @@ var WWApi_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "wwapi.v1.WWApi",
 	HandlerType: (*WWApiServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "ContainerDelete",
+			Handler:    _WWApi_ContainerDelete_Handler,
+		},
 		{
 			MethodName: "ContainerImport",
 			Handler:    _WWApi_ContainerImport_Handler,

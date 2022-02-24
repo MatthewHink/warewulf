@@ -14,6 +14,12 @@ import "google/protobuf/field_mask.proto";
 
 // Container
 
+// ContainerDeleteParameter contains input for removing containers from Warewulf
+// management.
+message ContainerDeleteParameter {
+	repeated string containerNames = 1;
+}
+
 message ContainerImportParameter{
 	string source = 1; // container source uri
 	string name = 2; // container name
@@ -188,6 +194,13 @@ message VersionResponse {
 service WWApi {
 
 	// Containers
+
+	// ContainerDelete removes one or more container from Warewulf management.
+	rpc ContainerDelete(ContainerDeleteParameter) returns (google.protobuf.Empty) {
+		option (google.api.http) = {
+			delete: "/v1/container"
+		};
+	}
 
 	// ContainerImport imports a container to Warewulf.
 	rpc ContainerImport(ContainerImportParameter) returns (ContainerListResponse) {

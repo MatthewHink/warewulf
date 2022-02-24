@@ -21,6 +21,49 @@ import (
 	wwapi "github.com/hpcng/warewulf/internal/pkg/api/routes/wwapiv1"
 )
 
+func ContainerDelete(cdp *wwapi.ContainerDeleteParameter) (err error) {
+
+	if cdp == nil {
+		return fmt.Errorf("ContainerDeleteParameter is nil")
+	}
+
+	nodeDB, err := node.New()
+	if err != nil {
+		wwlog.Printf(wwlog.ERROR, "Could not open nodeDB: %s\n", err)
+		return
+	}
+
+	nodes, err := nodeDB.FindAllNodes()
+	if err != nil {
+		return
+	}
+
+ARG_LOOP:
+	for i := 0; i < len(cdp.ContainerNames); i++ {
+		//_, arg := range args {
+		containerName := cdp.ContainerNames[i]
+		for _, n := range nodes {
+			if n.ContainerName.Get() == containerName {
+				wwlog.Printf(wwlog.ERROR, "Container is configured for nodes, skipping: %s\n", containerName)
+				continue ARG_LOOP
+			}
+		}
+
+		if !container.ValidSource(containerName) {
+			wwlog.Printf(wwlog.ERROR, "Container name is not a valid source: %s\n", containerName)
+			continue
+		}
+		err := container.DeleteSource(containerName)
+		if err != nil {
+			wwlog.Printf(wwlog.ERROR, "Could not remove source: %s\n", containerName)
+		} else {
+			fmt.Printf("Container has been deleted: %s\n", containerName)
+		}
+	}
+
+	return
+}
+
 func ContainerImport(cip *wwapi.ContainerImportParameter) (containerName string, err error) {
 
 	if cip == nil {

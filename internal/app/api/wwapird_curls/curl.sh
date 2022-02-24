@@ -9,6 +9,9 @@ curl http://localhost:9871/v1/container
 # container import
 curl -d '{"source": "docker://warewulf/rocky:8", "name": "rocky-8", "update": true, "default": true}' -H "Content-Type: application/json" -X POST http://localhost:9871/v1/container
 
+# container delete
+curl -X DELETE http://localhost:9871/v1/container?containerNames=rocky-8
+
 
 # node list all
 curl http://localhost:9871/v1/node

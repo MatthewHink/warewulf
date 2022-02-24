@@ -8,6 +8,7 @@ import (
 	"os"
 
 	wwapi "github.com/hpcng/warewulf/internal/pkg/api/routes/wwapiv1"
+	"github.com/hpcng/warewulf/internal/pkg/api/container"
 	"github.com/hpcng/warewulf/internal/pkg/api/node"
 
 	"google.golang.org/grpc"
@@ -59,6 +60,24 @@ func main() {
 }
 
 // Api implementation.
+
+// ContainerList returns details about containers.
+func (s *apiServer) ContainerList(ctx context.Context, request *emptypb.Empty) (response *wwapi.ContainerListResponse, err error) {
+	// TODO: Remove traces on PR. (here and across the interface)
+	log.Println("ContainerList start")
+	log.Printf("request: %T, %#v\n", request, request)
+
+	var containers []*wwapi.ContainerInfo
+	containers, err = container.ContainerList()
+	if err != nil {
+		return
+	}
+
+	response = &wwapi.ContainerListResponse{
+		Containers: containers,
+	}
+	return
+}
 
 // NodeAdd adds one or more nodes for management by Warewulf and returns the added nodes.
 func (s *apiServer) NodeAdd(ctx context.Context, request *wwapi.NodeAddParameter) (response *wwapi.NodeListResponse, err error) {

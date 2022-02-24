@@ -14,6 +14,15 @@ import "google/protobuf/field_mask.proto";
 
 // Container
 
+message ContainerImportParameter{
+	string source = 1; // container source uri
+	string name = 2; // container name
+	bool force = 3;
+	bool update = 4;
+	bool build = 5;
+	bool default = 6;
+}
+
 message ContainerInfo {
 	string name = 1;
 	bool built = 2;
@@ -179,6 +188,14 @@ message VersionResponse {
 service WWApi {
 
 	// Containers
+
+	// ContainerImport imports a container to Warewulf.
+	rpc ContainerImport(ContainerImportParameter) returns (ContainerListResponse) {
+		option(google.api.http) = {
+			post: "/v1/container"
+			body: "*"
+		};
+	}
 
 	// ContainerList lists ContainerInfo for each container.
 	rpc ContainerList(google.protobuf.Empty) returns (ContainerListResponse) {

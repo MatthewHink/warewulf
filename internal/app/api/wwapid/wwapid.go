@@ -61,6 +61,39 @@ func main() {
 
 // Api implementation.
 
+func (s *apiServer) ContainerImport(ctx context.Context, request *wwapi.ContainerImportParameter) (response *wwapi.ContainerListResponse, err error) {
+	// TODO: Remove traces on PR. (here and across the interface)
+	log.Println("ContainerImport start")
+	log.Printf("request: %T, %#v\n", request, request)
+
+
+	// TODO: Missing the import call here ...
+	var containerName string
+	containerName, err = container.ContainerImport(request)
+	if err != nil {
+		return
+	}
+
+	// TODO: Need a container list for a single container here.
+	var containers []*wwapi.ContainerInfo
+	containers, err = container.ContainerList()
+	if err != nil {
+		return
+	}
+
+	// Container name may have been shimmed in during import,
+	// which is why ContainerList returns it.
+	for i := 0; i < len(containers); i ++ {
+		if containerName == containers[i].Name {
+			response = &wwapi.ContainerListResponse{
+				Containers: []*wwapi.ContainerInfo{containers[i]},
+			}
+			return
+		}
+	}
+	return
+}
+
 // ContainerList returns details about containers.
 func (s *apiServer) ContainerList(ctx context.Context, request *emptypb.Empty) (response *wwapi.ContainerListResponse, err error) {
 	// TODO: Remove traces on PR. (here and across the interface)

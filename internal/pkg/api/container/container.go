@@ -21,6 +21,73 @@ import (
 	wwapi "github.com/hpcng/warewulf/internal/pkg/api/routes/wwapiv1"
 )
 
+func ContainerBuild(cbp *wwapi.ContainerBuildParameter) (err error) {
+
+	if cbp == nil {
+		return fmt.Errorf("ContainerBuildParameter is nil")
+	}
+
+	var containers []string
+
+	if cbp.All {
+		containers, err = container.ListSources()
+	} else {
+		containers = cbp.ContainerNames
+	}
+
+	if len(containers) == 0 {
+		return
+	}
+
+	for _, c := range containers {
+		if !container.ValidSource(c) {
+			err =  fmt.Errorf("VNFS name does not exist: %s", c)
+			wwlog.Printf(wwlog.ERROR, "%s\n", err)
+			return
+		}
+
+		err = container.Build(c, cbp.Force)
+		if err != nil {
+			wwlog.Printf(wwlog.ERROR, "Could not build container %s: %s\n", c, err)
+			return
+		}
+	}
+
+	if cbp.Default {
+		if len(containers) != 1 {
+			wwlog.Printf(wwlog.ERROR, "Can only set default for one container\n")
+		} else {
+			var nodeDB node.NodeYaml
+			nodeDB, err = node.New()
+			if err != nil {
+				wwlog.Printf(wwlog.ERROR, "Could not open node configuration: %s\n", err)
+				return
+			}
+
+			//TODO: Don't loop through profiles, instead have a nodeDB function that goes directly to the map
+			profiles, _ := nodeDB.FindAllProfiles()
+			for _, profile := range profiles {
+				wwlog.Printf(wwlog.DEBUG, "Looking for profile default: %s\n", profile.Id.Get())
+				if profile.Id.Get() == "default" {
+					wwlog.Printf(wwlog.DEBUG, "Found profile default, setting container name to: %s\n", containers[0])
+					profile.ContainerName.Set(containers[0])
+					err := nodeDB.ProfileUpdate(profile)
+					if err != nil {
+						return errors.Wrap(err, "failed to update node profile")
+					}
+				}
+			}
+			// TODO: Need a wrapper and flock around this. Sometimes we restart warewulfd and sometimes we don't.
+			err = nodeDB.Persist()
+			if err != nil {
+				return errors.Wrap(err, "failed to persist nodedb")
+			}
+			fmt.Printf("Set default profile to container: %s\n", containers[0])
+		}
+	}
+	return
+}
+
 func ContainerDelete(cdp *wwapi.ContainerDeleteParameter) (err error) {
 
 	if cdp == nil {

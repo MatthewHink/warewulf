@@ -14,6 +14,14 @@ import "google/protobuf/field_mask.proto";
 
 // Container
 
+// ContainerBuildParameter contains input for building zero or more containers.
+message ContainerBuildParameter {
+	repeated string containerNames = 1;
+	bool force = 2;
+	bool all = 3;
+	bool default = 4;
+}
+
 // ContainerDeleteParameter contains input for removing containers from Warewulf
 // management.
 message ContainerDeleteParameter {
@@ -194,6 +202,14 @@ message VersionResponse {
 service WWApi {
 
 	// Containers
+
+	// ContainerBuild builds zero or more containers.
+	rpc ContainerBuild(ContainerBuildParameter) returns (ContainerListResponse) {
+		option (google.api.http) = {
+			post: "/v1/containerbuild"
+			body: "*"
+		};
+	}
 
 	// ContainerDelete removes one or more container from Warewulf management.
 	rpc ContainerDelete(ContainerDeleteParameter) returns (google.protobuf.Empty) {

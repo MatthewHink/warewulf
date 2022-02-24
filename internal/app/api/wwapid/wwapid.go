@@ -61,6 +61,44 @@ func main() {
 
 // Api implementation.
 
+// ContainerBuild builds one or more containers.
+func (s *apiServer) ContainerBuild(ctx context.Context, request *wwapi.ContainerBuildParameter) (response *wwapi.ContainerListResponse, err error) {
+
+	log.Println("ContainerBuild start")
+	log.Printf("request: %T, %#v\n", request, request)
+
+	// Parameter checks.
+	if request == nil {
+		return response, status.Errorf(codes.InvalidArgument, "nil request")
+	}
+
+	if request.ContainerNames == nil {
+		return response, status.Errorf(codes.InvalidArgument, "nil request.ContainerNames")
+	}
+
+	err = container.ContainerBuild(request)
+	if err != nil {
+		return
+	}
+
+	// Return the built containers. (REST POST)
+	var containers []*wwapi.ContainerInfo
+	containers, err = container.ContainerList()
+	if err != nil {
+		return
+	}
+
+	response = &wwapi.ContainerListResponse{}
+	for i := 0; i < len(containers); i ++ {
+		for j := 0; j < len(request.ContainerNames); j++ {
+			if containers[i].Name == request.ContainerNames[j] {
+				response.Containers = append(response.Containers, containers[i])
+			}
+		}
+	}
+	return
+}
+
 // ContainerDelete deletes one or more containers from Warewulf.
 func (s *apiServer) ContainerDelete(ctx context.Context, request *wwapi.ContainerDeleteParameter) (response *emptypb.Empty, err error) {
 
@@ -102,7 +140,7 @@ func (s *apiServer) ContainerImport(ctx context.Context, request *wwapi.Containe
 	}
 
 	// Container name may have been shimmed in during import,
-	// which is why ContainerList returns it.
+	// which is why ContainerImport returns it.
 	for i := 0; i < len(containers); i ++ {
 		if containerName == containers[i].Name {
 			response = &wwapi.ContainerListResponse{

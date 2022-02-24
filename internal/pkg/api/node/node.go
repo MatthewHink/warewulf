@@ -7,7 +7,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	//"time"
 
 	"github.com/hpcng/warewulf/internal/pkg/node"
 	"github.com/hpcng/warewulf/internal/pkg/util"

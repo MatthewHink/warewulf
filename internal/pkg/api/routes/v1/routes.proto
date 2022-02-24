@@ -12,6 +12,20 @@ import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/field_mask.proto";
 
+// Container
+
+message ContainerInfo {
+	string name = 1;
+	bool built = 2;
+	uint32 nodeCount = 3;
+}
+
+message ContainerListResponse {
+	repeated ContainerInfo containers = 1;
+}
+
+// Nodes
+
 // NodeNames is an array of node ids.
 message NodeNames {
 	repeated string nodeNames = 1;
@@ -152,6 +166,8 @@ message NodeStatusResponse {
 	repeated NodeStatus nodeStatus = 1;
 }
 
+// Version
+
 // VersionReponse contains versions of the software.
 message VersionResponse {
 	string apiPrefix = 1;
@@ -161,6 +177,15 @@ message VersionResponse {
 
 // WWApi defines the wwapid service web interface.
 service WWApi {
+
+	// Containers
+
+	// ContainerList lists ContainerInfo for each container.
+	rpc ContainerList(google.protobuf.Empty) returns (ContainerListResponse) {
+		option (google.api.http) = {
+			get: "/v1/container"
+		};
+	}
 
 	// Nodes
 

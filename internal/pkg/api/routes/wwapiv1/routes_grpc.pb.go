@@ -31,6 +31,8 @@ type WWApiClient interface {
 	ContainerImport(ctx context.Context, in *ContainerImportParameter, opts ...grpc.CallOption) (*ContainerListResponse, error)
 	// ContainerList lists ContainerInfo for each container.
 	ContainerList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ContainerListResponse, error)
+	// ContainerShow lists ContainerShow for each container.
+	ContainerShow(ctx context.Context, in *ContainerShowParameter, opts ...grpc.CallOption) (*ContainerShowResponse, error)
 	// NodeAdd adds one or more nodes for management by Warewulf and returns
 	// the added nodes. Node fields may be shimmed in per profiles.
 	NodeAdd(ctx context.Context, in *NodeAddParameter, opts ...grpc.CallOption) (*NodeListResponse, error)
@@ -86,6 +88,15 @@ func (c *wWApiClient) ContainerImport(ctx context.Context, in *ContainerImportPa
 func (c *wWApiClient) ContainerList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ContainerListResponse, error) {
 	out := new(ContainerListResponse)
 	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/ContainerList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *wWApiClient) ContainerShow(ctx context.Context, in *ContainerShowParameter, opts ...grpc.CallOption) (*ContainerShowResponse, error) {
+	out := new(ContainerShowResponse)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/ContainerShow", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -158,6 +169,8 @@ type WWApiServer interface {
 	ContainerImport(context.Context, *ContainerImportParameter) (*ContainerListResponse, error)
 	// ContainerList lists ContainerInfo for each container.
 	ContainerList(context.Context, *emptypb.Empty) (*ContainerListResponse, error)
+	// ContainerShow lists ContainerShow for each container.
+	ContainerShow(context.Context, *ContainerShowParameter) (*ContainerShowResponse, error)
 	// NodeAdd adds one or more nodes for management by Warewulf and returns
 	// the added nodes. Node fields may be shimmed in per profiles.
 	NodeAdd(context.Context, *NodeAddParameter) (*NodeListResponse, error)
@@ -191,6 +204,9 @@ func (UnimplementedWWApiServer) ContainerImport(context.Context, *ContainerImpor
 }
 func (UnimplementedWWApiServer) ContainerList(context.Context, *emptypb.Empty) (*ContainerListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ContainerList not implemented")
+}
+func (UnimplementedWWApiServer) ContainerShow(context.Context, *ContainerShowParameter) (*ContainerShowResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ContainerShow not implemented")
 }
 func (UnimplementedWWApiServer) NodeAdd(context.Context, *NodeAddParameter) (*NodeListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NodeAdd not implemented")
@@ -291,6 +307,24 @@ func _WWApi_ContainerList_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).ContainerList(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WWApi_ContainerShow_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ContainerShowParameter)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WWApiServer).ContainerShow(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/wwapi.v1.WWApi/ContainerShow",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WWApiServer).ContainerShow(ctx, req.(*ContainerShowParameter))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -425,6 +459,10 @@ var WWApi_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ContainerList",
 			Handler:    _WWApi_ContainerList_Handler,
+		},
+		{
+			MethodName: "ContainerShow",
+			Handler:    _WWApi_ContainerShow_Handler,
 		},
 		{
 			MethodName: "NodeAdd",

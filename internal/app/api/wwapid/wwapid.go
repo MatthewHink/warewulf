@@ -170,6 +170,15 @@ func (s *apiServer) ContainerList(ctx context.Context, request *emptypb.Empty) (
 	return
 }
 
+// ContainerShow returns details about containers.
+func (s *apiServer) ContainerShow(ctx context.Context, request *wwapi.ContainerShowParameter) (response *wwapi.ContainerShowResponse, err error) {
+	// TODO: Remove traces on PR. (here and across the interface)
+	log.Println("ContainerShow start")
+	log.Printf("request: %T, %#v\n", request, request)
+
+	return container.ContainerShow(request)
+}
+
 // NodeAdd adds one or more nodes for management by Warewulf and returns the added nodes.
 func (s *apiServer) NodeAdd(ctx context.Context, request *wwapi.NodeAddParameter) (response *wwapi.NodeListResponse, err error) {
 

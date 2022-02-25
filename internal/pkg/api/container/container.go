@@ -290,6 +290,44 @@ func ContainerList() (containerInfo []*wwapi.ContainerInfo, err error) {
 	return
 }
 
+func ContainerShow(csp *wwapi.ContainerShowParameter) (response *wwapi.ContainerShowResponse, err error) {
+
+	containerName := csp.ContainerName
+
+	if !container.ValidName(containerName) {
+		err = fmt.Errorf("%s is not a valid container", containerName)
+		return
+	}
+
+	rootFsDir := container.RootFsDir(containerName)
+
+	nodeDB, err := node.New()
+	if err != nil {
+		return
+	}
+
+	nodes, err := nodeDB.FindAllNodes()
+	if err != nil {
+		return
+	}
+
+	var nodeList []string
+	for _, n := range nodes {
+		if n.ContainerName.Get() == containerName {
+
+			nodeList = append(nodeList, n.Id.Get())
+		}
+	}
+
+	response = &wwapi.ContainerShowResponse {
+		Name: containerName,
+		Rootfs: rootFsDir,
+		Nodes: nodeList,
+	}
+	return
+}
+
+
 // Private helpers
 
 func setOCICredentials(sCtx *types.SystemContext) error {

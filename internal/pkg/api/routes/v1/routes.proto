@@ -47,6 +47,16 @@ message ContainerListResponse {
 	repeated ContainerInfo containers = 1;
 }
 
+message ContainerShowParameter {
+	string containerName = 1;
+}
+
+message ContainerShowResponse {
+	string Name = 1;
+	string Rootfs = 2;
+	repeated string Nodes = 3;
+}
+
 // Nodes
 
 // NodeNames is an array of node ids.
@@ -230,6 +240,13 @@ service WWApi {
 	rpc ContainerList(google.protobuf.Empty) returns (ContainerListResponse) {
 		option (google.api.http) = {
 			get: "/v1/container"
+		};
+	}
+
+	// ContainerShow lists ContainerShow for each container.
+	rpc ContainerShow(ContainerShowParameter) returns (ContainerShowResponse) {
+		option (google.api.http) = {
+			get: "/v1/containershow"
 		};
 	}
 

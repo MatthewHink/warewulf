@@ -5,11 +5,9 @@ import (
 
 	"fmt"
 	"os"
-	"os/exec"
 	"path"
 	"strconv"
 	"strings"
-	"syscall"
 
 	"github.com/containers/image/v5/types"
 
@@ -288,61 +286,6 @@ func ContainerList() (containerInfo []*wwapi.ContainerInfo, err error) {
 			Built: util.IsFile(image),
 			NodeCount: uint32(nodemap[source]),
 		})
-	}
-	return
-}
-
-func ContainerShell(csp *wwapi.ContainerShellParameter) (err error) {
-	// TODO: There was what look like build directives at the top of the original file. Find out about those.
-	fmt.Printf("ContainerShell (internal) start\n")
-
-	containerName := csp.ContainerName
-	binds := csp.Binds
-	var allargs []string
-
-	if !container.ValidSource(containerName) {
-		err = fmt.Errorf("Unknown Warewulf container: %s", containerName)
-		wwlog.Printf(wwlog.ERROR, "%s\n", err.Error())
-		return
-	}
-
-	for _, b := range binds {
-		allargs = append(allargs, "--bind", b)
-	}
-	//allargs = append(allargs, args...)
-	allargs = append(allargs, csp.Args...)
-	allargs = append(allargs, "/usr/bin/bash")
-
-	fmt.Printf("allargs: %v\n", allargs)
-
-	c := exec.Command("/proc/self/exe", append([]string{"container", "exec"}, allargs...)...)
-	fmt.Printf("command: %s\n", c) // TODO: Remove
-
-	// Survives through here.
-
-	//c := exec.Command("/bin/sh")
-	c.SysProcAttr = &syscall.SysProcAttr{
-		Cloneflags: syscall.CLONE_NEWUTS | syscall.CLONE_NEWPID | syscall.CLONE_NEWNS,
-	}
-
-	c.Stdin = os.Stdin
-	c.Stdout = os.Stdout
-	c.Stderr = os.Stderr
-	wwlog.Printf(wwlog.VERBOSE, "command: %s\n", c)
-
-	fmt.Printf("command: %s\n", c) // TODO: Remove
-
-	/*
-	if err = c.Run(); err != nil {
-		fmt.Println(err)
-		//os.Exit(1)
-		return
-	}
-	*/
-	err = c.Run()
-	if err != nil {
-		fmt.Printf("ERR: %v\n", err)
-		wwlog.Printf(wwlog.ERROR, "%s\n", err.Error())		
 	}
 	return
 }

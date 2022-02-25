@@ -124,13 +124,8 @@ func (s *apiServer) ContainerImport(ctx context.Context, request *wwapi.Containe
 	log.Println("ContainerImport start")
 	log.Printf("request: %T, %#v\n", request, request)
 
-	// Parameter checks.
-	if request == nil {
-		return response, status.Errorf(codes.InvalidArgument, "nil request")
-	}
 
-	// TODO: anything more to check?
-
+	// TODO: Missing the import call here ...
 	var containerName string
 	containerName, err = container.ContainerImport(request)
 	if err != nil {
@@ -181,29 +176,7 @@ func (s *apiServer) ContainerShow(ctx context.Context, request *wwapi.ContainerS
 	log.Println("ContainerShow start")
 	log.Printf("request: %T, %#v\n", request, request)
 
-	// Parameter checks.
-	if request == nil {
-		return response, status.Errorf(codes.InvalidArgument, "nil request")
-	}
-	// TODO: Anything more to check?
-	
 	return container.ContainerShow(request)
-}
-
-// ContainerShell start a bash shell in a container as root.
-func (s *apiServer) ContainerShell(ctx context.Context, request *wwapi.ContainerShellParameter) (response *emptypb.Empty, err error) {
-	response = new(emptypb.Empty)
-	// TODO: Remove traces on PR. (here and across the interface)
-	log.Println("ContainerShell start")
-	log.Printf("request: %T, %#v\n", request, request)
-	
-	// Parameter checks.
-	if request == nil {
-		return response, status.Errorf(codes.InvalidArgument, "nil request")
-	}
-	
-	err =  container.ContainerShell(request)
-	return
 }
 
 // NodeAdd adds one or more nodes for management by Warewulf and returns the added nodes.

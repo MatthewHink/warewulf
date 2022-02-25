@@ -15,12 +15,6 @@ curl -X DELETE http://localhost:9871/v1/container?containerNames=rocky-8
 # container build
 curl -d '{"containerNames": ["rocky-8"], "force": true}' -H "Content-Type: application/json" -X POST http://localhost:9871/v1/containerbuild
 
-# container show
-curl http://localhost:9871/v1/containershow?containerName=rocky-8
-
-# container shell
-curl -d '{"containerName": "rocky-8"}' -H "Content-Type: application/json" -X POST http://localhost:9871/v1/containershell
-
 # node list all
 curl http://localhost:9871/v1/node
 

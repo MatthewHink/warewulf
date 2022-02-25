@@ -31,6 +31,8 @@ type WWApiClient interface {
 	ContainerImport(ctx context.Context, in *ContainerImportParameter, opts ...grpc.CallOption) (*ContainerListResponse, error)
 	// ContainerList lists ContainerInfo for each container.
 	ContainerList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ContainerListResponse, error)
+	// ContainerShell starts a shell on a container with optional bind paths from the host.
+	ContainerShell(ctx context.Context, in *ContainerShellParameter, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// ContainerShow lists ContainerShow for each container.
 	ContainerShow(ctx context.Context, in *ContainerShowParameter, opts ...grpc.CallOption) (*ContainerShowResponse, error)
 	// NodeAdd adds one or more nodes for management by Warewulf and returns
@@ -88,6 +90,15 @@ func (c *wWApiClient) ContainerImport(ctx context.Context, in *ContainerImportPa
 func (c *wWApiClient) ContainerList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ContainerListResponse, error) {
 	out := new(ContainerListResponse)
 	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/ContainerList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *wWApiClient) ContainerShell(ctx context.Context, in *ContainerShellParameter, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/wwapi.v1.WWApi/ContainerShell", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -169,6 +180,8 @@ type WWApiServer interface {
 	ContainerImport(context.Context, *ContainerImportParameter) (*ContainerListResponse, error)
 	// ContainerList lists ContainerInfo for each container.
 	ContainerList(context.Context, *emptypb.Empty) (*ContainerListResponse, error)
+	// ContainerShell starts a shell on a container with optional bind paths from the host.
+	ContainerShell(context.Context, *ContainerShellParameter) (*emptypb.Empty, error)
 	// ContainerShow lists ContainerShow for each container.
 	ContainerShow(context.Context, *ContainerShowParameter) (*ContainerShowResponse, error)
 	// NodeAdd adds one or more nodes for management by Warewulf and returns
@@ -204,6 +217,9 @@ func (UnimplementedWWApiServer) ContainerImport(context.Context, *ContainerImpor
 }
 func (UnimplementedWWApiServer) ContainerList(context.Context, *emptypb.Empty) (*ContainerListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ContainerList not implemented")
+}
+func (UnimplementedWWApiServer) ContainerShell(context.Context, *ContainerShellParameter) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ContainerShell not implemented")
 }
 func (UnimplementedWWApiServer) ContainerShow(context.Context, *ContainerShowParameter) (*ContainerShowResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ContainerShow not implemented")
@@ -307,6 +323,24 @@ func _WWApi_ContainerList_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WWApiServer).ContainerList(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WWApi_ContainerShell_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ContainerShellParameter)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WWApiServer).ContainerShell(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/wwapi.v1.WWApi/ContainerShell",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WWApiServer).ContainerShell(ctx, req.(*ContainerShellParameter))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -459,6 +493,10 @@ var WWApi_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ContainerList",
 			Handler:    _WWApi_ContainerList_Handler,
+		},
+		{
+			MethodName: "ContainerShell",
+			Handler:    _WWApi_ContainerShell_Handler,
 		},
 		{
 			MethodName: "ContainerShow",

@@ -47,6 +47,17 @@ message ContainerListResponse {
 	repeated ContainerInfo containers = 1;
 }
 
+// ContainerShellParameter contains all data for starting a shell on a
+// container as root.
+message ContainerShellParameter {
+	// The name of the container to start a shell on.
+	string containerName = 1;
+	// Bind local path(s) into the container.
+	repeated string binds = 2;
+	// Additional arguments for the shell.
+	repeated string args = 3;
+}
+
 message ContainerShowParameter {
 	string containerName = 1;
 }
@@ -240,6 +251,14 @@ service WWApi {
 	rpc ContainerList(google.protobuf.Empty) returns (ContainerListResponse) {
 		option (google.api.http) = {
 			get: "/v1/container"
+		};
+	}
+
+	// ContainerShell starts a shell on a container with optional bind paths from the host.
+	rpc ContainerShell(ContainerShellParameter) returns (google.protobuf.Empty) {
+		option (google.api.http) = {
+			post: "/v1/containershell"
+			body: "*"
 		};
 	}
 

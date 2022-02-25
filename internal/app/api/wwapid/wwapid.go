@@ -16,7 +16,6 @@ import (
 	"google.golang.org/grpc/codes"
 
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-	//wrapperspb "google.golang.org/protobuf/types/known/wrapperspb""
 	wwapidconf "github.com/hpcng/warewulf/internal/pkg/wwapidconf"
 	"github.com/hpcng/warewulf/internal/pkg/version"
 )
@@ -34,19 +33,17 @@ func main() {
 	// Read the config file.
 	config, err := wwapidconf.New("")
 	if err != nil {
-		// TODO: wwapi log
 		log.Printf("err: %v", err)
 		os.Exit(1)
 	}
-	log.Printf("config: %#v\n", config) // TODO: log
+	log.Printf("config: %#v\n", config)
 
-	// Pull out config variables and log.
+	// Pull out config variables.
 	apiPrefix = config.ApiPrefix
 	apiVersion = config.ApiVersion
 	servicePort := config.Port
-	log.Printf("Starting wwapid. Version %s. Port %d. ApiPrefix %s\n",
-		apiVersion, servicePort, apiPrefix)
 	portString := fmt.Sprintf(":%d", servicePort)
+	// TODO: Tls
 
 	listen, err := net.Listen("tcp", portString)
 	if err != nil {
@@ -76,12 +73,13 @@ func (s *apiServer) ContainerBuild(ctx context.Context, request *wwapi.Container
 		return response, status.Errorf(codes.InvalidArgument, "nil request.ContainerNames")
 	}
 
+	// Build the container.
 	err = container.ContainerBuild(request)
 	if err != nil {
 		return
 	}
 
-	// Return the built containers. (REST POST)
+	// Return the built containers. (A REST POST returns what is modified.)
 	var containers []*wwapi.ContainerInfo
 	containers, err = container.ContainerList()
 	if err != nil {
@@ -102,6 +100,7 @@ func (s *apiServer) ContainerBuild(ctx context.Context, request *wwapi.Container
 // ContainerDelete deletes one or more containers from Warewulf.
 func (s *apiServer) ContainerDelete(ctx context.Context, request *wwapi.ContainerDeleteParameter) (response *emptypb.Empty, err error) {
 
+	// TODO: Remove here and elsewhere. Keeping this for now because it's useful for getting curls working.
 	response = new(emptypb.Empty)
 	log.Println("ContainerDelete start")
 	log.Printf("request: %T, %#v\n", request, request)
@@ -120,19 +119,15 @@ func (s *apiServer) ContainerDelete(ctx context.Context, request *wwapi.Containe
 }
 
 func (s *apiServer) ContainerImport(ctx context.Context, request *wwapi.ContainerImportParameter) (response *wwapi.ContainerListResponse, err error) {
-	// TODO: Remove traces on PR. (here and across the interface)
-	log.Println("ContainerImport start")
-	log.Printf("request: %T, %#v\n", request, request)
 
-
-	// TODO: Missing the import call here ...
+	// Import the container.
 	var containerName string
 	containerName, err = container.ContainerImport(request)
 	if err != nil {
 		return
 	}
 
-	// TODO: Need a container list for a single container here.
+	// Return the imported container to the client.
 	var containers []*wwapi.ContainerInfo
 	containers, err = container.ContainerList()
 	if err != nil {
@@ -154,9 +149,6 @@ func (s *apiServer) ContainerImport(ctx context.Context, request *wwapi.Containe
 
 // ContainerList returns details about containers.
 func (s *apiServer) ContainerList(ctx context.Context, request *emptypb.Empty) (response *wwapi.ContainerListResponse, err error) {
-	// TODO: Remove traces on PR. (here and across the interface)
-	log.Println("ContainerList start")
-	log.Printf("request: %T, %#v\n", request, request)
 
 	var containers []*wwapi.ContainerInfo
 	containers, err = container.ContainerList()
@@ -172,9 +164,11 @@ func (s *apiServer) ContainerList(ctx context.Context, request *emptypb.Empty) (
 
 // ContainerShow returns details about containers.
 func (s *apiServer) ContainerShow(ctx context.Context, request *wwapi.ContainerShowParameter) (response *wwapi.ContainerShowResponse, err error) {
-	// TODO: Remove traces on PR. (here and across the interface)
-	log.Println("ContainerShow start")
-	log.Printf("request: %T, %#v\n", request, request)
+
+	// Parameter checks.
+	if request == nil {
+		return response, status.Errorf(codes.InvalidArgument, "nil request")
+	}
 
 	return container.ContainerShow(request)
 }
@@ -209,8 +203,6 @@ func (s *apiServer) NodeAdd(ctx context.Context, request *wwapi.NodeAddParameter
 func (s *apiServer) NodeDelete(ctx context.Context, request *wwapi.NodeDeleteParameter) (response *emptypb.Empty, err error) {
 
 	response = new(emptypb.Empty)
-	log.Println("NodeDelete start")
-	log.Printf("request: %T, %#v\n", request, request)
 
 	// Parameter checks.
 	if request == nil {
@@ -227,9 +219,6 @@ func (s *apiServer) NodeDelete(ctx context.Context, request *wwapi.NodeDeletePar
 
 // NodeList returns details about zero or more nodes.
 func (s *apiServer) NodeList(ctx context.Context, request *wwapi.NodeNames) (response *wwapi.NodeListResponse, err error) {
-
-	log.Println("NodeList start")
-	log.Printf("request: %T, %#v\n", request, request)
 
 	// Parameter checks. request.NodeNames can be nil.
 	if request == nil {
@@ -252,9 +241,6 @@ func (s *apiServer) NodeSet(ctx context.Context, request *wwapi.NodeSetParameter
 		return response, status.Errorf(codes.InvalidArgument, "nil request.NodeNames")
 	}
 
-	log.Println("NodeSet start")
-	log.Printf("request: %T, %#v\n", request, request)
-
 	// Perform the NodeSet.
 	err = node.NodeSet(request)
 	if err != nil {
@@ -267,14 +253,10 @@ func (s *apiServer) NodeSet(ctx context.Context, request *wwapi.NodeSetParameter
 
 func (s *apiServer) NodeStatus(ctx context.Context, request *wwapi.NodeNames) (response *wwapi.NodeStatusResponse, err error) {
 
-	log.Println("NodeStatus start")
-	log.Printf("request: %T, %#v\n", request, request)
-
 	// Parameter checks. request.NodeNames can be nil.
 	if request == nil {
 		return response, status.Errorf(codes.InvalidArgument, "nil request")
 	}
-
 	return node.NodeStatus(request.NodeNames)
 }
 

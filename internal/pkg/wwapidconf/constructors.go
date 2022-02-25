@@ -13,13 +13,13 @@ type WwapidConf struct {
 	ApiPrefix string	`yaml:"apiPrefix"`
 	ApiVersion string	`yaml:"apiVersion"`
 	Port int			`yaml:"port"`
-	PublicKey string	`yaml:"publicKey"`
+	Tls map [string]string `yaml:"tls"`
 }
 
 // New loads the wwapid config from the given configFilePath or the default if empty.
 func New(configFilePath string) (conf WwapidConf, err error) {
 
-	if configFilePath == "" {
+	if configFilePath == "" { // Load from the default location.
 		configFilePath = path.Join(buildconfig.SYSCONFDIR(), "warewulf/wwapid.conf")
 	}
 	log.Printf("Loading wwapid configuration from: %v\n", configFilePath)

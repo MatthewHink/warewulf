@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"log"
 	"net"
@@ -19,6 +20,8 @@ import (
 	wwapidconf "github.com/hpcng/warewulf/internal/pkg/wwapidconf"
 	"github.com/hpcng/warewulf/internal/pkg/version"
 )
+
+// TODO: golang formatting of all files.
 
 type apiServer struct {
 	wwapi.UnimplementedWWApiServer
@@ -44,6 +47,11 @@ func main() {
 	servicePort := config.Port
 	portString := fmt.Sprintf(":%d", servicePort)
 	// TODO: Tls
+	tls := config.Tls
+
+	if !tls.Enabled {
+		insecureMode()
+	}
 
 	listen, err := net.Listen("tcp", portString)
 	if err != nil {
@@ -54,6 +62,27 @@ func main() {
 	wwapi.RegisterWWApiServer(grpcServer, &apiServer{})
 
 	log.Fatalln(grpcServer.Serve(listen))
+}
+
+// private helpers
+
+// insecureMode creates a blocking prompt for customers running wwapid in insecure mode.
+// It's a deterrent. Setup TLS. TODO: README on how to do that.
+func insecureMode() {
+
+	fmt.Println("*** Running wwapid in INSECURE mode. *** THIS IS DANGEROUS! *** Enter y to continue. ***")
+	reader := bufio.NewReader(os.Stdin)
+	result, err := reader.ReadString('\n')
+
+	if err != nil {
+		fmt.Printf("Fatal error: %v\n", err)
+	}
+
+	if !(result == "y\n") {
+		os.Exit(1)
+	}
+
+	fmt.Printf("wwapid running IN INSECURE MODE\n")
 }
 
 // Api implementation.
@@ -257,6 +286,7 @@ func (s *apiServer) NodeStatus(ctx context.Context, request *wwapi.NodeNames) (r
 	if request == nil {
 		return response, status.Errorf(codes.InvalidArgument, "nil request")
 	}
+
 	return node.NodeStatus(request.NodeNames)
 }
 

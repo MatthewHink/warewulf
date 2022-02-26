@@ -8,12 +8,18 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+type TlsConf struct {
+	Enabled bool `yaml:"enabled"`
+	ServerCert string `yaml:"serverCert"`
+	ServerKey string `yaml:"serverKey"`
+}
+
 // WwapidConf is the structure of the wwapid config file.
 type WwapidConf struct {
 	ApiPrefix string	`yaml:"apiPrefix"`
 	ApiVersion string	`yaml:"apiVersion"`
 	Port int			`yaml:"port"`
-	Tls map [string]string `yaml:"tls"`
+	Tls TlsConf 		`yaml:"tls"`
 }
 
 // New loads the wwapid config from the given configFilePath or the default if empty.

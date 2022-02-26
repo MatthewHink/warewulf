@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 
-	"google.golang.org/grpc/credentials/insecure" // TODO: Remove
+	"google.golang.org/grpc/credentials/insecure" // TODO: Block server on startup if in insecure mode.
 )
 
 // wwapic is intended as a sample wwapi client.

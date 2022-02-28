@@ -3,9 +3,12 @@ package main
 import (
 	"bufio"
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"log"
 	"net"
 	"fmt"
+	"io/ioutil"
 	"os"
 
 	wwapi "github.com/hpcng/warewulf/internal/pkg/api/routes/wwapiv1"
@@ -15,6 +18,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials"
 
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	wwapidconf "github.com/hpcng/warewulf/internal/pkg/wwapidconf"
@@ -46,19 +50,66 @@ func main() {
 	apiVersion = config.ApiVersion
 	servicePort := config.Port
 	portString := fmt.Sprintf(":%d", servicePort)
-	// TODO: Tls
-	tls := config.Tls
 
-	if !tls.Enabled {
+	if !config.Tls.Enabled {
 		insecureMode()
 	}
+
+	// Setup TLS.
+//	var opts []grpc.ServerOption
+//	if config.Tls.Enabled {
+
+//		certFile := config.Tls.ServerCert
+//		keyFile := config.Tls.ServerKey
+//		creds, err := credentials.NewServerTLSFromFile(certFile, keyFile)
+//		if err != nil {
+//			log.Fatalf("Failed to generate credentials: %v", err)
+//		}
+//		opts = []grpc.ServerOption{grpc.Creds(creds)}
+
+	// TODO: Fix paths. Fix config.
+	serverCert, err := tls.LoadX509KeyPair("/home/mhink/mtls/server.pem", "/home/mhink/mtls/server.key")
+	if err != nil {
+		log.Fatalf("Failed to load server cert and key. err: %s\n", err)
+	}
+	
+	// Load the CA cert.
+	var cacert []byte
+	cacert, err = ioutil.ReadFile("/home/mhink/mtls/cacert.pem")
+	if err != nil {
+		log.Fatalf("Failed to load cacert. err: %s\n", err)
+	}
+
+	// Put the CA cert into the cert pool.
+	certPool := x509.NewCertPool()
+	if !certPool.AppendCertsFromPEM(cacert) {
+		log.Fatalf("Failed to append CA cert to certificate pool. %s.", err)
+	}
+
+	// Create the TLS configuration
+	tlsConfig := &tls.Config{
+		Certificates: []tls.Certificate{serverCert},
+		RootCAs:      certPool,
+		ClientCAs:    certPool,
+		MinVersion:   tls.VersionTLS13,
+		MaxVersion:   tls.VersionTLS13,
+	}
+
+	// Create TLS credentials from the TLS configuration
+	//var creds credentials.TransportCredentials
+	creds := credentials.NewTLS(tlsConfig)
+//	}
 
 	listen, err := net.Listen("tcp", portString)
 	if err != nil {
 		log.Fatalln(err)
 	}
+	defer func() {
+		listen.Close()
+	}()
 
-	grpcServer := grpc.NewServer()
+	//grpcServer := grpc.NewServer(opts...)
+	grpcServer := grpc.NewServer(grpc.Creds(creds))
 	wwapi.RegisterWWApiServer(grpcServer, &apiServer{})
 
 	log.Fatalln(grpcServer.Serve(listen))

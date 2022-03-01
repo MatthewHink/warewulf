@@ -21,7 +21,6 @@ import (
 	"github.com/hpcng/warewulf/internal/pkg/buildconfig"
 	"path"
 	"fmt"
-	"os"
 )
 
 // wwapic is intended as a sample wwapi client.
@@ -29,42 +28,24 @@ import (
 func main() {
 	log.Println("Client running")
 
-	/*
-	// TODO: Remove hardcoded port. Config file. Also TLS is hardcoded.
-	//certFile := "/home/mhink/mtls/client-cert.pem"
-	//keyFile := "/home/mhink/mtls/client-key.pem"
-	var opts []grpc.DialOption
-	//certFile := "/home/mhink/mtls/client-crt.pem"
-	caFile := "/home/mhink/mtls/ca-crt.pem"
-	creds, err := credentials.NewClientTLSFromFile(caFile, "")
-	if err != nil {
-		log.Fatalf("Failed to create TLS credentials %v", err)
-	}
-	opts = append(opts, grpc.WithTransportCredentials(creds))
-
-	//conn, err := grpc.Dial(":9872", grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
-	//conn, err := grpc.Dial("rocky:9872", opts...) // TODO: Servername in config.
-	*/
-
 	// Read the config file.
 	config, err := apiconfig.NewClient(path.Join(buildconfig.SYSCONFDIR(), "warewulf/wwapic.conf"))
 	if err != nil {
-		log.Printf("err: %v", err)
-		os.Exit(1)
+		log.Fatalf("err: %v", err)
 	}
-	
+
 	var opts []grpc.DialOption
 	if config.TlsConfig.Enabled {
 
 		// Load the client cert and its key
-		clientCert, err := tls.LoadX509KeyPair("/home/mhink/mtls/client.pem", "/home/mhink/mtls/client.key")
+		clientCert, err := tls.LoadX509KeyPair(config.TlsConfig.Cert, config.TlsConfig.Key)
 		if err != nil {
 			log.Fatalf("Failed to load client cert and key. %s.", err)
 		}
 
 		// Load the CA cert.
 		var cacert []byte
-		cacert, err = ioutil.ReadFile("/home/mhink/mtls/cacert.pem")
+		cacert, err = ioutil.ReadFile(config.TlsConfig.CaCert)
 		if err != nil {
 			log.Fatalf("Failed to load cacert. err: %s\n", err)
 		}
@@ -90,9 +71,7 @@ func main() {
 		opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	}
 
-	//conn, err := grpc.Dial("localhost:9872", opts...) // TODO: Servername in config.
-	conn, err := grpc.Dial(fmt.Sprintf("%s:%v", config.ApiConfig.Server, config.ApiConfig.Port), opts...) // TODO: Servername in config.
-	//conn, err := grpc.Dial("localhost:9872", grpc.WithTransportCredentials(creds)) // TODO: Servername in config.
+	conn, err := grpc.Dial(fmt.Sprintf("%s:%v", config.ApiConfig.Server, config.ApiConfig.Port), opts...)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -112,4 +91,3 @@ func main() {
 
 	log.Printf("Version Response: %v", response)
 }
-

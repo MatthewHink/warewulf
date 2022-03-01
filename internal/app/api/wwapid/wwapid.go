@@ -45,8 +45,7 @@ func main() {
 	// Read the config file.
 	config, err := apiconfig.NewServer(path.Join(buildconfig.SYSCONFDIR(), "warewulf/wwapid.conf"))
 	if err != nil {
-		log.Printf("err: %v", err)
-		os.Exit(1)
+		log.Fatalf("err: %v", err)
 	}
 
 	// Pull out config variables.

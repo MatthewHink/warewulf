@@ -1,4 +1,5 @@
 package wwapidconf
+/*
 
 import (
 	"github.com/hpcng/warewulf/internal/pkg/buildconfig"
@@ -44,3 +45,4 @@ func New(configFilePath string) (conf WwapidConf, err error) {
 	log.Printf("wwapid config: %#v\n", conf)
 	return
 }
+*/

@@ -14,7 +14,14 @@ import (
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/grpc/credentials"
 
-	//"google.golang.org/grpc/credentials/insecure" // TODO: Block client on startup if in insecure mode.
+	"google.golang.org/grpc/credentials/insecure"
+
+	"github.com/hpcng/warewulf/internal/pkg/api/apiconfig"
+
+	"github.com/hpcng/warewulf/internal/pkg/buildconfig"
+	"path"
+	"fmt"
+	"os"
 )
 
 // wwapic is intended as a sample wwapi client.
@@ -39,39 +46,53 @@ func main() {
 	//conn, err := grpc.Dial("rocky:9872", opts...) // TODO: Servername in config.
 	*/
 
-	// Load the client cert and its key
-	clientCert, err := tls.LoadX509KeyPair("/home/mhink/mtls/client.pem", "/home/mhink/mtls/client.key")
+	// Read the config file.
+	config, err := apiconfig.NewClient(path.Join(buildconfig.SYSCONFDIR(), "warewulf/wwapic.conf"))
 	if err != nil {
-		log.Fatalf("Failed to load client cert and key. %s.", err)
-	}
-
-	// Load the CA cert.
-	var cacert []byte
-	cacert, err = ioutil.ReadFile("/home/mhink/mtls/cacert.pem")
-	if err != nil {
-		log.Fatalf("Failed to load cacert. err: %s\n", err)
+		log.Printf("err: %v", err)
+		os.Exit(1)
 	}
 	
-	// Put the CA cert into the cert pool.
-	certPool := x509.NewCertPool()
-	if !certPool.AppendCertsFromPEM(cacert) {
-		log.Fatalf("Failed to append CA cert to certificate pool. %s.", err)
-	}
+	var opts []grpc.DialOption
+	if config.TlsConfig.Enabled {
 
-	// Create the TLS configuration
-	tlsConfig := &tls.Config{
-		Certificates: []tls.Certificate{clientCert},
-		RootCAs:      certPool,
-		MinVersion:   tls.VersionTLS13,
-		MaxVersion:   tls.VersionTLS13,
-	}
+		// Load the client cert and its key
+		clientCert, err := tls.LoadX509KeyPair("/home/mhink/mtls/client.pem", "/home/mhink/mtls/client.key")
+		if err != nil {
+			log.Fatalf("Failed to load client cert and key. %s.", err)
+		}
 
-	// Create TLS credentials from the TLS configuration
-	creds := credentials.NewTLS(tlsConfig)
-
+		// Load the CA cert.
+		var cacert []byte
+		cacert, err = ioutil.ReadFile("/home/mhink/mtls/cacert.pem")
+		if err != nil {
+			log.Fatalf("Failed to load cacert. err: %s\n", err)
+		}
 		
+		// Put the CA cert into the cert pool.
+		certPool := x509.NewCertPool()
+		if !certPool.AppendCertsFromPEM(cacert) {
+			log.Fatalf("Failed to append CA cert to certificate pool. %s.", err)
+		}
+
+		// Create the TLS configuration
+		tlsConfig := &tls.Config{
+			Certificates: []tls.Certificate{clientCert},
+			RootCAs:      certPool,
+			MinVersion:   tls.VersionTLS13,
+			MaxVersion:   tls.VersionTLS13,
+		}
+
+		// Create TLS credentials from the TLS configuration
+		creds := credentials.NewTLS(tlsConfig)
+		opts = append(opts, grpc.DialOption(grpc.WithTransportCredentials(creds)))
+	} else {
+		opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	}
+
 	//conn, err := grpc.Dial("localhost:9872", opts...) // TODO: Servername in config.
-	conn, err := grpc.Dial("localhost:9872", grpc.WithTransportCredentials(creds)) // TODO: Servername in config.
+	conn, err := grpc.Dial(fmt.Sprintf("%s:%v", config.ApiConfig.Server, config.ApiConfig.Port), opts...) // TODO: Servername in config.
+	//conn, err := grpc.Dial("localhost:9872", grpc.WithTransportCredentials(creds)) // TODO: Servername in config.
 	if err != nil {
 		log.Fatalln(err)
 	}

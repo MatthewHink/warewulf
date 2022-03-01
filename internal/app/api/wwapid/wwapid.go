@@ -21,11 +21,16 @@ import (
 	"google.golang.org/grpc/credentials"
 
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-	wwapidconf "github.com/hpcng/warewulf/internal/pkg/wwapidconf"
 	"github.com/hpcng/warewulf/internal/pkg/version"
+	"github.com/hpcng/warewulf/internal/pkg/api/apiconfig"
+
+	"github.com/hpcng/warewulf/internal/pkg/buildconfig"
+	"path"
+
 )
 
 // TODO: golang formatting of all files.
+// TODO: Doc how keys are created and setup.
 
 type apiServer struct {
 	wwapi.UnimplementedWWApiServer
@@ -38,67 +43,55 @@ func main() {
 	log.Println("Server running")
 
 	// Read the config file.
-	config, err := wwapidconf.New("")
+	config, err := apiconfig.NewServer(path.Join(buildconfig.SYSCONFDIR(), "warewulf/wwapid.conf"))
 	if err != nil {
 		log.Printf("err: %v", err)
 		os.Exit(1)
 	}
-	log.Printf("config: %#v\n", config)
 
 	// Pull out config variables.
-	apiPrefix = config.ApiPrefix
-	apiVersion = config.ApiVersion
-	servicePort := config.Port
+	apiPrefix = config.ApiConfig.Prefix
+	apiVersion = config.ApiConfig.Version
+	servicePort := config.ApiConfig.Port
 	portString := fmt.Sprintf(":%d", servicePort)
-
-	if !config.Tls.Enabled {
-		insecureMode()
-	}
-
-	// Setup TLS.
-//	var opts []grpc.ServerOption
-//	if config.Tls.Enabled {
-
-//		certFile := config.Tls.ServerCert
-//		keyFile := config.Tls.ServerKey
-//		creds, err := credentials.NewServerTLSFromFile(certFile, keyFile)
-//		if err != nil {
-//			log.Fatalf("Failed to generate credentials: %v", err)
-//		}
-//		opts = []grpc.ServerOption{grpc.Creds(creds)}
-
-	// TODO: Fix paths. Fix config.
-	serverCert, err := tls.LoadX509KeyPair("/home/mhink/mtls/server.pem", "/home/mhink/mtls/server.key")
-	if err != nil {
-		log.Fatalf("Failed to load server cert and key. err: %s\n", err)
-	}
 	
-	// Load the CA cert.
-	var cacert []byte
-	cacert, err = ioutil.ReadFile("/home/mhink/mtls/cacert.pem")
-	if err != nil {
-		log.Fatalf("Failed to load cacert. err: %s\n", err)
-	}
+	var opts []grpc.ServerOption
+	if !config.TlsConfig.Enabled {
+		insecureMode()
+	} else {
 
-	// Put the CA cert into the cert pool.
-	certPool := x509.NewCertPool()
-	if !certPool.AppendCertsFromPEM(cacert) {
-		log.Fatalf("Failed to append CA cert to certificate pool. %s.", err)
-	}
+		// Setup TLS.
+		serverCert, err := tls.LoadX509KeyPair(config.TlsConfig.Cert, config.TlsConfig.Key)
+		if err != nil {
+			log.Fatalf("Failed to load server cert and key. err: %s\n", err)
+		}
+		
+		// Load the CA cert.
+		var cacert []byte
+		cacert, err = ioutil.ReadFile(config.TlsConfig.CaCert)
+		if err != nil {
+			log.Fatalf("Failed to load cacert. err: %s\n", err)
+		}
 
-	// Create the TLS configuration
-	tlsConfig := &tls.Config{
-		Certificates: []tls.Certificate{serverCert},
-		RootCAs:      certPool,
-		ClientCAs:    certPool,
-		MinVersion:   tls.VersionTLS13,
-		MaxVersion:   tls.VersionTLS13,
-	}
+		// Put the CA cert into the cert pool.
+		certPool := x509.NewCertPool()
+		if !certPool.AppendCertsFromPEM(cacert) {
+			log.Fatalf("Failed to append CA cert to certificate pool. %s.", err)
+		}
 
-	// Create TLS credentials from the TLS configuration
-	//var creds credentials.TransportCredentials
-	creds := credentials.NewTLS(tlsConfig)
-//	}
+		// Create the TLS configuration
+		tlsConfig := &tls.Config{
+			Certificates: []tls.Certificate{serverCert},
+			RootCAs:      certPool,
+			ClientCAs:    certPool,
+			MinVersion:   tls.VersionTLS13,
+			MaxVersion:   tls.VersionTLS13,
+		}
+
+		// Create TLS credentials from the TLS configuration
+		creds := credentials.NewTLS(tlsConfig)
+		opts = []grpc.ServerOption{grpc.Creds(creds)}
+	}
 
 	listen, err := net.Listen("tcp", portString)
 	if err != nil {
@@ -108,10 +101,8 @@ func main() {
 		listen.Close()
 	}()
 
-	//grpcServer := grpc.NewServer(opts...)
-	grpcServer := grpc.NewServer(grpc.Creds(creds))
+	grpcServer := grpc.NewServer(opts...)
 	wwapi.RegisterWWApiServer(grpcServer, &apiServer{})
-
 	log.Fatalln(grpcServer.Serve(listen))
 }
 

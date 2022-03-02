@@ -124,9 +124,6 @@ func insecureMode() {
 // ContainerBuild builds one or more containers.
 func (s *apiServer) ContainerBuild(ctx context.Context, request *wwapiv1.ContainerBuildParameter) (response *wwapiv1.ContainerListResponse, err error) {
 
-	log.Println("ContainerBuild start")
-	log.Printf("request: %T, %#v\n", request, request)
-
 	// Parameter checks.
 	if request == nil {
 		return response, status.Errorf(codes.InvalidArgument, "nil request")
@@ -162,11 +159,6 @@ func (s *apiServer) ContainerBuild(ctx context.Context, request *wwapiv1.Contain
 
 // ContainerDelete deletes one or more containers from Warewulf.
 func (s *apiServer) ContainerDelete(ctx context.Context, request *wwapiv1.ContainerDeleteParameter) (response *emptypb.Empty, err error) {
-
-	// TODO: Remove here and elsewhere. Keeping this for now because it's useful for getting curls working.
-	response = new(emptypb.Empty)
-	log.Println("ContainerDelete start")
-	log.Printf("request: %T, %#v\n", request, request)
 
 	// Parameter checks.
 	if request == nil {
@@ -238,10 +230,6 @@ func (s *apiServer) ContainerShow(ctx context.Context, request *wwapiv1.Containe
 
 // NodeAdd adds one or more nodes for management by Warewulf and returns the added nodes.
 func (s *apiServer) NodeAdd(ctx context.Context, request *wwapiv1.NodeAddParameter) (response *wwapiv1.NodeListResponse, err error) {
-
-	// TODO: Remove traces on PR. (here and across the interface)
-	log.Println("NodeAdd start")
-	log.Printf("request: %T, %#v\n", request, request)
 
 	// Parameter checks.
 	if request == nil {

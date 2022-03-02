@@ -80,7 +80,6 @@ func run() error {
 		opts = append(opts, grpc.DialOption(grpc.WithTransportCredentials(creds)))
 
 	} else {
-		// TODO: Put in blocking prompt here.
 		opts = []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 	}
 
@@ -100,7 +99,7 @@ func run() error {
 	}
 
 	// Insecure
-	return http.ListenAndServe(httpServerEndpoint, mux) // TODO: This is the client side change.
+	return http.ListenAndServe(httpServerEndpoint, mux)
 }
 
 func main() {

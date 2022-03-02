@@ -3,6 +3,12 @@
 # version
 curl http://localhost:9871/version
 
+# secure version
+curl --cacert /home/mhink/mtls/cacert.pem \
+    --key /home/mhink/mtls/client.key \
+    --cert /home/mhink/mtls/client.pem \
+    https://localhost:9871/version
+
 # container list all
 curl http://localhost:9871/v1/container
 

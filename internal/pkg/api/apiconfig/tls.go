@@ -1,13 +1,5 @@
 package apiconfig
 
-import (
-    //"github.com/hpcng/warewulf/internal/pkg/buildconfig"
-	//"path"
-	//"io/ioutil"
-	//"log"
-	//"gopkg.in/yaml.v2"
-)
-
 // TlsConfig contains TLS configuration parameters for a client or server.
 type TlsConfig struct {
 	// Enabled is true when secure.
@@ -18,4 +10,10 @@ type TlsConfig struct {
 	Key string `yaml:"key,omitempty"`
 	// CaCert is the path the CA certificate file.
 	CaCert string `yaml:"cacert,omitempty"`
+	// ConcatCert is for wwapird. http.ListenAndServeTLS wants the following
+	// cert file:
+	// If the certificate is signed by a certificate authority, the certFile
+	// should be the concatenation of the server's certificate, any
+	// intermediates, and the CA's certificate
+	ConcatCert string `yaml:"concatcert,omitempty"`
 }

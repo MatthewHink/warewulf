@@ -15,10 +15,10 @@ import (
 	"github.com/hpcng/warewulf/internal/pkg/warewulfd"
 	"github.com/hpcng/warewulf/internal/pkg/wwlog"
 	"github.com/hpcng/warewulf/pkg/hostlist"
-	"github.com/manifoldco/promptui"
 	"github.com/pkg/errors"
 )
 
+// NodeAdd adds nodes for management by Warewulf.
 func NodeAdd(nap *wwapiv1.NodeAddParameter) (err error) {
 
 	if nap == nil {
@@ -167,14 +167,52 @@ func NodeAdd(nap *wwapiv1.NodeAddParameter) (err error) {
 	return
 }
 
+// NodeDelete adds nodes for management by Warewulf.
 func NodeDelete(ndp *wwapiv1.NodeDeleteParameter) (err error) {
 
-	if ndp == nil {
-		return fmt.Errorf("NodeDeleteParameter is nil")
+	var nodeList []node.NodeInfo
+	nodeList, err = NodeDeleteParameterCheck(ndp, false)
+	if err != nil {
+		return
 	}
 
-	var count int
-	var nodeList []node.NodeInfo
+	nodeDB, err := node.New()
+	if err != nil {
+		wwlog.Printf(wwlog.ERROR, "Failed to open node database: %s\n", err)
+		return
+	}
+
+	for _, n := range nodeList {
+		err := nodeDB.DelNode(n.Id.Get())
+		if err != nil {
+			wwlog.Printf(wwlog.ERROR, "%s\n", err)
+		} else {
+			//count++
+			fmt.Printf("Deleting node: %s\n", n.Id.Print())
+		}
+	}
+
+	err = nodeDB.Persist()
+	if err != nil {
+		return errors.Wrap(err, "failed to persist nodedb")
+	}
+
+	err = warewulfd.DaemonReload()
+	if err != nil {
+		return errors.Wrap(err, "failed to reload warewulf daemon")
+	}
+	return
+}
+
+// NodeDeleteParameterCheck does error checking on NodeDeleteParameter.
+// Output to the console if console is true.
+// Returns the nodes to delete.
+func NodeDeleteParameterCheck(ndp *wwapiv1.NodeDeleteParameter, console bool) (nodeList []node.NodeInfo, err error) {
+
+	if ndp == nil {
+		err = fmt.Errorf("NodeDeleteParameter is nil")
+		return
+	}
 
 	nodeDB, err := node.New()
 	if err != nil {
@@ -206,31 +244,11 @@ func NodeDelete(ndp *wwapiv1.NodeDeleteParameter) (err error) {
 
 	if len(nodeList) == 0 {
 		fmt.Printf("No nodes found\n")
-		return
-	}
-
-	for _, n := range nodeList {
-		err := nodeDB.DelNode(n.Id.Get())
-		if err != nil {
-			wwlog.Printf(wwlog.ERROR, "%s\n", err)
-		} else {
-			count++
-			fmt.Printf("Deleting node: %s\n", n.Id.Print())
-		}
-	}
-
-	err = nodeDB.Persist()
-	if err != nil {
-		return errors.Wrap(err, "failed to persist nodedb")
-	}
-
-	err = warewulfd.DaemonReload()
-	if err != nil {
-		return errors.Wrap(err, "failed to reload warewulf daemon")
 	}
 	return
 }
 
+// NodeList lists all to none of the nodes managed by Warewulf.
 func NodeList(nodeNames []string) (nodeInfo []*wwapiv1.NodeInfo, err error) {
 
 	// nil is okay for nodeNames
@@ -800,22 +818,6 @@ func NodeSetParameterCheck(set *wwapiv1.NodeSetParameter, console bool) (nodeDB 
 		}
 
 		nodeCount++
-	}
-	return
-}
-
-// NodeSetPrompt prompt is a blocking confirmation prompt.
-// Returns true on y or yes.
-func NodeSetPrompt(label string) (yes bool) {
-
-	prompt := promptui.Prompt{
-		Label:     label,
-		IsConfirm: true,
-	}
-
-	result, _ := prompt.Run()
-	if result == "y" || result == "yes" {
-		yes = true
 	}
 	return
 }

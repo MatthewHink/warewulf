@@ -5,6 +5,7 @@ import (
 
 	"github.com/hpcng/warewulf/internal/pkg/api/node"
 	"github.com/hpcng/warewulf/internal/pkg/api/routes/wwapiv1"
+	"github.com/hpcng/warewulf/internal/pkg/api/util"
 	"github.com/spf13/cobra"
 )
 
@@ -59,7 +60,7 @@ func CobraRunE(cmd *cobra.Command, args []string) (err error) {
 		if err != nil {
 			return
 		}
-		yes := node.NodeSetPrompt(fmt.Sprintf("Are you sure you want to modify %d nodes(s)", nodeCount))
+		yes := util.ConfirmationPrompt(fmt.Sprintf("Are you sure you want to modify %d nodes(s)", nodeCount))
 		if !yes {
 			return
 		}

@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/hpcng/warewulf/internal/pkg/api/routes/wwapiv1"
 	"github.com/hpcng/warewulf/internal/pkg/node"
 	"github.com/hpcng/warewulf/internal/pkg/util"
 	"github.com/hpcng/warewulf/internal/pkg/warewulfconf"
@@ -16,11 +17,9 @@ import (
 	"github.com/hpcng/warewulf/pkg/hostlist"
 	"github.com/manifoldco/promptui"
 	"github.com/pkg/errors"
-
-	wwapi "github.com/hpcng/warewulf/internal/pkg/api/routes/wwapiv1"
 )
 
-func NodeAdd(nap *wwapi.NodeAddParameter) (err error) {
+func NodeAdd(nap *wwapiv1.NodeAddParameter) (err error) {
 
 	if nap == nil {
 		return fmt.Errorf("NodeAddParameter is nil")
@@ -155,7 +154,7 @@ func NodeAdd(nap *wwapi.NodeAddParameter) (err error) {
 
 		count++
 	} // end for
-	
+
 	err = nodeDB.Persist()
 	if err != nil {
 		return errors.Wrap(err, "failed to persist new node")
@@ -168,7 +167,7 @@ func NodeAdd(nap *wwapi.NodeAddParameter) (err error) {
 	return
 }
 
-func NodeDelete(ndp *wwapi.NodeDeleteParameter) (err error) {
+func NodeDelete(ndp *wwapiv1.NodeDeleteParameter) (err error) {
 
 	if ndp == nil {
 		return fmt.Errorf("NodeDeleteParameter is nil")
@@ -232,8 +231,7 @@ func NodeDelete(ndp *wwapi.NodeDeleteParameter) (err error) {
 	return
 }
 
-
-func NodeList(nodeNames []string) (nodeInfo []*wwapi.NodeInfo, err error) {
+func NodeList(nodeNames []string) (nodeInfo []*wwapiv1.NodeInfo, err error) {
 
 	// nil is okay for nodeNames
 
@@ -249,185 +247,184 @@ func NodeList(nodeNames []string) (nodeInfo []*wwapi.NodeInfo, err error) {
 
 	nodeNames = hostlist.Expand(nodeNames)
 
-	// Translate to the protobuf structure so wwapi can use this across the wire.
+	// Translate to the protobuf structure so wwapiv1 can use this across the wire.
 	// This is the same logic as was in wwctl.
 	for _, node := range node.FilterByName(nodes, nodeNames) {
 
-		var ni wwapi.NodeInfo
-		
-		ni.Id = &wwapi.NodeField{
+		var ni wwapiv1.NodeInfo
+
+		ni.Id = &wwapiv1.NodeField{
 			Source: node.Id.Source(),
-			Value: node.Id.Get(),
-			Print: node.Id.Print(),
+			Value:  node.Id.Get(),
+			Print:  node.Id.Print(),
 		}
 
-		ni.Comment = &wwapi.NodeField{
+		ni.Comment = &wwapiv1.NodeField{
 			Source: node.Comment.Source(),
-			Value: node.Comment.Get(),
-			Print: node.Comment.Print(),
+			Value:  node.Comment.Get(),
+			Print:  node.Comment.Print(),
 		}
 
-		ni.Cluster = &wwapi.NodeField{
+		ni.Cluster = &wwapiv1.NodeField{
 			Source: node.ClusterName.Source(),
-			Value: node.ClusterName.Get(),
-			Print: node.ClusterName.Print(),
+			Value:  node.ClusterName.Get(),
+			Print:  node.ClusterName.Print(),
 		}
 
 		ni.Profiles = node.Profiles
-		
-		ni.Discoverable = &wwapi.NodeField {
+
+		ni.Discoverable = &wwapiv1.NodeField{
 			Source: node.Discoverable.Source(),
-			Value: strconv.FormatBool(node.Discoverable.GetB()),
-			Print: strconv.FormatBool(node.Discoverable.PrintB()),
+			Value:  strconv.FormatBool(node.Discoverable.GetB()),
+			Print:  strconv.FormatBool(node.Discoverable.PrintB()),
 		}
 
-		ni.Container = &wwapi.NodeField {
+		ni.Container = &wwapiv1.NodeField{
 			Source: node.ContainerName.Source(),
-			Value: node.ContainerName.Get(),
-			Print: node.ContainerName.Print(),
+			Value:  node.ContainerName.Get(),
+			Print:  node.ContainerName.Print(),
 		}
 
-		ni.Kernel = &wwapi.NodeField{
+		ni.Kernel = &wwapiv1.NodeField{
 			Source: node.KernelVersion.Source(),
-			Value: node.KernelVersion.Get(),
-			Print: node.KernelVersion.Print(),
+			Value:  node.KernelVersion.Get(),
+			Print:  node.KernelVersion.Print(),
 		}
 
-		ni.KernelArgs = &wwapi.NodeField{
+		ni.KernelArgs = &wwapiv1.NodeField{
 			Source: node.KernelArgs.Source(),
-			Value: node.KernelArgs.Get(),
-			Print: node.KernelArgs.Print(),
+			Value:  node.KernelArgs.Get(),
+			Print:  node.KernelArgs.Print(),
 		}
 
-		ni.SystemOverlay = &wwapi.NodeField{
+		ni.SystemOverlay = &wwapiv1.NodeField{
 			Source: node.SystemOverlay.Source(),
-			Value: node.SystemOverlay.Get(),
-			Print: node.SystemOverlay.Print(),
+			Value:  node.SystemOverlay.Get(),
+			Print:  node.SystemOverlay.Print(),
 		}
 
-		ni.RuntimeOverlay = &wwapi.NodeField{
+		ni.RuntimeOverlay = &wwapiv1.NodeField{
 			Source: node.RuntimeOverlay.Source(),
-			Value: node.RuntimeOverlay.Get(),
-			Print: node.RuntimeOverlay.Print(),
+			Value:  node.RuntimeOverlay.Get(),
+			Print:  node.RuntimeOverlay.Print(),
 		}
 
-		ni.Ipxe = &wwapi.NodeField{
+		ni.Ipxe = &wwapiv1.NodeField{
 			Source: node.Ipxe.Source(),
-			Value: node.Ipxe.Get(),
-			Print: node.Ipxe.Print(),
+			Value:  node.Ipxe.Get(),
+			Print:  node.Ipxe.Print(),
 		}
 
-		ni.Init = &wwapi.NodeField{
+		ni.Init = &wwapiv1.NodeField{
 			Source: node.Init.Source(),
-			Value: node.Init.Get(),
-			Print: node.Init.Print(),
+			Value:  node.Init.Get(),
+			Print:  node.Init.Print(),
 		}
 
-		ni.Root = &wwapi.NodeField{
+		ni.Root = &wwapiv1.NodeField{
 			Source: node.Root.Source(),
-			Value: node.Root.Get(),
-			Print: node.Root.Print(),
+			Value:  node.Root.Get(),
+			Print:  node.Root.Print(),
 		}
 
-		ni.AssetKey = &wwapi.NodeField{
+		ni.AssetKey = &wwapiv1.NodeField{
 			Source: node.AssetKey.Source(),
-			Value: node.AssetKey.Get(),
-			Print: node.AssetKey.Print(),
+			Value:  node.AssetKey.Get(),
+			Print:  node.AssetKey.Print(),
 		}
 
-		ni.IpmiIpaddr = &wwapi.NodeField{
+		ni.IpmiIpaddr = &wwapiv1.NodeField{
 			Source: node.IpmiIpaddr.Source(),
-			Value: node.IpmiIpaddr.Get(),
-			Print: node.IpmiIpaddr.Print(),
+			Value:  node.IpmiIpaddr.Get(),
+			Print:  node.IpmiIpaddr.Print(),
 		}
 
-		ni.IpmiNetmask = &wwapi.NodeField{
+		ni.IpmiNetmask = &wwapiv1.NodeField{
 			Source: node.IpmiNetmask.Source(),
-			Value: node.IpmiNetmask.Get(),
-			Print: node.IpmiNetmask.Print(),
+			Value:  node.IpmiNetmask.Get(),
+			Print:  node.IpmiNetmask.Print(),
 		}
 
-		ni.IpmiPort = &wwapi.NodeField{
+		ni.IpmiPort = &wwapiv1.NodeField{
 			Source: node.IpmiPort.Source(),
-			Value: node.IpmiPort.Get(),
-			Print: node.IpmiPort.Print(),
+			Value:  node.IpmiPort.Get(),
+			Print:  node.IpmiPort.Print(),
 		}
 
-		ni.IpmiGateway = &wwapi.NodeField{
+		ni.IpmiGateway = &wwapiv1.NodeField{
 			Source: node.IpmiGateway.Source(),
-			Value: node.IpmiGateway.Get(),
-			Print: node.IpmiGateway.Print(),
+			Value:  node.IpmiGateway.Get(),
+			Print:  node.IpmiGateway.Print(),
 		}
 
-		ni.IpmiUserName = &wwapi.NodeField{
+		ni.IpmiUserName = &wwapiv1.NodeField{
 			Source: node.IpmiUserName.Source(),
-			Value: node.IpmiUserName.Get(),
-			Print: node.IpmiUserName.Print(),
+			Value:  node.IpmiUserName.Get(),
+			Print:  node.IpmiUserName.Print(),
 		}
 
-		ni.IpmiPassword = &wwapi.NodeField{
+		ni.IpmiPassword = &wwapiv1.NodeField{
 			Source: node.IpmiPassword.Source(),
-			Value: node.IpmiPassword.Get(),
-			Print: node.IpmiPassword.Print(),
+			Value:  node.IpmiPassword.Get(),
+			Print:  node.IpmiPassword.Print(),
 		}
 
-		ni.IpmiInterface = &wwapi.NodeField{
+		ni.IpmiInterface = &wwapiv1.NodeField{
 			Source: node.IpmiInterface.Source(),
-			Value: node.IpmiInterface.Get(),
-			Print: node.IpmiInterface.Print(),
+			Value:  node.IpmiInterface.Get(),
+			Print:  node.IpmiInterface.Print(),
 		}
 
-		for keyname, keyvalue := range node.Tags{
+		for keyname, keyvalue := range node.Tags {
 			ni.Tags[keyname].Source = keyvalue.Source()
 			ni.Tags[keyname].Value = keyvalue.Get()
 			ni.Tags[keyname].Print = keyvalue.Print()
 		}
 
-		ni.NetDevs = map[string]*wwapi.NetDev{}
+		ni.NetDevs = map[string]*wwapiv1.NetDev{}
 		for name, netdev := range node.NetDevs {
 
-			ni.NetDevs[name] = &wwapi.NetDev{
-				Device: &wwapi.NodeField{
+			ni.NetDevs[name] = &wwapiv1.NetDev{
+				Device: &wwapiv1.NodeField{
 					Source: netdev.Device.Source(),
-					Value: netdev.Device.Get(),
-					Print: netdev.Device.Print(),
+					Value:  netdev.Device.Get(),
+					Print:  netdev.Device.Print(),
 				},
-				Hwaddr: &wwapi.NodeField{
+				Hwaddr: &wwapiv1.NodeField{
 					Source: netdev.Hwaddr.Source(),
-					Value: netdev.Hwaddr.Get(),
-					Print: netdev.Hwaddr.Print(),
+					Value:  netdev.Hwaddr.Get(),
+					Print:  netdev.Hwaddr.Print(),
 				},
-				Ipaddr: &wwapi.NodeField{
+				Ipaddr: &wwapiv1.NodeField{
 					Source: netdev.Ipaddr.Source(),
-					Value: netdev.Ipaddr.Get(),
-					Print: netdev.Ipaddr.Print(),
+					Value:  netdev.Ipaddr.Get(),
+					Print:  netdev.Ipaddr.Print(),
 				},
-				Netmask: &wwapi.NodeField{
+				Netmask: &wwapiv1.NodeField{
 					Source: netdev.Netmask.Source(),
-					Value: netdev.Netmask.Get(),
-					Print: netdev.Netmask.Print(),
+					Value:  netdev.Netmask.Get(),
+					Print:  netdev.Netmask.Print(),
 				},
-				Gateway: &wwapi.NodeField{
+				Gateway: &wwapiv1.NodeField{
 					Source: netdev.Gateway.Source(),
-					Value: netdev.Gateway.Get(),
-					Print: netdev.Gateway.Print(),
+					Value:  netdev.Gateway.Get(),
+					Print:  netdev.Gateway.Print(),
 				},
-				Type: &wwapi.NodeField{
+				Type: &wwapiv1.NodeField{
 					Source: netdev.Type.Source(),
-					Value: netdev.Type.Get(),
-					Print: netdev.Type.Print(),
+					Value:  netdev.Type.Get(),
+					Print:  netdev.Type.Print(),
 				},
-				Onboot: &wwapi.NodeField{
+				Onboot: &wwapiv1.NodeField{
 					Source: netdev.OnBoot.Source(),
-					Value: strconv.FormatBool(netdev.OnBoot.GetB()),
-					Print: strconv.FormatBool(netdev.OnBoot.PrintB()),
-				},				
-				Default: &wwapi.NodeField{
-					Source: netdev.Default.Source(),
-					Value: strconv.FormatBool(netdev.Default.GetB()),
-					Print: strconv.FormatBool(netdev.Default.PrintB()),
+					Value:  strconv.FormatBool(netdev.OnBoot.GetB()),
+					Print:  strconv.FormatBool(netdev.OnBoot.PrintB()),
 				},
-
+				Default: &wwapiv1.NodeField{
+					Source: netdev.Default.Source(),
+					Value:  strconv.FormatBool(netdev.Default.GetB()),
+					Print:  strconv.FormatBool(netdev.Default.PrintB()),
+				},
 			}
 		}
 		nodeInfo = append(nodeInfo, &ni)
@@ -435,8 +432,8 @@ func NodeList(nodeNames []string) (nodeInfo []*wwapi.NodeInfo, err error) {
 	return
 }
 
-// NodeSet is the wwapi implmentation for updating node fields.
-func NodeSet(set *wwapi.NodeSetParameter) (err error) {
+// NodeSet is the wwapiv1 implmentation for updating node fields.
+func NodeSet(set *wwapiv1.NodeSetParameter) (err error) {
 
 	if set == nil {
 		return fmt.Errorf("NodeAddParameter is nil")
@@ -454,7 +451,7 @@ func NodeSet(set *wwapi.NodeSetParameter) (err error) {
 // Output to the console if console is true.
 // TODO: Determine if the console switch does wwlog or not.
 // - console may end up being textOutput?
-func NodeSetParameterCheck(set * wwapi.NodeSetParameter, console bool) (nodeDB node.NodeYaml, nodeCount uint, err error) {
+func NodeSetParameterCheck(set *wwapiv1.NodeSetParameter, console bool) (nodeDB node.NodeYaml, nodeCount uint, err error) {
 
 	if set == nil {
 		err = fmt.Errorf("Node set parameter is null")
@@ -812,7 +809,7 @@ func NodeSetParameterCheck(set * wwapi.NodeSetParameter, console bool) (nodeDB n
 func NodeSetPrompt(label string) (yes bool) {
 
 	prompt := promptui.Prompt{
-		Label: label,
+		Label:     label,
 		IsConfirm: true,
 	}
 
@@ -825,7 +822,7 @@ func NodeSetPrompt(label string) (yes bool) {
 
 // NodeStatus returns the imaging state for nodes.
 // This requires warewulfd.
-func NodeStatus(nodeNames []string) (nodeStatusResponse *wwapi.NodeStatusResponse, err error) {
+func NodeStatus(nodeNames []string) (nodeStatusResponse *wwapiv1.NodeStatusResponse, err error) {
 
 	// Local structs for translating json from warewulfd.
 	type nodeStatusInternal struct {
@@ -874,16 +871,16 @@ func NodeStatus(nodeNames []string) (nodeStatusResponse *wwapi.NodeStatusRespons
 	}
 
 	// Translate struct and filter.
-	nodeStatusResponse = &wwapi.NodeStatusResponse{}
+	nodeStatusResponse = &wwapiv1.NodeStatusResponse{}
 
 	if len(nodeNames) == 0 {
 		for _, v := range wwNodeStatus.Nodes {
 			nodeStatusResponse.NodeStatus = append(nodeStatusResponse.NodeStatus,
-				&wwapi.NodeStatus{
+				&wwapiv1.NodeStatus{
 					NodeName: v.NodeName,
-					Stage: v.Stage,
-					Sent: v.Sent,
-					Ipaddr: v.Ipaddr,
+					Stage:    v.Stage,
+					Sent:     v.Sent,
+					Ipaddr:   v.Ipaddr,
 					Lastseen: v.Lastseen,
 				})
 		}
@@ -893,18 +890,18 @@ func NodeStatus(nodeNames []string) (nodeStatusResponse *wwapi.NodeStatusRespons
 			for j := 0; j < len(nodeList); j++ {
 				if v.NodeName == nodeList[j] {
 					nodeStatusResponse.NodeStatus = append(nodeStatusResponse.NodeStatus,
-						&wwapi.NodeStatus{
+						&wwapiv1.NodeStatus{
 							NodeName: v.NodeName,
-							Stage: v.Stage,
-							Sent: v.Sent,
-							Ipaddr: v.Ipaddr,
+							Stage:    v.Stage,
+							Sent:     v.Sent,
+							Ipaddr:   v.Ipaddr,
 							Lastseen: v.Lastseen,
 						})
-						break
-					}
+					break
+				}
 			}
 		}
-	}	
+	}
 	return
 }
 

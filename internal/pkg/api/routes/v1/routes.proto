@@ -8,7 +8,6 @@ option go_package = "internal/pkg/api/routes/wwapiv1;wwapiv1";
 package wwapi.v1;
 
 import "google/protobuf/empty.proto";
-//import "google/protobuf/wrappers.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/field_mask.proto";
 

@@ -1,7 +1,7 @@
 package imprt
 
 import (
-	wwapi "github.com/hpcng/warewulf/internal/pkg/api/container"
+	"github.com/hpcng/warewulf/internal/pkg/api/container"
 	"github.com/hpcng/warewulf/internal/pkg/api/routes/wwapiv1"
 	"github.com/spf13/cobra"
 )
@@ -15,13 +15,13 @@ func CobraRunE(cmd *cobra.Command, args []string) (err error) {
 	}
 
 	cip := &wwapiv1.ContainerImportParameter{
-		Source: args[0],
-		Name: name,
-		Force: SetForce,
-		Update: SetUpdate,
-		Build: SetBuild,
+		Source:  args[0],
+		Name:    name,
+		Force:   SetForce,
+		Update:  SetUpdate,
+		Build:   SetBuild,
 		Default: SetDefault,
 	}
-	_, err = wwapi.ContainerImport(cip)
+	_, err = container.ContainerImport(cip)
 	return
 }

@@ -11,7 +11,8 @@ type TlsConfig struct {
 	// CaCert is the path the CA certificate file.
 	CaCert string `yaml:"cacert,omitempty"`
 	// ConcatCert is for wwapird. http.ListenAndServeTLS wants the following
-	// cert file:
+	// cert file, so in our case this file contains `cat ${Cert} ${CaCert}`
+	//
 	// If the certificate is signed by a certificate authority, the certFile
 	// should be the concatenation of the server's certificate, any
 	// intermediates, and the CA's certificate

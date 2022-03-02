@@ -3,7 +3,7 @@ package show
 import (
 	"fmt"
 
-	wwapi "github.com/hpcng/warewulf/internal/pkg/api/container"
+	"github.com/hpcng/warewulf/internal/pkg/api/container"
 	"github.com/hpcng/warewulf/internal/pkg/api/routes/wwapiv1"
 
 	"github.com/spf13/cobra"
@@ -16,7 +16,7 @@ func CobraRunE(cmd *cobra.Command, args []string) (err error) {
 	}
 
 	var r *wwapiv1.ContainerShowResponse
-	r, err = wwapi.ContainerShow(csp)
+	r, err = container.ContainerShow(csp)
 	if err != nil {
 		return
 	}

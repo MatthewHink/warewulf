@@ -1,9 +1,12 @@
 #! /usr/bin/env bash
 
+# This file is a scratchpad for curling wwapird.
+
 # version
 curl http://localhost:9871/version
 
 # secure version
+# TODO: Secure curls. Cleanup key dirs.
 curl --cacert /home/mhink/mtls/cacert.pem \
     --key /home/mhink/mtls/client.key \
     --cert /home/mhink/mtls/client.pem \

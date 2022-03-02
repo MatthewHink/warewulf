@@ -1,9 +1,9 @@
 package apiconfig
 
 import (
+	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
-	"gopkg.in/yaml.v2"
 )
 
 // ClientApiConfig contains configuration parameters for an API server.
@@ -17,12 +17,10 @@ type ClientApiConfig struct {
 // ClientConfig is the full client configuration.
 type ClientConfig struct {
 	ApiConfig ClientApiConfig `yaml:"api"`
-	TlsConfig TlsConfig `yaml:"tls"`
+	TlsConfig TlsConfig       `yaml:"tls"`
 }
 
 // NewClient loads the client config from the given configFilePath.
-// TODO: parameters will be oneof these:
-// path.Join(buildconfig.SYSCONFDIR(), "warewulf/wwapic.conf")
 func NewClient(configFilePath string) (config ClientConfig, err error) {
 
 	log.Printf("Loading api client configuration from: %v\n", configFilePath)

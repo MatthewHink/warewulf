@@ -1,17 +1,19 @@
 package apiconfig
 
 import (
+	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
-	"gopkg.in/yaml.v2"
 )
 
 // ClientServerConfig is the full client server configuration.
+// wwapird is a client of wwapid.
+// wwapird serves REST. (WareWulf API Rest Daemon)
 type ClientServerConfig struct {
 	ClientApiConfig ClientApiConfig `yaml:"clientapi"`
 	ServerApiConfig ServerApiConfig `yaml:"serverapi"`
-	ClientTlsConfig TlsConfig `yaml:"clienttls"`
-	ServerTlsConfig TlsConfig `yaml:"servertls"`
+	ClientTlsConfig TlsConfig       `yaml:"clienttls"`
+	ServerTlsConfig TlsConfig       `yaml:"servertls"`
 }
 
 // NewClientServer loads the client config from the given configFilePath.

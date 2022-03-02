@@ -8,13 +8,11 @@ import (
 	"time"
 
 	"github.com/fatih/color"
+	"github.com/hpcng/warewulf/internal/pkg/api/node"
+	"github.com/hpcng/warewulf/internal/pkg/api/routes/wwapiv1"
 	"github.com/hpcng/warewulf/internal/pkg/warewulfconf"
 	"github.com/hpcng/warewulf/internal/pkg/wwlog"
 	"github.com/hpcng/warewulf/pkg/hostlist"
-
-	"github.com/hpcng/warewulf/internal/pkg/api/routes/wwapiv1"
-	wwapi "github.com/hpcng/warewulf/internal/pkg/api/node" // TODO: Rename package/file to apinode? May be easier.
-
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 )
@@ -37,9 +35,9 @@ func CobraRunE(cmd *cobra.Command, args []string) (err error) {
 		var height int
 		var count int
 		rightnow := time.Now().Unix()
-		
+
 		var nodeStatusResponse *wwapiv1.NodeStatusResponse
-		nodeStatusResponse, err = wwapi.NodeStatus([]string{})
+		nodeStatusResponse, err = node.NodeStatus([]string{})
 		if err != nil {
 			return err
 		}
@@ -76,7 +74,7 @@ func CobraRunE(cmd *cobra.Command, args []string) (err error) {
 
 		wwlog.Printf(wwlog.VERBOSE, "Sorting index\n")
 		if SetSortLast {
-			sort.Slice(statuses, func(i, j int) (bool) {
+			sort.Slice(statuses, func(i, j int) bool {
 				if statuses[i].Lastseen > statuses[j].Lastseen {
 					return true
 				} else if statuses[i].Lastseen < statuses[j].Lastseen {
@@ -87,12 +85,12 @@ func CobraRunE(cmd *cobra.Command, args []string) (err error) {
 			})
 		} else if SetSortReverse {
 			wwlog.Printf(wwlog.VERBOSE, "Reversing sort order\n")
-			sort.Slice(statuses, func(i, j int) (bool) {
+			sort.Slice(statuses, func(i, j int) bool {
 				return statuses[i].NodeName > statuses[j].NodeName
 			})
 
 		} else {
-			sort.Slice(statuses, func(i, j int) (bool) {
+			sort.Slice(statuses, func(i, j int) bool {
 				return statuses[i].NodeName < statuses[j].NodeName
 			})
 		}

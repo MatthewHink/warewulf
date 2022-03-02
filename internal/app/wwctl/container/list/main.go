@@ -3,15 +3,14 @@ package list
 import (
 	"fmt"
 
-	wwapi "github.com/hpcng/warewulf/internal/pkg/api/container"
-
+	"github.com/hpcng/warewulf/internal/pkg/api/container"
 	"github.com/hpcng/warewulf/internal/pkg/wwlog"
 	"github.com/spf13/cobra"
 )
 
 func CobraRunE(cmd *cobra.Command, args []string) (err error) {
 
-	containerInfo, err := wwapi.ContainerList()
+	containerInfo, err := container.ContainerList()
 	if err != nil {
 		wwlog.Printf(wwlog.ERROR, "%s\n", err)
 		return

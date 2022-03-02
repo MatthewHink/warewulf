@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	apinode "github.com/hpcng/warewulf/internal/pkg/api/node"
 	"github.com/hpcng/warewulf/internal/pkg/api/routes/wwapiv1"
-	wwapi "github.com/hpcng/warewulf/internal/pkg/api/node" // TODO: Rename package/file to apinode? May be easier.
 	"github.com/hpcng/warewulf/internal/pkg/node"
 	"github.com/hpcng/warewulf/internal/pkg/wwlog"
 	"github.com/hpcng/warewulf/pkg/hostlist"
@@ -20,6 +20,7 @@ func CobraRunE(cmd *cobra.Command, args []string) (err error) {
 	// TODO: Break this up into:
 	// - NodeDeleteParamCheck(consoleOutputOnOff)
 	// - NodeDeletePrompt.
+	// TODO: See node set for example.
 	if !SetYes {
 		var count int
 		var nodeList []node.NodeInfo
@@ -82,8 +83,8 @@ func CobraRunE(cmd *cobra.Command, args []string) (err error) {
 
 	// Call the API to delete the nodes.
 	ndp := wwapiv1.NodeDeleteParameter{
-		Force: SetForce,
+		Force:     SetForce,
 		NodeNames: args,
 	}
-	return wwapi.NodeDelete(&ndp)
+	return apinode.NodeDelete(&ndp)
 }

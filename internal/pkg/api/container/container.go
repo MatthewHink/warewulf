@@ -1,8 +1,6 @@
 package container
 
 import (
-
-
 	"fmt"
 	"os"
 	"path"
@@ -10,18 +8,16 @@ import (
 	"strings"
 
 	"github.com/containers/image/v5/types"
-
+	"github.com/hpcng/warewulf/internal/pkg/api/routes/wwapiv1"
 	"github.com/hpcng/warewulf/internal/pkg/container"
 	"github.com/hpcng/warewulf/internal/pkg/node"
 	"github.com/hpcng/warewulf/internal/pkg/util"
 	"github.com/hpcng/warewulf/internal/pkg/warewulfd"
 	"github.com/hpcng/warewulf/internal/pkg/wwlog"
 	"github.com/pkg/errors"
-
-	wwapi "github.com/hpcng/warewulf/internal/pkg/api/routes/wwapiv1"
 )
 
-func ContainerBuild(cbp *wwapi.ContainerBuildParameter) (err error) {
+func ContainerBuild(cbp *wwapiv1.ContainerBuildParameter) (err error) {
 
 	if cbp == nil {
 		return fmt.Errorf("ContainerBuildParameter is nil")
@@ -41,7 +37,7 @@ func ContainerBuild(cbp *wwapi.ContainerBuildParameter) (err error) {
 
 	for _, c := range containers {
 		if !container.ValidSource(c) {
-			err =  fmt.Errorf("VNFS name does not exist: %s", c)
+			err = fmt.Errorf("VNFS name does not exist: %s", c)
 			wwlog.Printf(wwlog.ERROR, "%s\n", err)
 			return
 		}
@@ -88,7 +84,7 @@ func ContainerBuild(cbp *wwapi.ContainerBuildParameter) (err error) {
 	return
 }
 
-func ContainerDelete(cdp *wwapi.ContainerDeleteParameter) (err error) {
+func ContainerDelete(cdp *wwapiv1.ContainerDeleteParameter) (err error) {
 
 	if cdp == nil {
 		return fmt.Errorf("ContainerDeleteParameter is nil")
@@ -131,7 +127,7 @@ ARG_LOOP:
 	return
 }
 
-func ContainerImport(cip *wwapi.ContainerImportParameter) (containerName string, err error) {
+func ContainerImport(cip *wwapiv1.ContainerImportParameter) (containerName string, err error) {
 
 	if cip == nil {
 		err = fmt.Errorf("NodeAddParameter is nil")
@@ -200,7 +196,6 @@ func ContainerImport(cip *wwapi.ContainerImportParameter) (containerName string,
 		wwlog.Printf(wwlog.WARN, "Could not copy /etc/resolv.conf into container: %s\n", err)
 	}
 
-
 	fmt.Printf("Building container: %s\n", cip.Name)
 	err = container.Build(cip.Name, true)
 	if err != nil {
@@ -242,14 +237,14 @@ func ContainerImport(cip *wwapi.ContainerImportParameter) (containerName string,
 		fmt.Printf("Set default profile to container: %s\n", cip.Name)
 		err = warewulfd.DaemonReload()
 		if err != nil {
-			err =  errors.Wrap(err, "failed to reload warewulf daemon")
+			err = errors.Wrap(err, "failed to reload warewulf daemon")
 			return
 		}
 	}
 	return
 }
 
-func ContainerList() (containerInfo []*wwapi.ContainerInfo, err error) {
+func ContainerList() (containerInfo []*wwapiv1.ContainerInfo, err error) {
 	var sources []string
 
 	sources, err = container.ListSources()
@@ -263,7 +258,7 @@ func ContainerList() (containerInfo []*wwapi.ContainerInfo, err error) {
 		wwlog.Printf(wwlog.ERROR, "%s\n", err)
 		return
 	}
-	
+
 	nodes, err := nodeDB.FindAllNodes()
 	if err != nil {
 		wwlog.Printf(wwlog.ERROR, "%s\n", err)
@@ -281,16 +276,16 @@ func ContainerList() (containerInfo []*wwapi.ContainerInfo, err error) {
 		if nodemap[source] == 0 {
 			nodemap[source] = 0
 		}
-		containerInfo = append(containerInfo, &wwapi.ContainerInfo{
-			Name: source,
-			Built: util.IsFile(image),
+		containerInfo = append(containerInfo, &wwapiv1.ContainerInfo{
+			Name:      source,
+			Built:     util.IsFile(image),
 			NodeCount: uint32(nodemap[source]),
 		})
 	}
 	return
 }
 
-func ContainerShow(csp *wwapi.ContainerShowParameter) (response *wwapi.ContainerShowResponse, err error) {
+func ContainerShow(csp *wwapiv1.ContainerShowParameter) (response *wwapiv1.ContainerShowResponse, err error) {
 
 	containerName := csp.ContainerName
 
@@ -319,14 +314,13 @@ func ContainerShow(csp *wwapi.ContainerShowParameter) (response *wwapi.Container
 		}
 	}
 
-	response = &wwapi.ContainerShowResponse {
-		Name: containerName,
+	response = &wwapiv1.ContainerShowResponse{
+		Name:   containerName,
 		Rootfs: rootFsDir,
-		Nodes: nodeList,
+		Nodes:  nodeList,
 	}
 	return
 }
-
 
 // Private helpers
 

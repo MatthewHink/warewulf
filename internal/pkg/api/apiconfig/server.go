@@ -1,9 +1,9 @@
 package apiconfig
 
 import (
+	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
-	"gopkg.in/yaml.v2"
 )
 
 // ServerApiConfig contains configuration parameters for an API server.
@@ -19,7 +19,7 @@ type ServerApiConfig struct {
 // ServerConfig is the full server configuration.
 type ServerConfig struct {
 	ApiConfig ServerApiConfig `yaml:"api"`
-	TlsConfig TlsConfig `yaml:"tls"`
+	TlsConfig TlsConfig       `yaml:"tls"`
 }
 
 // NewServer loads the server config from the given configFilePath.

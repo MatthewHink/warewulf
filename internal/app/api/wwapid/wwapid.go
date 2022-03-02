@@ -5,35 +5,28 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
-	"log"
-	"net"
 	"fmt"
 	"io/ioutil"
+	"log"
+	"net"
 	"os"
-
-	wwapi "github.com/hpcng/warewulf/internal/pkg/api/routes/wwapiv1"
-	"github.com/hpcng/warewulf/internal/pkg/api/container"
-	"github.com/hpcng/warewulf/internal/pkg/api/node"
-
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/status"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/credentials"
-
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
-	"github.com/hpcng/warewulf/internal/pkg/version"
-	"github.com/hpcng/warewulf/internal/pkg/api/apiconfig"
-
-	"github.com/hpcng/warewulf/internal/pkg/buildconfig"
 	"path"
 
+	"github.com/hpcng/warewulf/internal/pkg/api/apiconfig"
+	"github.com/hpcng/warewulf/internal/pkg/api/container"
+	"github.com/hpcng/warewulf/internal/pkg/api/node"
+	"github.com/hpcng/warewulf/internal/pkg/api/routes/wwapiv1"
+	"github.com/hpcng/warewulf/internal/pkg/buildconfig"
+	"github.com/hpcng/warewulf/internal/pkg/version"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// TODO: golang formatting of all files.
-// TODO: Doc how keys are created and setup.
-
 type apiServer struct {
-	wwapi.UnimplementedWWApiServer
+	wwapiv1.UnimplementedWWApiServer
 }
 
 var apiPrefix string
@@ -53,7 +46,7 @@ func main() {
 	apiVersion = config.ApiConfig.Version
 	servicePort := config.ApiConfig.Port
 	portString := fmt.Sprintf(":%d", servicePort)
-	
+
 	var opts []grpc.ServerOption
 	if !config.TlsConfig.Enabled {
 		insecureMode()
@@ -64,7 +57,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to load server cert and key. err: %s\n", err)
 		}
-		
+
 		// Load the CA cert.
 		var cacert []byte
 		cacert, err = ioutil.ReadFile(config.TlsConfig.CaCert)
@@ -101,14 +94,14 @@ func main() {
 	}()
 
 	grpcServer := grpc.NewServer(opts...)
-	wwapi.RegisterWWApiServer(grpcServer, &apiServer{})
+	wwapiv1.RegisterWWApiServer(grpcServer, &apiServer{})
 	log.Fatalln(grpcServer.Serve(listen))
 }
 
 // private helpers
 
 // insecureMode creates a blocking prompt for customers running wwapid in insecure mode.
-// It's a deterrent. Setup TLS. TODO: README on how to do that.
+// It's a deterrent. Setup TLS.
 func insecureMode() {
 
 	fmt.Println("*** Running wwapid in INSECURE mode. *** THIS IS DANGEROUS! *** Enter y to continue. ***")
@@ -129,7 +122,7 @@ func insecureMode() {
 // Api implementation.
 
 // ContainerBuild builds one or more containers.
-func (s *apiServer) ContainerBuild(ctx context.Context, request *wwapi.ContainerBuildParameter) (response *wwapi.ContainerListResponse, err error) {
+func (s *apiServer) ContainerBuild(ctx context.Context, request *wwapiv1.ContainerBuildParameter) (response *wwapiv1.ContainerListResponse, err error) {
 
 	log.Println("ContainerBuild start")
 	log.Printf("request: %T, %#v\n", request, request)
@@ -150,14 +143,14 @@ func (s *apiServer) ContainerBuild(ctx context.Context, request *wwapi.Container
 	}
 
 	// Return the built containers. (A REST POST returns what is modified.)
-	var containers []*wwapi.ContainerInfo
+	var containers []*wwapiv1.ContainerInfo
 	containers, err = container.ContainerList()
 	if err != nil {
 		return
 	}
 
-	response = &wwapi.ContainerListResponse{}
-	for i := 0; i < len(containers); i ++ {
+	response = &wwapiv1.ContainerListResponse{}
+	for i := 0; i < len(containers); i++ {
 		for j := 0; j < len(request.ContainerNames); j++ {
 			if containers[i].Name == request.ContainerNames[j] {
 				response.Containers = append(response.Containers, containers[i])
@@ -168,7 +161,7 @@ func (s *apiServer) ContainerBuild(ctx context.Context, request *wwapi.Container
 }
 
 // ContainerDelete deletes one or more containers from Warewulf.
-func (s *apiServer) ContainerDelete(ctx context.Context, request *wwapi.ContainerDeleteParameter) (response *emptypb.Empty, err error) {
+func (s *apiServer) ContainerDelete(ctx context.Context, request *wwapiv1.ContainerDeleteParameter) (response *emptypb.Empty, err error) {
 
 	// TODO: Remove here and elsewhere. Keeping this for now because it's useful for getting curls working.
 	response = new(emptypb.Empty)
@@ -188,7 +181,7 @@ func (s *apiServer) ContainerDelete(ctx context.Context, request *wwapi.Containe
 	return
 }
 
-func (s *apiServer) ContainerImport(ctx context.Context, request *wwapi.ContainerImportParameter) (response *wwapi.ContainerListResponse, err error) {
+func (s *apiServer) ContainerImport(ctx context.Context, request *wwapiv1.ContainerImportParameter) (response *wwapiv1.ContainerListResponse, err error) {
 
 	// Import the container.
 	var containerName string
@@ -198,7 +191,7 @@ func (s *apiServer) ContainerImport(ctx context.Context, request *wwapi.Containe
 	}
 
 	// Return the imported container to the client.
-	var containers []*wwapi.ContainerInfo
+	var containers []*wwapiv1.ContainerInfo
 	containers, err = container.ContainerList()
 	if err != nil {
 		return
@@ -206,10 +199,10 @@ func (s *apiServer) ContainerImport(ctx context.Context, request *wwapi.Containe
 
 	// Container name may have been shimmed in during import,
 	// which is why ContainerImport returns it.
-	for i := 0; i < len(containers); i ++ {
+	for i := 0; i < len(containers); i++ {
 		if containerName == containers[i].Name {
-			response = &wwapi.ContainerListResponse{
-				Containers: []*wwapi.ContainerInfo{containers[i]},
+			response = &wwapiv1.ContainerListResponse{
+				Containers: []*wwapiv1.ContainerInfo{containers[i]},
 			}
 			return
 		}
@@ -218,22 +211,22 @@ func (s *apiServer) ContainerImport(ctx context.Context, request *wwapi.Containe
 }
 
 // ContainerList returns details about containers.
-func (s *apiServer) ContainerList(ctx context.Context, request *emptypb.Empty) (response *wwapi.ContainerListResponse, err error) {
+func (s *apiServer) ContainerList(ctx context.Context, request *emptypb.Empty) (response *wwapiv1.ContainerListResponse, err error) {
 
-	var containers []*wwapi.ContainerInfo
+	var containers []*wwapiv1.ContainerInfo
 	containers, err = container.ContainerList()
 	if err != nil {
 		return
 	}
 
-	response = &wwapi.ContainerListResponse{
+	response = &wwapiv1.ContainerListResponse{
 		Containers: containers,
 	}
 	return
 }
 
 // ContainerShow returns details about containers.
-func (s *apiServer) ContainerShow(ctx context.Context, request *wwapi.ContainerShowParameter) (response *wwapi.ContainerShowResponse, err error) {
+func (s *apiServer) ContainerShow(ctx context.Context, request *wwapiv1.ContainerShowParameter) (response *wwapiv1.ContainerShowResponse, err error) {
 
 	// Parameter checks.
 	if request == nil {
@@ -244,7 +237,7 @@ func (s *apiServer) ContainerShow(ctx context.Context, request *wwapi.ContainerS
 }
 
 // NodeAdd adds one or more nodes for management by Warewulf and returns the added nodes.
-func (s *apiServer) NodeAdd(ctx context.Context, request *wwapi.NodeAddParameter) (response *wwapi.NodeListResponse, err error) {
+func (s *apiServer) NodeAdd(ctx context.Context, request *wwapiv1.NodeAddParameter) (response *wwapiv1.NodeListResponse, err error) {
 
 	// TODO: Remove traces on PR. (here and across the interface)
 	log.Println("NodeAdd start")
@@ -258,7 +251,7 @@ func (s *apiServer) NodeAdd(ctx context.Context, request *wwapi.NodeAddParameter
 	if request.NodeNames == nil {
 		return response, status.Errorf(codes.InvalidArgument, "nil request.NodeNames")
 	}
-	
+
 	// Add the node(s).
 	err = node.NodeAdd(request)
 	if err != nil {
@@ -270,7 +263,7 @@ func (s *apiServer) NodeAdd(ctx context.Context, request *wwapi.NodeAddParameter
 }
 
 // NodeDelete deletes one or more nodes for removal of management by Warewulf.
-func (s *apiServer) NodeDelete(ctx context.Context, request *wwapi.NodeDeleteParameter) (response *emptypb.Empty, err error) {
+func (s *apiServer) NodeDelete(ctx context.Context, request *wwapiv1.NodeDeleteParameter) (response *emptypb.Empty, err error) {
 
 	response = new(emptypb.Empty)
 
@@ -288,7 +281,7 @@ func (s *apiServer) NodeDelete(ctx context.Context, request *wwapi.NodeDeletePar
 }
 
 // NodeList returns details about zero or more nodes.
-func (s *apiServer) NodeList(ctx context.Context, request *wwapi.NodeNames) (response *wwapi.NodeListResponse, err error) {
+func (s *apiServer) NodeList(ctx context.Context, request *wwapiv1.NodeNames) (response *wwapiv1.NodeListResponse, err error) {
 
 	// Parameter checks. request.NodeNames can be nil.
 	if request == nil {
@@ -300,7 +293,7 @@ func (s *apiServer) NodeList(ctx context.Context, request *wwapi.NodeNames) (res
 }
 
 // NodeSet updates fields for zero or more nodes and returns the updated nodes.
-func (s *apiServer) NodeSet(ctx context.Context, request *wwapi.NodeSetParameter) (response *wwapi.NodeListResponse, err error) {
+func (s *apiServer) NodeSet(ctx context.Context, request *wwapiv1.NodeSetParameter) (response *wwapiv1.NodeListResponse, err error) {
 
 	// Parameter checks.
 	if request == nil {
@@ -321,7 +314,7 @@ func (s *apiServer) NodeSet(ctx context.Context, request *wwapi.NodeSetParameter
 	return s.nodeListInternal(request.NodeNames)
 }
 
-func (s *apiServer) NodeStatus(ctx context.Context, request *wwapi.NodeNames) (response *wwapi.NodeStatusResponse, err error) {
+func (s *apiServer) NodeStatus(ctx context.Context, request *wwapiv1.NodeNames) (response *wwapiv1.NodeStatusResponse, err error) {
 
 	// Parameter checks. request.NodeNames can be nil.
 	if request == nil {
@@ -331,13 +324,13 @@ func (s *apiServer) NodeStatus(ctx context.Context, request *wwapi.NodeNames) (r
 	return node.NodeStatus(request.NodeNames)
 }
 
-// Version returns the versions of the wwapi and warewulf as well as the api
+// Version returns the versions of the wwapiv1 and warewulf as well as the api
 // prefix for http routes.
-func (s *apiServer) Version(ctx context.Context, request *emptypb.Empty) (response *wwapi.VersionResponse, err error) {
+func (s *apiServer) Version(ctx context.Context, request *emptypb.Empty) (response *wwapiv1.VersionResponse, err error) {
 
-	response = &wwapi.VersionResponse{
-		ApiPrefix: apiPrefix,
-		ApiVersion: apiVersion,
+	response = &wwapiv1.VersionResponse{
+		ApiPrefix:       apiPrefix,
+		ApiVersion:      apiVersion,
 		WarewulfVersion: version.GetVersion(),
 	}
 	return
@@ -347,15 +340,15 @@ func (s *apiServer) Version(ctx context.Context, request *emptypb.Empty) (respon
 
 // nodeListInternal calls NodeList and returns NodeListResponse.
 // This does not contain parameter checks.
-func (s *apiServer) nodeListInternal(nodeNames []string) (response *wwapi.NodeListResponse, err error) {
+func (s *apiServer) nodeListInternal(nodeNames []string) (response *wwapiv1.NodeListResponse, err error) {
 
-	var nodes []*wwapi.NodeInfo
+	var nodes []*wwapiv1.NodeInfo
 	nodes, err = node.NodeList(nodeNames)
 	if err != nil {
 		return
 	}
 
-	response = &wwapi.NodeListResponse{
+	response = &wwapiv1.NodeListResponse{
 		Nodes: nodes,
 	}
 	return

@@ -4,23 +4,20 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
-	"log"
-	"time"
+	"fmt"
 	"io/ioutil"
-
-	wwapi "github.com/hpcng/warewulf/internal/pkg/api/routes/wwapiv1"
-
-	"google.golang.org/grpc"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
-	"google.golang.org/grpc/credentials"
-
-	"google.golang.org/grpc/credentials/insecure"
+	"log"
+	"path"
+	"time"
 
 	"github.com/hpcng/warewulf/internal/pkg/api/apiconfig"
-
+	"github.com/hpcng/warewulf/internal/pkg/api/routes/wwapiv1"
 	"github.com/hpcng/warewulf/internal/pkg/buildconfig"
-	"path"
-	"fmt"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // wwapic is intended as a sample wwapi client.
@@ -49,7 +46,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to load cacert. err: %s\n", err)
 		}
-		
+
 		// Put the CA cert into the cert pool.
 		certPool := x509.NewCertPool()
 		if !certPool.AppendCertsFromPEM(cacert) {
@@ -77,8 +74,7 @@ func main() {
 	}
 	defer conn.Close()
 
-	client := wwapi.NewWWApiClient(conn)
-
+	client := wwapiv1.NewWWApiClient(conn)
 	request := &emptypb.Empty{}
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
@@ -89,5 +85,5 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	log.Printf("Version Response: %v", response)
+	log.Printf("Version Response: %v\n", response)
 }

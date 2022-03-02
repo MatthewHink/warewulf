@@ -5,14 +5,14 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/hpcng/warewulf/internal/pkg/api/node"
 	"github.com/hpcng/warewulf/internal/pkg/wwlog"
-	wwapi "github.com/hpcng/warewulf/internal/pkg/api/node"
 	"github.com/spf13/cobra"
 )
 
 func CobraRunE(cmd *cobra.Command, args []string) (err error) {
 
-	nodeInfo, err := wwapi.NodeList(args)
+	nodeInfo, err := node.NodeList(args)
 	if err != nil {
 		wwlog.Printf(wwlog.ERROR, "Could not open node configuration: %s\n", err)
 		return

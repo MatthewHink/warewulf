@@ -1,4 +1,4 @@
-// Routes for wwapi.
+// Routes for the wwapi (WareWulf API).
 // TODO: Try protoc-gen-doc for generating documentation.
 
 syntax = "proto3";
@@ -27,6 +27,7 @@ message ContainerDeleteParameter {
 	repeated string containerNames = 1;
 }
 
+// ContainerImportParameter has all input for importing a container.
 message ContainerImportParameter{
 	string source = 1; // container source uri
 	string name = 2; // container name
@@ -36,20 +37,25 @@ message ContainerImportParameter{
 	bool default = 6;
 }
 
+// ContainerInfo has data on each container. This is emitted in the
+// ContainerListResponse.
 message ContainerInfo {
 	string name = 1;
 	bool built = 2;
 	uint32 nodeCount = 3;
 }
 
+// ContainerListResponse has all information that ContainerList provides.
 message ContainerListResponse {
 	repeated ContainerInfo containers = 1;
 }
 
+// ContainerShowParameter is the input for ContainerShow.
 message ContainerShowParameter {
 	string containerName = 1;
 }
 
+// ContainerShowResponse has all information emitted on ContainerShow.
 message ContainerShowResponse {
 	string Name = 1;
 	string Rootfs = 2;

@@ -72,7 +72,7 @@ message NodeNames {
 // NodeField contains data output on NodeList.
 message NodeField {
 	string source = 1;
-	string value = 2; // TODO: Variable name okay? Also this is weird since it could be a bool.
+	string value = 2; // TODO: Variable name okay?
 	string print = 3; // Empty values printed as -- in wwctl.
 }
 
@@ -283,7 +283,7 @@ service WWApi {
 	// NodeSet updates node fields for one or more nodes.
 	rpc NodeSet(NodeSetParameter) returns (NodeListResponse) {
 		option (google.api.http) = {
-			post: "/v1/nodeset" // TODO: This should be a patch.
+			post: "/v1/nodeset" // TODO: This should be a patch. Had trouble getting patch to work at all.
 			body: "*"
 		};
 	}

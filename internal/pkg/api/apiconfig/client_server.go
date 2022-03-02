@@ -17,8 +17,6 @@ type ClientServerConfig struct {
 }
 
 // NewClientServer loads the client config from the given configFilePath.
-// TODO: parameters will be oneof these:
-// path.Join(buildconfig.SYSCONFDIR(), "warewulf/wwapic.conf")
 func NewClientServer(configFilePath string) (config ClientServerConfig, err error) {
 
 	log.Printf("Loading api client server configuration from: %v\n", configFilePath)

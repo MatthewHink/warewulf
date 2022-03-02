@@ -515,7 +515,7 @@ type NodeField struct {
 	unknownFields protoimpl.UnknownFields
 
 	Source string `protobuf:"bytes,1,opt,name=source,proto3" json:"source,omitempty"`
-	Value  string `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"` // TODO: Variable name okay? Also this is weird since it could be a bool.
+	Value  string `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"` // TODO: Variable name okay?
 	Print  string `protobuf:"bytes,3,opt,name=print,proto3" json:"print,omitempty"` // Empty values printed as -- in wwctl.
 }
 

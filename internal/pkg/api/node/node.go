@@ -303,10 +303,10 @@ func NodeList(nodeNames []string) (nodeInfo []*wwapiv1.NodeInfo, err error) {
 			Print:  node.ContainerName.Print(),
 		}
 
-		ni.Kernel = &wwapiv1.NodeField{
-			Source: node.KernelVersion.Source(),
-			Value:  node.KernelVersion.Get(),
-			Print:  node.KernelVersion.Print(),
+		ni.KernelOverride = &wwapiv1.NodeField{
+			Source: node.KernelOverride.Source(),
+			Value:  node.KernelOverride.Get(),
+			Print:  node.KernelOverride.Print(),
 		}
 
 		ni.KernelArgs = &wwapiv1.NodeField{
@@ -545,9 +545,9 @@ func NodeSetParameterCheck(set *wwapiv1.NodeSetParameter, console bool) (nodeDB 
 			n.AssetKey.Set(set.AssetKey)
 		}
 
-		if set.Kernel != "" {
-			wwlog.Printf(wwlog.VERBOSE, "Node: %s, Setting kernel to: %s\n", n.Id.Get(), set.Kernel)
-			n.KernelVersion.Set(set.Kernel)
+		if set.KernelOverride != "" {
+			wwlog.Printf(wwlog.VERBOSE, "Node: %s, Setting kernel override to: %s\n", n.Id.Get(), set.KernelOverride)
+			n.KernelOverride.Set(set.KernelOverride)
 		}
 
 		if set.KernelArgs != "" {
@@ -609,6 +609,14 @@ func NodeSetParameterCheck(set *wwapiv1.NodeSetParameter, console bool) (nodeDB 
 		if set.IpmiInterface != "" {
 			wwlog.Printf(wwlog.VERBOSE, "Node: %s, Setting IPMI IP interface to: %s\n", n.Id.Get(), set.IpmiInterface)
 			n.IpmiInterface.Set(set.IpmiInterface)
+		}
+
+		if set.IpmiWrite == "yes" || set.Onboot == "y" || set.Onboot == "1" || set.Onboot == "true" {
+			wwlog.Printf(wwlog.VERBOSE, "Node: %s, Setting Ipmiwrite to %s\n", n.Id.Get(), set.IpmiWrite)
+			n.IpmiWrite.SetB(true)
+		} else {
+			wwlog.Printf(wwlog.VERBOSE, "Node: %s, Setting Ipmiwrite to %s\n", n.Id.Get(), set.IpmiWrite)
+			n.IpmiWrite.SetB(false)
 		}
 
 		if set.Discoverable {

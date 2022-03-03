@@ -13,7 +13,7 @@ func CobraRunE(cmd *cobra.Command, args []string) (err error) {
 	set := wwapiv1.NodeSetParameter{
 		Comment:        SetComment,
 		Container:      SetContainer,
-		Kernel:         SetKernel,
+		KernelOverride: SetKernelOverride,
 		KernelArgs:     SetKernelArgs,
 		Netname:        SetNetName,
 		Netdev:         SetNetDev,
@@ -50,6 +50,7 @@ func CobraRunE(cmd *cobra.Command, args []string) (err error) {
 		TagsDelete:     SetDelTags,
 		AssetKey:       SetAssetKey,
 		NodeNames:      args,
+		IpmiWrite:      SetIpmiWrite,
 	}
 
 	if !SetYes {

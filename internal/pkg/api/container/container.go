@@ -271,15 +271,17 @@ func ContainerList() (containerInfo []*wwapiv1.ContainerInfo, err error) {
 	}
 
 	for _, source := range sources {
-		image := container.ImageFile(source)
-
 		if nodemap[source] == 0 {
 			nodemap[source] = 0
 		}
+
+		wwlog.Printf(wwlog.DEBUG, "Finding kernel version for: %s\n", source)
+		kernelVersion := container.KernelVersion(source)
+
 		containerInfo = append(containerInfo, &wwapiv1.ContainerInfo{
-			Name:      source,
-			Built:     util.IsFile(image),
-			NodeCount: uint32(nodemap[source]),
+			Name:          source,
+			NodeCount:     uint32(nodemap[source]),
+			KernelVersion: kernelVersion,
 		})
 	}
 	return

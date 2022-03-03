@@ -33,7 +33,7 @@ func CobraRunE(cmd *cobra.Command, args []string) (err error) {
 			fmt.Printf("%-20s %-18s %-12s %s\n", nodeName, "Discoverable", ni.Discoverable.Source, ni.Discoverable.Print)
 
 			fmt.Printf("%-20s %-18s %-12s %s\n", nodeName, "Container", ni.Container.Source, ni.Container.Print)
-			fmt.Printf("%-20s %-18s %-12s %s\n", nodeName, "Kernel", ni.Kernel.Source, ni.Kernel.Print)
+			fmt.Printf("%-20s %-18s %-12s %s\n", nodeName, "KernelOverride", ni.KernelOverride.Source, ni.KernelOverride.Print)
 			fmt.Printf("%-20s %-18s %-12s %s\n", nodeName, "KernelArgs", ni.KernelArgs.Source, ni.KernelArgs.Print)
 			fmt.Printf("%-20s %-18s %-12s %s\n", nodeName, "SystemOverlay", ni.SystemOverlay.Source, ni.SystemOverlay.Print)
 			fmt.Printf("%-20s %-18s %-12s %s\n", nodeName, "RuntimeOverlay", ni.RuntimeOverlay.Source, ni.RuntimeOverlay.Print)
@@ -92,14 +92,14 @@ func CobraRunE(cmd *cobra.Command, args []string) (err error) {
 		}
 
 	} else if ShowLong {
-		fmt.Printf("%-22s %-26s %-35s %s\n", "NODE NAME", "KERNEL", "CONTAINER", "OVERLAYS (S/R)")
+		fmt.Printf("%-22s %-26s %-35s %s\n", "NODE NAME", "KERNEL OVERRIDE", "CONTAINER", "OVERLAYS (S/R)")
 		fmt.Println(strings.Repeat("=", 120))
 
 		for i := 0; i < len(nodeInfo); i++ {
 			ni := nodeInfo[i]
 			nodeName := ni.Id.Value
 
-			fmt.Printf("%-22s %-26s %-35s %s\n", nodeName, ni.Kernel.Print, ni.Container.Print, ni.SystemOverlay.Print+"/"+ni.RuntimeOverlay.Print)
+			fmt.Printf("%-22s %-26s %-35s %s\n", nodeName, ni.KernelOverride.Print, ni.Container.Print, ni.SystemOverlay.Print+"/"+ni.RuntimeOverlay.Print)
 		}
 
 	} else {

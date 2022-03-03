@@ -9,7 +9,6 @@ package wwapi.v1;
 
 import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
-import "google/protobuf/field_mask.proto";
 
 // Container
 
@@ -41,8 +40,8 @@ message ContainerImportParameter{
 // ContainerListResponse.
 message ContainerInfo {
 	string name = 1;
-	bool built = 2;
-	uint32 nodeCount = 3;
+	uint32 nodeCount = 2;
+	string kernelVersion = 3;
 }
 
 // ContainerListResponse has all information that ContainerList provides.
@@ -95,7 +94,7 @@ message NodeInfo {
 	NodeField cluster = 3;
 	NodeField discoverable = 4;
 	NodeField container = 5;
-	NodeField kernel =  6;
+	NodeField kernelOverride =  6;
 	NodeField kernelArgs = 7;
 	NodeField systemOverlay = 8;
 	NodeField runtimeOverlay = 9;
@@ -151,7 +150,7 @@ message NodeDeleteParameter {
 message NodeSetParameter {
 	string comment = 1;
 	string container = 2;
-	string kernel = 3;
+	string kernelOverride = 3;
 	string kernelArgs = 4;
 	string netname = 5;
 	string netdev = 6;
@@ -188,6 +187,7 @@ message NodeSetParameter {
 	repeated string tagsDelete = 37;
 	string assetKey = 38;
 	repeated string nodeNames = 39;
+	string ipmiWrite = 40;
 }
 
 // NodeStatus contains information about the imaging status per node.

@@ -16,12 +16,12 @@ func CobraRunE(cmd *cobra.Command, args []string) (err error) {
 		return
 	}
 
-	fmt.Printf("%-35s %-6s %-6s\n", "CONTAINER NAME", "BUILT", "NODES")
+	fmt.Printf("%-25s %-6s %-6s\n", "CONTAINER NAME", "NODES", "KERNEL VERSION")
 	for i := 0; i < len(containerInfo); i++ {
-		fmt.Printf("%-35s %-6t %-6d\n",
+		fmt.Printf("%-25s %-6d %-6s\n",
 			containerInfo[i].Name,
-			containerInfo[i].Built,
-			containerInfo[i].NodeCount)
+			containerInfo[i].NodeCount,
+			containerInfo[i].KernelVersion)
 	}
 	return
 }

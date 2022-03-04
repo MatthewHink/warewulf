@@ -51,7 +51,6 @@ func CobraRunE(cmd *cobra.Command, args []string) (err error) {
 		AssetKey:       SetAssetKey,
 		NodeNames:      args,
 		IpmiWrite:      SetIpmiWrite,
->>>>>>> e0bdf3b... wwapi preview
 	}
 
 	if !SetYes {

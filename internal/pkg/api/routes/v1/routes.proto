@@ -84,7 +84,7 @@ message NetDev {
 	NodeField gateway = 5;
 	NodeField type = 6;
 	NodeField onboot = 7;
-	NodeField default = 8;
+	NodeField primary = 8;
 }
 
 // NodeInfo contains details about a node managed by Warewulf/

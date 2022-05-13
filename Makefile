@@ -245,6 +245,15 @@ dist: vendor config
 	cd .dist; tar -czf ../$(WAREWULF)-$(VERSION).tar.gz $(WAREWULF)-$(VERSION)
 	rm -rf .dist
 
+#TODO: Christian has a commit to fix up this part of the Makefile. We should take it.
+proto: ## wwapi generate code from protobuf. Not under make all. Requires protoc to generate code.
+	protoc -I internal/pkg/api/routes/v1 -I=. \
+		--grpc-gateway_out=. \
+		--grpc-gateway_opt logtostderr=true \
+		--go_out=. \
+		--go-grpc_out=. \
+		routes.proto
+
 clean:
 	rm -f wwclient
 	rm -f wwctl

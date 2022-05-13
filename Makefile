@@ -246,6 +246,7 @@ dist: vendor config
 	rm -rf .dist
 
 #TODO: Christian has a commit to fix up this part of the Makefile. We should take it.
+#TODO: proc install and protoc-gen-grpc-gateway need to be in the docs.
 proto: ## wwapi generate code from protobuf. Not under make all. Requires protoc to generate code.
 	protoc -I internal/pkg/api/routes/v1 -I=. \
 		--grpc-gateway_out=. \

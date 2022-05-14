@@ -1,24 +1,25 @@
 package node
 
 import (
-	//"encoding/json"
-	//"fmt"
-	//"net/http"
-	//"os"
+	"encoding/json"
+	"fmt"
+	"net"
+	"net/http"
+	"os"
 	"strconv"
-	//"strings"
+	"strings"
 
 	"github.com/hpcng/warewulf/internal/pkg/api/routes/wwapiv1"
 	"github.com/hpcng/warewulf/internal/pkg/node"
+	"github.com/hpcng/warewulf/internal/pkg/util"
+	"github.com/hpcng/warewulf/internal/pkg/warewulfconf"
+	"github.com/hpcng/warewulf/internal/pkg/wwlog"
 	"github.com/hpcng/warewulf/pkg/hostlist"
-	//"github.com/hpcng/warewulf/internal/pkg/util"
-	//"github.com/hpcng/warewulf/internal/pkg/warewulfconf"
-	//"github.com/hpcng/warewulf/internal/pkg/warewulfd"
-	//"github.com/hpcng/warewulf/internal/pkg/wwlog"
-	//"github.com/hpcng/warewulf/pkg/hostlist"
+	"github.com/pkg/errors"
+
+	"github.com/hpcng/warewulf/internal/pkg/warewulfd"
 )
 
-/*
 // NodeAdd adds nodes for management by Warewulf.
 func NodeAdd(nap *wwapiv1.NodeAddParameter) (err error) {
 
@@ -142,6 +143,19 @@ func NodeAdd(nap *wwapiv1.NodeAddParameter) (err error) {
 			n.NetDevs[nap.Netname].Type.Set(nap.Type)
 		}
 
+		if nap.Ipaddr6 != "" {
+			if nap.Netname == "" {
+				return errors.New("you must include the '--netname' option")
+			}
+			if _, ok := n.NetDevs[nap.Netname]; !ok {
+				return errors.New("network device does not exist: " + nap.Netname)
+			}
+			// just check if address is a valid ipv6 CIDR address
+			if _, _, err := net.ParseCIDR(nap.Ipaddr6); err != nil {
+				return errors.New(fmt.Sprintf("%s is not a valid ipv6 address in CIDR notation\n", nap.Ipaddr6))
+			}
+		}
+
 		if nap.Discoverable {
 			wwlog.Printf(wwlog.VERBOSE, "Node: %s, Setting node to discoverable\n", n.Id.Get())
 
@@ -248,8 +262,6 @@ func NodeDeleteParameterCheck(ndp *wwapiv1.NodeDeleteParameter, console bool) (n
 	}
 	return
 }
-
-*/
 
 // NodeList lists all to none of the nodes managed by Warewulf.
 func NodeList(nodeNames []string) (nodeInfo []*wwapiv1.NodeInfo, err error) {
@@ -453,7 +465,6 @@ func NodeList(nodeNames []string) (nodeInfo []*wwapiv1.NodeInfo, err error) {
 	return
 }
 
-/*
 // NodeSet is the wwapiv1 implmentation for updating node fields.
 func NodeSet(set *wwapiv1.NodeSetParameter) (err error) {
 
@@ -476,7 +487,7 @@ func NodeSet(set *wwapiv1.NodeSetParameter) (err error) {
 func NodeSetParameterCheck(set *wwapiv1.NodeSetParameter, console bool) (nodeDB node.NodeYaml, nodeCount uint, err error) {
 
 	if set == nil {
-		err = fmt.Errorf("Node set parameter is null")
+		err = fmt.Errorf("Node set parameter is nil")
 		if console {
 			fmt.Printf("%v\n", err)
 			return
@@ -484,14 +495,14 @@ func NodeSetParameterCheck(set *wwapiv1.NodeSetParameter, console bool) (nodeDB 
 	}
 
 	if set.NodeNames == nil {
-		err = fmt.Errorf("Node set parameter: NodeNames is null")
+		err = fmt.Errorf("Node set parameter: NodeNames is nil")
 		if console {
 			fmt.Printf("%v\n", err)
 			return
 		}
 	}
 
-	var setProfiles []string // TODO: Look at this. Is there an issue here?
+	var setProfiles []string
 	nodeDB, err = node.New()
 	if err != nil {
 		wwlog.Printf(wwlog.ERROR, "Could not open node configuration: %s\n", err)
@@ -551,12 +562,12 @@ func NodeSetParameterCheck(set *wwapiv1.NodeSetParameter, console bool) (nodeDB 
 
 		if set.KernelOverride != "" {
 			wwlog.Printf(wwlog.VERBOSE, "Node: %s, Setting kernel override to: %s\n", n.Id.Get(), set.KernelOverride)
-			n.KernelOverride.Set(set.KernelOverride)
+			n.Kernel.Override.Set(set.KernelOverride)
 		}
 
 		if set.KernelArgs != "" {
 			wwlog.Printf(wwlog.VERBOSE, "Node: %s, Setting kernel args to: %s\n", n.Id.Get(), set.KernelArgs)
-			n.KernelArgs.Set(set.KernelArgs)
+			n.Kernel.Args.Set(set.KernelArgs)
 		}
 
 		if set.Cluster != "" {
@@ -582,45 +593,45 @@ func NodeSetParameterCheck(set *wwapiv1.NodeSetParameter, console bool) (nodeDB 
 		if set.IpmiIpaddr != "" {
 			newIpaddr := util.IncrementIPv4(set.IpmiIpaddr, nodeCount)
 			wwlog.Printf(wwlog.VERBOSE, "Node: %s, Setting IPMI IP address to: %s\n", n.Id.Get(), newIpaddr)
-			n.IpmiIpaddr.Set(newIpaddr)
+			n.Ipmi.Ipaddr.Set(newIpaddr)
 		}
 
 		if set.IpmiNetmask != "" {
 			wwlog.Printf(wwlog.VERBOSE, "Node: %s, Setting IPMI netmask to: %s\n", n.Id.Get(), set.IpmiNetmask)
-			n.IpmiNetmask.Set(set.IpmiNetmask)
+			n.Ipmi.Netmask.Set(set.IpmiNetmask)
 		}
 
 		if set.IpmiPort != "" {
 			wwlog.Printf(wwlog.VERBOSE, "Node: %s, Setting IPMI port to: %s\n", n.Id.Get(), set.IpmiPort)
-			n.IpmiPort.Set(set.IpmiPort)
+			n.Ipmi.Port.Set(set.IpmiPort)
 		}
 
 		if set.IpmiGateway != "" {
 			wwlog.Printf(wwlog.VERBOSE, "Node: %s, Setting IPMI gateway to: %s\n", n.Id.Get(), set.IpmiGateway)
-			n.IpmiGateway.Set(set.IpmiGateway)
+			n.Ipmi.Gateway.Set(set.IpmiGateway)
 		}
 
 		if set.IpmiUsername != "" {
 			wwlog.Printf(wwlog.VERBOSE, "Node: %s, Setting IPMI IP username to: %s\n", n.Id.Get(), set.IpmiUsername)
-			n.IpmiUserName.Set(set.IpmiUsername)
+			n.Ipmi.UserName.Set(set.IpmiUsername)
 		}
 
 		if set.IpmiPassword != "" {
 			wwlog.Printf(wwlog.VERBOSE, "Node: %s, Setting IPMI IP password to: %s\n", n.Id.Get(), set.IpmiPassword)
-			n.IpmiPassword.Set(set.IpmiPassword)
+			n.Ipmi.Password.Set(set.IpmiPassword)
 		}
 
 		if set.IpmiInterface != "" {
 			wwlog.Printf(wwlog.VERBOSE, "Node: %s, Setting IPMI IP interface to: %s\n", n.Id.Get(), set.IpmiInterface)
-			n.IpmiInterface.Set(set.IpmiInterface)
+			n.Ipmi.Interface.Set(set.IpmiInterface)
 		}
 
 		if set.IpmiWrite == "yes" || set.Onboot == "y" || set.Onboot == "1" || set.Onboot == "true" {
 			wwlog.Printf(wwlog.VERBOSE, "Node: %s, Setting Ipmiwrite to %s\n", n.Id.Get(), set.IpmiWrite)
-			n.IpmiWrite.SetB(true)
+			n.Ipmi.Write.SetB(true)
 		} else {
 			wwlog.Printf(wwlog.VERBOSE, "Node: %s, Setting Ipmiwrite to %s\n", n.Id.Get(), set.IpmiWrite)
-			n.IpmiWrite.SetB(false)
+			n.Ipmi.Write.SetB(false)
 		}
 
 		if set.Discoverable {
@@ -668,7 +679,7 @@ func NodeSetParameterCheck(set *wwapiv1.NodeSetParameter, console bool) (nodeDB 
 			set.Onboot = "yes"
 
 			for _, n := range n.NetDevs {
-				if n.Default.GetB() {
+				if n.Primary.GetB() {
 					def = false
 				}
 			}
@@ -766,14 +777,14 @@ func NodeSetParameterCheck(set *wwapiv1.NodeSetParameter, console bool) (nodeDB 
 
 				// Set all other devices to non-default
 				for _, n := range n.NetDevs {
-					n.Default.SetB(false)
+					n.Primary.SetB(false)
 				}
 
-				wwlog.Printf(wwlog.VERBOSE, "Node: %s:%s, Setting DEFAULT\n", n.Id.Get(), set.Netname)
-				n.NetDevs[set.Netname].Default.SetB(true)
+				wwlog.Printf(wwlog.VERBOSE, "Node: %s:%s, Setting PRIMARY\n", n.Id.Get(), set.Netname)
+				n.NetDevs[set.Netname].Primary.SetB(true)
 			} else {
-				wwlog.Printf(wwlog.VERBOSE, "Node: %s:%s, Unsetting DEFAULT\n", n.Id.Get(), set.Netname)
-				n.NetDevs[set.Netname].Default.SetB(false)
+				wwlog.Printf(wwlog.VERBOSE, "Node: %s:%s, Unsetting PRIMARY\n", n.Id.Get(), set.Netname)
+				n.NetDevs[set.Netname].Primary.SetB(false)
 			}
 		}
 
@@ -946,4 +957,3 @@ func nodeDbSave(nodeDB *node.NodeYaml) (err error) {
 	}
 	return
 }
-*/

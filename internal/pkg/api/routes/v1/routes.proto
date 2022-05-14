@@ -136,6 +136,7 @@ message NodeAddParameter {
 	string netname = 8;
 	string type = 9;
 	repeated string nodeNames = 10;
+	string ipaddr6 = 11;
 }
 
 // NodeDeleteParameter contains input for removing nodes from Warewulf

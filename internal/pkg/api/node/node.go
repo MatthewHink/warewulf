@@ -580,14 +580,14 @@ func NodeSetParameterCheck(set *wwapiv1.NodeSetParameter, console bool) (nodeDB 
 			n.Ipxe.Set(set.Ipxe)
 		}
 
-		if set.RuntimeOverlay != "" {
+		if len(set.RuntimeOverlay) != 0 {
 			wwlog.Printf(wwlog.VERBOSE, "Node: %s, Setting runtime overlay to: %s\n", n.Id.Get(), set.RuntimeOverlay)
-			n.RuntimeOverlay.Set(set.RuntimeOverlay)
+			n.RuntimeOverlay.SetSlice(set.RuntimeOverlay)
 		}
 
-		if set.SystemOverlay != "" {
+		if len(set.SystemOverlay) != 0 {
 			wwlog.Printf(wwlog.VERBOSE, "Node: %s, Setting system overlay to: %s\n", n.Id.Get(), set.SystemOverlay)
-			n.SystemOverlay.Set(set.SystemOverlay)
+			n.SystemOverlay.SetSlice(set.SystemOverlay)
 		}
 
 		if set.IpmiIpaddr != "" {

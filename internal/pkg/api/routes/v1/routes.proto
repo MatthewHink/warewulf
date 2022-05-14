@@ -173,8 +173,8 @@ message NodeSetParameter {
 	string cluster = 15;
 	string ipxe = 16;
 	string initOverlay = 17;
-	string runtimeOverlay = 18;
-	string systemOverlay = 19;
+	repeated string runtimeOverlay = 18;
+	repeated string systemOverlay = 19;
 	string ipmiIpaddr = 20;
 	string ipmiNetmask = 21;
 	string ipmiPort = 22;

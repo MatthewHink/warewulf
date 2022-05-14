@@ -255,6 +255,22 @@ proto: ## wwapi generate code from protobuf. Not under make all. Requires protoc
 		--go-grpc_out=. \
 		routes.proto
 
+wwapid: ## Build the grpc api server. TODO: not under make all.
+	go build -race -ldflags "-s -w" -o ./wwapid internal/app/api/wwapid/wwapid.go
+
+wwapic: ## Build the sample wwapi client. TODO: not under make all.
+	go build -race -ldflags "-s -w" -o ./wwapic  internal/app/api/wwapic/wwapic.go
+
+wwapird: ## Build the rest api server (revese proxy to the grpc api server). TODO: Not under make all.
+	go build -race -ldflags "-s -w" -o ./wwapird internal/app/api/wwapird/wwapird.gowwapid: ## Build the grpc api server. TODO: not under make all.
+	go build -race -ldflags "-s -w" -o ./wwapid internal/app/api/wwapid/wwapid.go
+
+wwapic: ## Build the sample wwapi client. TODO: not under make all.
+	go build -race -ldflags "-s -w" -o ./wwapic  internal/app/api/wwapic/wwapic.go
+
+wwapird: ## Build the rest api server (revese proxy to the grpc api server). TODO: Not under make all.
+	go build -race -ldflags "-s -w" -o ./wwapird internal/app/api/wwapird/wwapird.go
+
 clean:
 	rm -f wwclient
 	rm -f wwctl

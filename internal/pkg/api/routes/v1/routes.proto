@@ -34,6 +34,7 @@ message ContainerImportParameter{
 	bool update = 4;
 	bool build = 5;
 	bool default = 6;
+	bool syncUser = 7;
 }
 
 // ContainerInfo has data on each container. This is emitted in the
@@ -59,6 +60,12 @@ message ContainerShowResponse {
 	string Name = 1;
 	string Rootfs = 2;
 	repeated string Nodes = 3;
+	string KernelVersion = 4;
+}
+
+// ContainerSyncUserParameter is the input for ContainerSyncUser.
+message ContainerSyncUserParameter {
+	string containerName = 1;
 }
 
 // Nodes

@@ -564,34 +564,21 @@ type FileInfo struct {
 // Get all the files as a FileInfo slice for a given overlay.
 func OverlayGetFiles(name string) (files []FileInfo, err error) {
 	baseDir := GetOverlay(name).Rootfs()
-	wwlog.Warn("baseDir %s", baseDir) // TODO: Log level
 	if !util.IsDir(baseDir) {
-		wwlog.Warn("overlay %s doesn't exist", name) // TODO: Log level
 		err = fmt.Errorf("overlay %s doesn't exist", name)
 		return
 	}
-	//wwlog.Warn("os.Stat path %s", path) // TODO: Log level
-	//wwlog.Warn("os.Stat info %s", info) // TODO: Log level
-	//wwlog.Warn("os.Stat err %s", err)   // TODO: Log level
 	err = filepath.Walk(baseDir, func(path string, info fs.FileInfo, err error) error {
-		wwlog.Warn("os.Stat path %s", path) // TODO: Log level
-		wwlog.Warn("os.Stat info %s", info) // TODO: Log level
-		wwlog.Warn("os.Stat err %s", err)   // TODO: Log level
 		if util.IsFile(path) {
 			filename := strings.TrimPrefix(path, baseDir)
 
 			s, err := os.Stat(path)
 			if err != nil {
-				//wwlog.Error("os.Stat error %s: %s: %w", name, path, err)
-				wwlog.Warn("os.Stat path %s", path) // TODO: Log level
-				wwlog.Warn("os.Stat info %s", info) // TODO: Log level
-				wwlog.Warn("os.Stat err %s", err)   // TODO: Log level
-				// error is logged and continue, get what we can
-				// return???
+				wwlog.Warn("os.Stat err %w", err)
+				// error is logged, continue walking, get what we can
 				return nil
 			}
 
-			wwlog.Warn("os.Stat path %s", path) // TODO: Log level
 			fileMode := s.Mode()
 			Perms := fileMode & os.ModePerm
 

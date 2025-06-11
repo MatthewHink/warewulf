@@ -569,15 +569,21 @@ func OverlayGetFiles(name string) (files []FileInfo, err error) {
 		return
 	}
 	err = filepath.Walk(baseDir, func(path string, info fs.FileInfo, err error) error {
+		wwlog.Warn("os.Stat path %s", path) // TODO: Log level
+		wwlog.Warn("os.Stat info %s", info) // TODO: Log level
+		wwlog.Warn("os.Stat err %s", err) // TODO: Log level
 		if util.IsFile(path) {
 			filename := strings.TrimPrefix(path, baseDir)
 
 			s, err := os.Stat(path)
 			if err != nil {
-				wwlog.Warn("os.Stat error %s: %s: %w", name, path, err)
-				// error is logged and ignored, get what we can
+				wwlog.Error("os.Stat error %s: %s: %w", name, path, err)
+				// error is logged and continue, get what we can
+				// return???
+				return nil
 			}
 
+			wwlog.Warn("os.Stat path %s", path) // TODO: Log level
 			fileMode := s.Mode()
 			Perms := fileMode & os.ModePerm
 

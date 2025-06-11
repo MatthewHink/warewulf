@@ -42,7 +42,8 @@ func TestOverlayAPI(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NoError(t, resp.Body.Close())
 
-		assert.JSONEq(t, `{"testoverlay":{"files":["/email.ww"], "site":false}}`, string(body))
+		//assert.JSONEq(t, `{"testoverlay":{"files":["/email.ww"], "site":false}}`, string(body))
+		assert.JSONEq(t, `{"testoverlay":{"files":[{"gid":1000, "name":"/email.ww", "perms":420, "uid":1000}], "site":false}}`, string(body))
 	})
 
 	t.Run("get one specific overlay", func(t *testing.T) {
@@ -58,7 +59,8 @@ func TestOverlayAPI(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NoError(t, resp.Body.Close())
 
-		assert.JSONEq(t, `{"files":["/email.ww"], "site":false}`, string(body))
+		//assert.JSONEq(t, `{"files":["/email.ww"], "site":false}`, string(body))
+		assert.JSONEq(t, `{"files":[{"gid":1000, "name":"/email.ww", "perms":420, "uid":1000}], "site":false}`, string(body))
 	})
 
 	t.Run("get overlay file", func(t *testing.T) {
@@ -102,7 +104,7 @@ func TestOverlayAPI(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NoError(t, resp.Body.Close())
 
-		assert.JSONEq(t, `{"test":{"files":null, "site":true},"testoverlay":{"files":["/email.ww"], "site":false}}`, string(body))
+		assert.JSONEq(t, `{"test":{"files":null, "site":true},"testoverlay":{"files":[{"gid":1000, "name":"/email.ww", "perms":420, "uid":1000}], "site":false}}`, string(body))
 	})
 
 	t.Run("test delete overlays", func(t *testing.T) {

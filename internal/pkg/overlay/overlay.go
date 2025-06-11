@@ -11,6 +11,7 @@ import (
 	"regexp"
 	"strings"
 	"sync"
+	"syscall"
 	"text/template"
 
 	"github.com/Masterminds/sprig/v3"
@@ -553,8 +554,15 @@ func ScanLines(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	return 0, nil, nil
 }
 
-// Get all the files as a string slice for a given overlay
-func OverlayGetFiles(name string) (files []string, err error) {
+type FileInfo struct {
+	Name  string      `json:"name"`
+	Perms os.FileMode `json:"perms"`
+	Uid   uint32      `json:"uid"`
+	Gid   uint32      `json:"gid"`
+}
+
+// Get all the files as a FileInfo slice for a given overlay.
+func OverlayGetFiles(name string) (files []FileInfo, err error) {
 	baseDir := GetOverlay(name).Rootfs()
 	if !util.IsDir(baseDir) {
 		err = fmt.Errorf("overlay %s doesn't exist", name)
@@ -562,7 +570,27 @@ func OverlayGetFiles(name string) (files []string, err error) {
 	}
 	err = filepath.Walk(baseDir, func(path string, info fs.FileInfo, err error) error {
 		if util.IsFile(path) {
-			files = append(files, strings.TrimPrefix(path, baseDir))
+			filename := strings.TrimPrefix(path, baseDir)
+
+			s, err := os.Stat(path)
+			if err != nil {
+				wwlog.Warn("os.Stat error %s: %s: %w", name, path, err)
+				// error is logged and ignored, get what we can
+			}
+
+			fileMode := s.Mode()
+			Perms := fileMode & os.ModePerm
+
+			sys := s.Sys()
+			uid := sys.(*syscall.Stat_t).Uid
+			gid := sys.(*syscall.Stat_t).Gid
+
+			files = append(files, FileInfo{
+				Name:  filename,
+				Perms: Perms,
+				Uid:   uid,
+				Gid:   gid,
+			})
 		}
 		return nil
 	})

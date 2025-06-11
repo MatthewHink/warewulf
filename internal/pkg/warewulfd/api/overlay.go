@@ -16,13 +16,14 @@ import (
 )
 
 type OverlayResponse struct {
-	Files []string `json:"files"`
-	Site  bool     `json:"site"`
+	Files []overlay.FileInfo `json:"files"`
+	Site  bool               `json:"site"`
 }
 
+// func NewOverlayResponse(name string) *OverlayResponse {
 func NewOverlayResponse(name string) *OverlayResponse {
 	o := new(OverlayResponse)
-	o.Files = []string{}
+	o.Files = []overlay.FileInfo{}
 	if files, err := overlay.OverlayGetFiles(name); err == nil {
 		o.Files = files
 	}

@@ -90,7 +90,11 @@ func OverlayList(cmd *cobra.Command, args []string, toComplete string) ([]string
 
 func OverlayFiles(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	ret, _ := overlay.OverlayGetFiles(args[0])
-	return ret, cobra.ShellCompDirectiveNoFileComp
+	names := []string{}
+	for _, x := range ret {
+		names = append(names, x.Name)
+	}
+	return names, cobra.ShellCompDirectiveNoFileComp
 }
 
 func OverlayAndFiles(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {

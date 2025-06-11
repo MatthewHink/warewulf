@@ -571,7 +571,7 @@ func OverlayGetFiles(name string) (files []FileInfo, err error) {
 	err = filepath.Walk(baseDir, func(path string, info fs.FileInfo, err error) error {
 		wwlog.Warn("os.Stat path %s", path) // TODO: Log level
 		wwlog.Warn("os.Stat info %s", info) // TODO: Log level
-		wwlog.Warn("os.Stat err %s", err) // TODO: Log level
+		wwlog.Warn("os.Stat err %s", err)   // TODO: Log level
 		if util.IsFile(path) {
 			filename := strings.TrimPrefix(path, baseDir)
 
